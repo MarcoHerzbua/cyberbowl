@@ -4,7 +4,7 @@
 #include "CooldownComponent.h"
 #include "TimerManager.h"
 
-#include "CyberbowlCharacter.generated.h"
+#include "Cyberbowl/CyberbowlCharacter.h"
 
 // Sets default values for this component's properties
 UCooldownComponent::UCooldownComponent()
@@ -23,11 +23,15 @@ void UCooldownComponent::StartCooldown(FString ability)
 	{
 		DashReady = false;
 		GetWorld()->GetTimerManager().SetTimer(DashCooldownHandle, this, &UCooldownComponent::SetDashReady, TotalDashCooldown, false);
+
+		DashCooldownStarted.Broadcast();
 	}
 	else if (ability == "Ult")
 	{
 		UltReady = false;
 		GetWorld()->GetTimerManager().SetTimer(UltCooldownHandle, this, &UCooldownComponent::SetUltReady, TotalUltCooldown, false);
+	
+		UltCooldownStarted.Broadcast();
 	}
 }
 
@@ -43,11 +47,13 @@ void UCooldownComponent::BeginPlay()
 void UCooldownComponent::SetDashReady()
 {
 	DashReady = true;
+	DashCooldownFinished.Broadcast();
 }
 
 void UCooldownComponent::SetUltReady()
 {
 	UltReady = true;
+	UltCooldownFinished.Broadcast();
 }
 
 
