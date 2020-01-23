@@ -52,7 +52,8 @@ SourceArt/**/*.tga
 
 # Binary Files
 Binaries/*
-Plugins/*/Binaries/*
+!Plugins/*/Binaries/*/*
+!Plugins/FMODStudio/Binaries/*/*
 
 # Builds
 Build/*
@@ -90,5 +91,7 @@ Build/Android/res/*
 !Build/Android/res/*/
 Build/Android/res/*/*
 !Build/Android/res/*/*.png
+
+
 
 # End of https://www.gitignore.io/api/unrealengine
