@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "CyberbowlCharacter.generated.h"
 
+
+
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter
 {
@@ -28,6 +30,7 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
 
 protected:
 

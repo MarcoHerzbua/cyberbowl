@@ -6,6 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "CooldownComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashCooldownStarted);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashCooldownFinished);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUltCooldownStarted);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUltCooldownFinished);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CYBERBOWL_API UCooldownComponent : public UActorComponent
@@ -16,6 +20,17 @@ public:
 	// Sets default values for this component's properties
 	UCooldownComponent();
 
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnDashCooldownStarted DashCooldownStarted;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnDashCooldownFinished DashCooldownFinished;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnUltCooldownStarted UltCooldownStarted;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnUltCooldownFinished UltCooldownFinished;
 
 protected:
 	// Called when the game starts
