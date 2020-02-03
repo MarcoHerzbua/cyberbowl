@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayBall.h"
+#include "Actors/PlayBall.h"
 
 // Sets default values
 APlayBall::APlayBall()

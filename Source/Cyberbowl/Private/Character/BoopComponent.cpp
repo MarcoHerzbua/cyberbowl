@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BoopComponent.h"
+#include "Character/BoopComponent.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
-#include "Cyberbowl/Actors/PlayBall.h"
+#include "Actors/PlayBall.h"
 
 // Sets default values for this component's properties
 UBoopComponent::UBoopComponent()
