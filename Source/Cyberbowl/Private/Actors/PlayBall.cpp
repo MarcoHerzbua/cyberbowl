@@ -32,3 +32,9 @@ void APlayBall::Tick(float DeltaTime)
 
 }
 
+void APlayBall::PushBall(float force, FVector direction)
+{
+	BallStaticMesh->ComponentVelocity = FVector(0);
+	BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
+}
+
