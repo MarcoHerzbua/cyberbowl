@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/InputComponent.h"
 #include "BoopComponent.generated.h"
 
 
@@ -12,14 +13,30 @@ class CYBERBOWL_API UBoopComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
+	float Range = 500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
+	float BoxWidth = 250.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
+	float BoxHeight = 250.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
+	float Force = 5000.f;
+
 	UBoopComponent();
 
 protected:
-	// Called when the game starts
+	AActor* Owner;
+	UInputComponent* InputComponent;
+	APlayerController* PlayerController;
+	
 	virtual void BeginPlay() override;
-
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
+	void StartBoop();
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

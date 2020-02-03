@@ -29,4 +29,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void PushBall(float force, FVector direction);
 };
