@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayBall.h"
+#include "Actors/PlayBall.h"
 
 // Sets default values
 APlayBall::APlayBall()
@@ -30,5 +30,11 @@ void APlayBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APlayBall::PushBall(float force, FVector direction)
+{
+	BallStaticMesh->ComponentVelocity = FVector(0);
+	BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
 }
 
