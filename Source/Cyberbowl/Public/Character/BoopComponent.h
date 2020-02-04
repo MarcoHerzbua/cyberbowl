@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/InputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "BoopComponent.generated.h"
 
 
@@ -26,12 +27,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
 	float Force = 5000.f;
 
+	//Defines how much the ball is pushed upwards when the character is on the ground running
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
+	float UpwardsAngle = 20.f;
+
 	UBoopComponent();
 
 protected:
 	AActor* Owner;
 	UInputComponent* InputComponent;
 	APlayerController* PlayerController;
+	UCharacterMovementComponent* MovementComponent;
 	
 	virtual void BeginPlay() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
