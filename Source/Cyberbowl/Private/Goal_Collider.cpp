@@ -16,7 +16,10 @@ void AGoal_Collider::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//APoints::GetBall();
+	if (ball)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ball is set!"));
+	}
 	
 }
 

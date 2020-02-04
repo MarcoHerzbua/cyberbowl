@@ -25,8 +25,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* goal_collider_team1;
 
-	AActor* GetBall() { return ball; };
-
 private:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
