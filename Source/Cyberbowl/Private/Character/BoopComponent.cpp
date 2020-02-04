@@ -23,6 +23,8 @@ void UBoopComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	Owner = GetOwner();
+
+	MovementComponent = Owner->FindComponentByClass<UCharacterMovementComponent>();
 }
 
 void UBoopComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -53,7 +55,12 @@ void UBoopComponent::StartBoop()
 		auto ball = Cast<APlayBall>(hit.Actor);
 		if(ball)
 		{
-			ball->PushBall(Force, cameraForwardVec);
+			FVector direction = cameraForwardVec;
+			if(MovementComponent->MovementMode == EMovementMode::MOVE_Walking)
+			{
+				direction = direction.RotateAngleAxis(UpwardsAngle, FVector(1, 0, 0));
+			}
+			ball->PushBall(Force, direction);
 		}
 	}
 
