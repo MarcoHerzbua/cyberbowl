@@ -23,6 +23,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* ball;
+
+private:
+	APoints* points;
 
 };
