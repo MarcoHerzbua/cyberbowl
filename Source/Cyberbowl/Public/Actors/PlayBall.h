@@ -18,7 +18,7 @@ public:
 
 	UStaticMeshComponent* BallStaticMesh;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
 	float ScaleModifier = 3.f;
 
 protected:
