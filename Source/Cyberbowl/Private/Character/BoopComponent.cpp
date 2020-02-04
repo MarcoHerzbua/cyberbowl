@@ -83,8 +83,6 @@ void UBoopComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		}
 
 		auto pc = Cast<APlayerController>(pawn->GetController());
-
-		auto id = UGameplayStatics::GetPlayerControllerID(pc);
 		PlayerController = pc;
 	}
 
