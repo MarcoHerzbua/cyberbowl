@@ -28,8 +28,6 @@ public:
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	float JumpInputPressedDuration = 0.f;
-
-	bool bOnWall = false;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;

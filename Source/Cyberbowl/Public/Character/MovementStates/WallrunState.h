@@ -18,5 +18,9 @@ public:
 	void OnTick(float DeltaTime) override;
 
 protected:
+	class UInputComponent* InputComponent;
 	float DefaultGravityScale;
+	FVector WallrunDirection;
+
+	void LaunchCharacter();
 };

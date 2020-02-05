@@ -23,6 +23,10 @@ class CYBERBOWL_API UCBCharacterMovementComponent : public UCharacterMovementCom
 	GENERATED_BODY()
 
 public:
+	//modifies the speed of the wallrun in relation to the maxMovementSpeed
+	UPROPERTY(EditAnywhere)
+	float WallrunSpeedModifier = 1.5f;
+	
 	UFUNCTION(BlueprintCallable)
 	void SetCBMovementMode(ECBMovementMode mode);
 	

@@ -55,6 +55,10 @@ void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AAc
 	if(MovementComponent->MovementMode == EMovementMode::MOVE_Falling)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("WallrunCmp valid Wallrun")));
+		
+		//push character against the wall 
+		MovementComponent->AddImpulse(SweepResult.Normal * 1000.f);
+		
 		MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Wallrun);
 	}
 }
