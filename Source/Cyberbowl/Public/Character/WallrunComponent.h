@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/SphereComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerInput.h"
 #include "WallrunComponent.generated.h"
 
@@ -20,7 +19,7 @@ public:
 	float TimeToActivateWallrun = 0.2f;
 	
 	USphereComponent* WallrunCollider;
-	UCharacterMovementComponent* MovementComponent;
+	class UCBCharacterMovementComponent* MovementComponent;
 	APlayerController* PlayerController;
 	TArray<FInputActionKeyMapping> JumpKeyMapping;
 	
@@ -37,6 +36,8 @@ protected:
 
 	UFUNCTION()
 	void CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

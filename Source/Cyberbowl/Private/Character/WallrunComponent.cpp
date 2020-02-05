@@ -6,6 +6,8 @@
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerInput.h"
+#include "Character/CBCharacterMovementComponent.h"
+
 
 
 // Sets default values for this component's properties
@@ -34,10 +36,11 @@ void UWallrunComponent::BeginPlay()
 	else
 	{
 		WallrunCollider->OnComponentBeginOverlap.AddDynamic(this, &UWallrunComponent::CheckForWallrun);
+		WallrunCollider->OnComponentEndOverlap.AddDynamic(this, &UWallrunComponent::EndWallrun);
 		//WallrunCollider->OnComponentHit.AddDynamic(this, &UWallrunComponent::CheckForWallrun);
 	}
 
-	MovementComponent = GetOwner()->FindComponentByClass<UCharacterMovementComponent>();
+	MovementComponent = GetOwner()->FindComponentByClass<UCBCharacterMovementComponent>();
 }
 
 void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -51,8 +54,15 @@ void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AAc
 
 	if(MovementComponent->MovementMode == EMovementMode::MOVE_Falling)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("WallrunCmp valid Wallrun")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("WallrunCmp valid Wallrun")));
+		MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Wallrun);
 	}
+}
+
+void UWallrunComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_None);
 }
 
 
@@ -61,6 +71,7 @@ void UWallrunComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, FString::Printf(TEXT("Movementmode: %i"), int(MovementComponent->MovementMode)));
 	//TODO: not supposed to be here; some of the logic in this class should be outsourced to custom playercontroller
 	if (!PlayerController)
 	{
@@ -89,11 +100,6 @@ void UWallrunComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 				JumpInputPressedDuration = oldDuration;
 			}
 		}
-	}
-
-	if(bOnWall && JumpInputPressedDuration >= TimeToActivateWallrun)
-	{
-		MovementComponent->Velocity *= FVector(1, 1, 0);
 	}
 }
 

@@ -8,11 +8,18 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Character/CBCharacterMovementComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACyberbowlCharacter
 
 ACyberbowlCharacter::ACyberbowlCharacter()
+{
+
+}
+
+ACyberbowlCharacter::ACyberbowlCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCBCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);

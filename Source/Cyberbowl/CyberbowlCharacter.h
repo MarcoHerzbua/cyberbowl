@@ -22,6 +22,7 @@ class ACyberbowlCharacter : public ACharacter
 	class UCameraComponent* FollowCamera;
 public:
 	ACyberbowlCharacter();
+	ACyberbowlCharacter(const class FObjectInitializer& ObjectInitializer);
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
