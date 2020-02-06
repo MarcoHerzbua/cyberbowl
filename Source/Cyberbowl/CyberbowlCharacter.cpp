@@ -83,6 +83,32 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ACyberbowlCharacter::OnResetVR);
 }
 
+void ACyberbowlCharacter::Jump()
+{
+	auto CBCharMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
+	if(!CBCharMoveCmp)
+	{
+		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CBCharacterMovementCmp not found"));
+		return;
+	}
+
+	if (CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_DoubleJump
+		|| CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+	{
+		return;
+	}
+	
+	Super::Jump();
+
+	if(CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
+	{
+		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
+		return;
+	}
+	
+	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+}
+
 
 void ACyberbowlCharacter::OnResetVR()
 {

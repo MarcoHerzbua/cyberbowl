@@ -3,6 +3,9 @@
 
 #include "Character/CBCharacterMovementComponent.h"
 #include "Character/MovementStates/WallrunState.h"
+#include "Character/MovementStates/JumpState.h"
+#include "Character/MovementStates/DoubleJumpState.h"
+#include "Engine/Engine.h"
 
 void UCBCharacterMovementComponent::SetCBMovementMode(ECBMovementMode mode)
 {
@@ -11,6 +14,8 @@ void UCBCharacterMovementComponent::SetCBMovementMode(ECBMovementMode mode)
     CBMovementMode = mode;
 
     MovementStates[CBMovementMode]->Activate();
+
+    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("MoveMode: %i"), CBMovementMode));
 }
 
 void UCBCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -25,14 +30,26 @@ void UCBCharacterMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-    CBMovementMode = ECBMovementMode::CBMOVE_None;
+    CBMovementMode = ECBMovementMode::CBMOVE_Running;
 	
-    MovementStates.Add(ECBMovementMode::CBMOVE_None, NewObject<UBaseMovementState>());
+    MovementStates.Add(ECBMovementMode::CBMOVE_Running, NewObject<UBaseMovementState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, NewObject<UWallrunState>());
+    MovementStates.Add(ECBMovementMode::CBMOVE_Jump, NewObject<UJumpState>());
+    MovementStates.Add(ECBMovementMode::CBMOVE_DoubleJump, NewObject<UDoubleJumpState>());
 
 	for(auto state : MovementStates)
 	{
         state.Value->InitializeState(this);
+	}
+}
+
+void UCBCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
+{
+    UCharacterMovementComponent::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
+
+	if(MovementMode == EMovementMode::MOVE_Walking)
+	{
+        SetCBMovementMode(ECBMovementMode::CBMOVE_Running);
 	}
 }
 
@@ -52,7 +69,7 @@ void UCBCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
 	case int(ECBMovementMode::CBMOVE_Wallrun) :
 		PhysWallrun(deltaTime, Iterations);
 		break;
-	case int(ECBMovementMode::CBMOVE_None) :
+	case int(ECBMovementMode::CBMOVE_Running) :
 	default:
 		break;
 	}

@@ -10,8 +10,10 @@
 UENUM(BlueprintType)
 enum class ECBMovementMode : uint8
 {
-	CBMOVE_None UMETA(DisplayName="None"),
-	CBMOVE_Wallrun UMETA(DisplayName="Wallrun")
+	CBMOVE_Running UMETA(DisplayName="Running"),
+	CBMOVE_Wallrun UMETA(DisplayName="Wallrun"),
+	CBMOVE_Jump UMETA(DisplayName="Jump"),
+	CBMOVE_DoubleJump UMETA(DisplayName="DoubleJump")
 };
 
 /**
@@ -51,6 +53,7 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 /*
  *
  *

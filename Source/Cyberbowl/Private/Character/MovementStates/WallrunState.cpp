@@ -79,11 +79,11 @@ void UWallrunState::LaunchCharacter()
 	launchVec *= MovementComponent->WallrunLaunchForce;
 	launchVec.Z = MovementComponent->WallrunLaunchForce;
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), launchVec.X, launchVec.Y, launchVec.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), launchVec.X, launchVec.Y, launchVec.Z));
 	
 	MovementComponent->AddImpulse(launchVec, true);
 	//auto ownerAsCharacter = Cast<ACharacter>(MovementComponent->GetOwner());
 	//ownerAsCharacter->LaunchCharacter(launchVec, true, true);
 
-	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_None);
+	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Running);
 }

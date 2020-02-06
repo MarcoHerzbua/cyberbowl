@@ -66,7 +66,7 @@ void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AAc
 void UWallrunComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_None);
+	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Running);
 }
 
 
