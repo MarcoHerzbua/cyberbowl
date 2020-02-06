@@ -1,18 +1,18 @@
 #include "Character/MovementStates/BaseMovementState.h"
 
-void BaseMovementState::InitializeState(UCBCharacterMovementComponent* moveComponent)
+void UBaseMovementState::InitializeState(UCBCharacterMovementComponent* moveComponent)
 {
 	MovementComponent = moveComponent;
 }
 
-void BaseMovementState::Activate()
+void UBaseMovementState::Activate()
 {
 }
 
-void BaseMovementState::Deactivate()
+void UBaseMovementState::Deactivate()
 {
 }
 
-void BaseMovementState::OnTick(float DeltaTime)
+void UBaseMovementState::OnTick(float DeltaTime)
 {
 }

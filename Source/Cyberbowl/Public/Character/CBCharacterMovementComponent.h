@@ -26,16 +26,28 @@ public:
 	//modifies the speed of the wallrun in relation to the maxMovementSpeed
 	UPROPERTY(EditAnywhere)
 	float WallrunSpeedModifier = 1.5f;
+
+	//modifies the force by which the character gets launched away from the wall when jumping during wallrun
+	UPROPERTY(EditAnywhere)
+	float WallrunLaunchForce = 700.f;
+	
+	//modifies the angle in which the character get launched away from the wall when jumping during wallrun
+	UPROPERTY(EditAnywhere)
+	float WallrunLaunchAngle = 45.f;
 	
 	UFUNCTION(BlueprintCallable)
 	void SetCBMovementMode(ECBMovementMode mode);
+
+	UFUNCTION(BlueprintCallable)
+	ECBMovementMode GetCBMovementMode() { return CBMovementMode; }
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 protected:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	ECBMovementMode CBMovementMode;
 
-	TMap<ECBMovementMode, BaseMovementState*> MovementStates;
+	UPROPERTY()
+	TMap<ECBMovementMode, UBaseMovementState*> MovementStates;
 	
 	virtual void BeginPlay() override;
 

@@ -2,15 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "Character/MovementStates/BaseMovementState.h"
+#include "WallrunState.generated.h"
 
 
 /**
  *
  */
-class CYBERBOWL_API WallrunState : public BaseMovementState
+UCLASS()
+class CYBERBOWL_API UWallrunState : public UBaseMovementState
 {
+	GENERATED_BODY()
 public:
-	WallrunState();
+	UWallrunState();
 
 	void InitializeState(class UCBCharacterMovementComponent* moveComponent) override;
 	void Activate() override;
@@ -22,5 +25,6 @@ protected:
 	float DefaultGravityScale;
 	FVector WallrunDirection;
 
+	UFUNCTION()
 	void LaunchCharacter();
 };

@@ -27,8 +27,8 @@ void UCBCharacterMovementComponent::BeginPlay()
 	
     CBMovementMode = ECBMovementMode::CBMOVE_None;
 	
-    MovementStates.Add(ECBMovementMode::CBMOVE_None, new BaseMovementState());
-    MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, new WallrunState());
+    MovementStates.Add(ECBMovementMode::CBMOVE_None, NewObject<UBaseMovementState>());
+    MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, NewObject<UWallrunState>());
 
 	for(auto state : MovementStates)
 	{
