@@ -9,6 +9,10 @@
 
 void UCBCharacterMovementComponent::SetCBMovementMode(ECBMovementMode mode)
 {
+	if(MovementStates.Num() == 0)
+	{
+        return;
+	}
     MovementStates[CBMovementMode]->Deactivate();
 	
     CBMovementMode = mode;

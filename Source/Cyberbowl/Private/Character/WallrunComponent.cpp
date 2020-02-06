@@ -87,6 +87,10 @@ void UWallrunComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 		auto pc = Cast<APlayerController>(pawn->GetController());
 
+		if(!pc)
+		{
+			return;
+		}
 		PlayerController = pc;
 		JumpKeyMapping = PlayerController->PlayerInput->GetKeysForAction("Jump");
 	}
