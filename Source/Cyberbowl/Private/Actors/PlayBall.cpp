@@ -17,12 +17,12 @@ void APlayBall::BeginPlay()
 	Super::BeginPlay();
 	
 	BallStaticMesh = FindComponentByClass<UStaticMeshComponent>();
-	auto test = GetComponents();
 	if (!BallStaticMesh)
 	{
 		return;
 	}
 	BallStaticMesh->SetWorldScale3D(FVector(ScaleModifier));
+	CurrMode = Cast<APoints>(GetWorld()->GetAuthGameMode());
 }
 
 // Called every frame

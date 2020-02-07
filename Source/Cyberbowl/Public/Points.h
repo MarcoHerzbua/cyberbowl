@@ -16,51 +16,57 @@
  */
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndGameEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGamePlayEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRegroupEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartGamePlayEvent);
 
-USTRUCT(BlueprintType)
-struct FCyberbowlCharacters
-{
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* Character;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Team;
-	
-};
-
-
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API APoints : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	AActor* Ball;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY( BlueprintReadWrite)
 	AActor* GoalColliderTeam0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	AActor* GoalColliderTeam1;
 	void Add_Points(AActor* Collider);
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	int PointsTeam0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	int PointsTeam1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FCyberbowlCharacters> Characters;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	int WinningTeam;
-	UFUNCTION(BlueprintCallable)
-	void AddToCharacters(FCyberbowlCharacters character) { Characters.Add(character); }
+	UPROPERTY(BlueprintReadWrite)
+	int ScoringTeam;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Time;
-	FTimerHandle TimerHandle;
+	float GamePlayTime = 180.f;
+	UPROPERTY(BlueprintReadWrite)
+	float GameEndTime;
+	FTimerHandle GameEndTimerHandle;
 	UPROPERTY(BlueprintAssignable)
 	FEndGameEvent EndGame;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float GameIntermediateTime = 3.f;
+	FTimerHandle GameIntermediateTimerHandle;
+	FTimerHandle GameCountdownTimerHandle;
+	UPROPERTY(BlueprintAssignable)
+	FPauseGamePlayEvent PauseGamePlay;
+	UPROPERTY(BlueprintAssignable)
+	FRegroupEvent Regroup;
+	UPROPERTY(BlueprintAssignable)
+	FRestartGamePlayEvent StartGamePlay;
+
 	UFUNCTION(BlueprintCallable)
 	void SelectGameOverMenu(int LevelIndex);
+	UFUNCTION(BlueprintCallable)
+	void RegroupPlayers();
+	UFUNCTION(BlueprintCallable)
+	void Restart();
 
 private:
 	virtual void Tick(float DeltaSeconds) override;

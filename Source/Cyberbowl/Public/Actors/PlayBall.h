@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Points.h"
 #include "PlayBall.generated.h"
 
 UCLASS()
@@ -24,6 +25,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+private:
+	APoints* CurrMode;
 
 public:	
 	// Called every frame
