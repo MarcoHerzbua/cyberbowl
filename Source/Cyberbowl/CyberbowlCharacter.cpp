@@ -8,11 +8,18 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Character/CBCharacterMovementComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACyberbowlCharacter
 
 ACyberbowlCharacter::ACyberbowlCharacter()
+{
+
+}
+
+ACyberbowlCharacter::ACyberbowlCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCBCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -76,6 +83,32 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ACyberbowlCharacter::OnResetVR);
 }
 
+void ACyberbowlCharacter::Jump()
+{
+	auto CBCharMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
+	if(!CBCharMoveCmp)
+	{
+		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CBCharacterMovementCmp not found"));
+		return;
+	}
+
+	if (CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_DoubleJump
+		|| CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+	{
+		return;
+	}
+	
+	Super::Jump();
+
+	if(CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
+	{
+		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
+		return;
+	}
+	
+	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+}
+
 
 void ACyberbowlCharacter::OnResetVR()
 {
@@ -106,29 +139,29 @@ void ACyberbowlCharacter::LookUpAtRate(float Rate)
 
 void ACyberbowlCharacter::MoveForward(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
-	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+	//if ((Controller != NULL) && (Value != 0.0f))
+	//{
+	//	// find out which way is forward
+	//	const FRotator Rotation = Controller->GetControlRotation();
+	//	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
-	}
+	//	// get forward vector
+	//	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	//	AddMovementInput(Direction, Value);
+	//}
 }
 
 void ACyberbowlCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
-	{
-		// find out which way is right
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
-		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// add movement in that direction
-		AddMovementInput(Direction, Value);
-	}
+	//if ( (Controller != NULL) && (Value != 0.0f) )
+	//{
+	//	// find out which way is right
+	//	const FRotator Rotation = Controller->GetControlRotation();
+	//	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	//
+	//	// get right vector 
+	//	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	//	// add movement in that direction
+	//	AddMovementInput(Direction, Value);
+	//}
 }
