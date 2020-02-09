@@ -21,17 +21,27 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
 	float ScaleModifier = 3.f;
+		
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
-	APoints* CurrMode;
+	FVector StartPosition;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void PushBall(float force, FVector direction);
+
+	UFUNCTION(BlueprintCallable)
+	void StopBall();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayBall();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetBallPosition();
 };

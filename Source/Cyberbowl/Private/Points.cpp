@@ -2,6 +2,7 @@
 
 
 #include "Points.h"
+#include <string>
 
 void APoints::BeginPlay()
 {
@@ -10,6 +11,7 @@ void APoints::BeginPlay()
 	PointsTeam1 = 0;
 	
 	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &APoints::GameEnd, GamePlayTime);
+	StartGamePlay.Broadcast();
 
 }
 
@@ -57,7 +59,8 @@ void APoints::Add_Points(AActor* Collider)
 
 void APoints::Tick(float DeltaSeconds)
 {
-	GameEndTime = GetWorldTimerManager().GetTimerRemaining(GameEndTimerHandle);
+	GameEndTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameEndTimerHandle);
+	GameIntermediateTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameCountdownTimerHandle);
 }
 
 void APoints::SelectGameOverMenu(int LevelIndex)
@@ -75,9 +78,9 @@ void APoints::SelectGameOverMenu(int LevelIndex)
 
 void APoints::RegroupPlayers()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Regrouping!!!!"));
 	Regroup.Broadcast();
 	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &APoints::Restart, GameIntermediateTime);
+
 }
 
 void APoints::Restart()

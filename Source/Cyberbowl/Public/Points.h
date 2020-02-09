@@ -45,7 +45,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float GamePlayTime = 180.f;
 	UPROPERTY(BlueprintReadWrite)
-	float GameEndTime;
+	float GameEndTimeRemaining;
 	FTimerHandle GameEndTimerHandle;
 	UPROPERTY(BlueprintAssignable)
 	FEndGameEvent EndGame;
@@ -54,6 +54,8 @@ public:
 	float GameIntermediateTime = 3.f;
 	FTimerHandle GameIntermediateTimerHandle;
 	FTimerHandle GameCountdownTimerHandle;
+	UPROPERTY(BlueprintReadWrite)
+	float GameIntermediateTimeRemaining;
 	UPROPERTY(BlueprintAssignable)
 	FPauseGamePlayEvent PauseGamePlay;
 	UPROPERTY(BlueprintAssignable)
