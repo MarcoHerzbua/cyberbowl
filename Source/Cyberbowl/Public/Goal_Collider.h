@@ -17,6 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	AGoal_Collider();
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,12 +27,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* Ball;
+	
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	int Points;
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	APoints* CurrMode;
+	
 	UBoxComponent* BoxComponent;
 };

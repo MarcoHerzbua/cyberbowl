@@ -2,46 +2,37 @@
 
 
 #include "Points.h"
+#include <string>
 
 void APoints::BeginPlay()
 {
 	Super::BeginPlay();
 	PointsTeam0 = 0;
 	PointsTeam1 = 0;
-	float Game_Play_Time = 180.f;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &APoints::GameEnd, Game_Play_Time);
 	
+	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &APoints::GameEnd, GamePlayTime);
+	StartGamePlay.Broadcast();
+
 }
 
 void APoints::GameEnd()
 {
 	TArray<AActor*> team0;
 	TArray<AActor*> team1;
-	/*
-	for (FCyberbowl_Characters Character : Characters)
-	{
-		if (Character.Team == 0)
-			team0.Add(Character.Character);
-		else
-			team1.Add(Character.Character);
-	} */
 	
 	if (PointsTeam0 > PointsTeam1)
 	{
 		WinningTeam = 0;
-		//WinningTeam.Broadcast(0, team0);
 	}
 
 	else if (PointsTeam0 < PointsTeam1)
 	{
 		WinningTeam = 1;
-		//WinningTeam.Broadcast(1, team1);
 	}
 
 	else
 	{
 		WinningTeam = 2;
-		//WinningTeam.Broadcast(-1, team0);
 	}
 	EndGame.Broadcast();
 }
@@ -52,19 +43,24 @@ void APoints::Add_Points(AActor* Collider)
 	if (Collider->GetName()=="BP_Goal_Collider_Team0")
 	{
 		PointsTeam1 += 1;
-		UE_LOG(LogTemp, Warning, TEXT("Collider 0"))
+		ScoringTeam = 1;
 	}
 	else if (Collider->GetName() == "BP_Goal_Collider_Team1")
 	{
 		PointsTeam0 += 1;
-		UE_LOG(LogTemp, Warning, TEXT("Collider 1"));
+		ScoringTeam = 0;
 	}
-		
+
+	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
+	PauseGamePlay.Broadcast();
+	GetWorldTimerManager().SetTimer(GameIntermediateTimerHandle, this, &APoints::RegroupPlayers, GameIntermediateTime);
+	
 }
 
 void APoints::Tick(float DeltaSeconds)
 {
-	Time = GetWorldTimerManager().GetTimerRemaining(TimerHandle);
+	GameEndTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameEndTimerHandle);
+	GameIntermediateTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameCountdownTimerHandle);
 }
 
 void APoints::SelectGameOverMenu(int LevelIndex)
@@ -78,4 +74,17 @@ void APoints::SelectGameOverMenu(int LevelIndex)
 	{
 		UGameplayStatics::OpenLevel(this, "CyberbowlArenaMap");
 	}
+}
+
+void APoints::RegroupPlayers()
+{
+	Regroup.Broadcast();
+	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &APoints::Restart, GameIntermediateTime);
+
+}
+
+void APoints::Restart()
+{
+	StartGamePlay.Broadcast();
+	GetWorldTimerManager().UnPauseTimer(GameEndTimerHandle);
 }

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Points.h"
 #include "PlayBall.generated.h"
 
 UCLASS()
@@ -20,14 +21,27 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
 	float ScaleModifier = 3.f;
+		
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+private:
+	FVector StartPosition;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void PushBall(float force, FVector direction);
+
+	UFUNCTION(BlueprintCallable)
+	void StopBall();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayBall();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetBallPosition();
 };
