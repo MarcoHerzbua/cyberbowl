@@ -62,8 +62,10 @@ protected:
 
 	bool bAllReady;
 
+	UPROPERTY(BlueprintReadWrite)
 	float totalCooldown = 3.f;
 
+	UPROPERTY(BlueprintReadWrite)
 	float currentCooldown = 3.f;
 	
 	void CreateMainMenu();

@@ -46,10 +46,10 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnMainMenuNavigated MainMenuNavigated;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void PushToMenuStack(UUserWidget* newWidget);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void PopFromMenuStack();
 
 	UFUNCTION(BlueprintCallable)
@@ -58,22 +58,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetIsAssigned(bool assigned);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	UWLobby* GetLobbyWidget() const;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetLobbyWidget(UWLobby* lobbyWidget);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	UUserWidget* GetLobbyNotJoinedWidget() const;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetLobbyNotJoinedWidget(UUserWidget* lobbyNotJoinedWidget);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	ACyberbowlCharacter* GetCharacterPreviewDummy() const;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetCharacterPreviewDummy(ACyberbowlCharacter* characterPreviewDummy);
 	
 protected:
