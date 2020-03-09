@@ -11,6 +11,14 @@
 #include "WMainMenu.h"
 #include "TimerManager.h"
 
+AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	DefaultPawnClass = nullptr;
+	HUDClass = nullptr;
+	PlayerControllerClass = AMainMenuPlayerController::StaticClass();
+}
+
 void AMainMenuGameMode::BeginPlay()
 {
 	CreateMainMenu();

@@ -17,6 +17,8 @@ class CYBERBOWL_API AMainMenuGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+	AMainMenuGameMode(const FObjectInitializer& ObjectInitializer);
+	
 protected:
 	virtual void BeginPlay() override;
 
