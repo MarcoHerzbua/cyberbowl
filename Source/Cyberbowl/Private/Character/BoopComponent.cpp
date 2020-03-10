@@ -52,6 +52,8 @@ void UBoopComponent::BeginPlay()
 	{
 		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		BoopHitbox->OnComponentBeginOverlap.AddDynamic(this, &UBoopComponent::PushBall);
+		BoopHitboxInitialLocation = BoopHitbox->GetRelativeLocation();
+		BoopHitbox->SetAbsolute(false, true, false);
 	}
 }
 
@@ -64,11 +66,22 @@ void UBoopComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void UBoopComponent::StartBoop()
 {
+	if(bBoopOnCooldown)
+	{
+		return;
+	}
+	
 	OnBoopStarted.Broadcast();
+
+	//Set Cooldown
+	Owner->GetWorld()->GetTimerManager().SetTimer(BoopCooldownHandle, this, &UBoopComponent::OnBoopCooldown, BoopCooldown);
+	bBoopOnCooldown = true;
+	
 
 	if (!bBoopActive)
 	{
-		Owner->GetWorld()->GetTimerManager().SetTimer(BoopDurationHandle, this, &UBoopComponent::DeactivateBoopHitbox, Duration);
+		Owner->GetWorld()->GetTimerManager().SetTimer(BoopDurationHandle, this, &UBoopComponent::DeactivateBoopHitbox, BoopDuration);
+	
 
 		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		bBoopActive = true;
@@ -93,32 +106,31 @@ void UBoopComponent::PushBall(UPrimitiveComponent* OverlappedComp, AActor* Other
 		cameraForwardVec = cameraForwardVec.RotateAngleAxis(UpwardsAngle, FVector(1, 0, 0));
 	}
 	ball->PushBall(Force, cameraForwardVec);
+
+	//deactivate hitbox so ball only gets pushed once when inside hitbox
+	DeactivateBoopHitbox();
 }
 
 void UBoopComponent::DeactivateBoopHitbox()
 {
+	if(bBoopActive)
+	{
+		//TODO: fire event
+		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		bBoopActive = false;
+	}
+}
+
+void UBoopComponent::OnBoopCooldown()
+{
 	//TODO: fire event
-	BoopHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	bBoopActive = false;
+	bBoopOnCooldown = false;
 }
 
 // Called every frame
 void UBoopComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	//DEBUG
-	if(bBoopActive)
-		DrawDebugBox(Owner->GetWorld(), BoopHitbox->GetComponentLocation(), BoopHitbox->GetScaledBoxExtent(), BoopHitbox->GetComponentRotation().Quaternion(), FColor::Red, false, DeltaTime, 0, 3.f);
-
-	{
-		auto cameraMngr = UGameplayStatics::GetPlayerCameraManager(Owner, UGameplayStatics::GetPlayerControllerID(PlayerController));
-
-		FVector cameraForwardVec = cameraMngr->GetActorForwardVector();
-
-		//BoopHitbox->SetWorldRotation()
-	}
-
 	
 	//these assignments do not work in BeginPlay(), because playercontroller is assigned afterwards at some point
 	if(!PlayerController)
@@ -141,6 +153,20 @@ void UBoopComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		{
 			InputComponent->BindAction("Boop", IE_Pressed, this, &UBoopComponent::StartBoop);
 		}
+	}
+	
+	if(auto cameraMngr = UGameplayStatics::GetPlayerCameraManager(Owner, UGameplayStatics::GetPlayerControllerID(PlayerController)))
+	{
+		FVector cameraForwardVec = cameraMngr->GetActorForwardVector();
+		//float viewAngleRadians = FVector::DotProduct(FVector::UpVector, FVector(0, 0, cameraForwardVec.Z));
+		//float viewAngleDegrees = FMath::RadiansToDegrees(viewAngleRadians);
+
+		BoopHitbox->SetWorldRotation(cameraForwardVec.Rotation());
+		BoopHitbox->SetWorldLocation(Owner->GetActorLocation() + FVector(cameraForwardVec * BoopHitboxInitialLocation.Size()));
+		
+		//DEBUG
+		if(bBoopActive)
+			DrawDebugBox(Owner->GetWorld(), BoopHitbox->GetComponentLocation(), BoopHitbox->GetScaledBoxExtent(), BoopHitbox->GetComponentRotation().Quaternion(), FColor::Red, false, DeltaTime, 0, 3.f);
 	}
 }
 

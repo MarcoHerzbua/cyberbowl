@@ -16,15 +16,8 @@ class CYBERBOWL_API UBoopComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
-	//float Range = 500.f;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
-	//float BoxWidth = 250.f;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
-	//float BoxHeight = 250.f;
-
+	UBoopComponent();
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
 	float Force = 5000.f;
 
@@ -33,9 +26,10 @@ public:
 	float UpwardsAngle = 20.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
-	float Duration = 1.f;
+	float BoopDuration = 1.f;
 
-	UBoopComponent();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
+	float BoopCooldown = 1.f;
 
 	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
 	FOnBoopStarted OnBoopStarted;
@@ -45,13 +39,20 @@ protected:
 	UInputComponent* InputComponent;
 	APlayerController* PlayerController;
 	UCBCharacterMovementComponent* MovementComponent;
+	
 	class UBoxComponent* BoopHitbox;
+	FVector BoopHitboxInitialLocation;
 
 	UPROPERTY()
 	FTimerHandle BoopDurationHandle;
 
+	UPROPERTY()
+	FTimerHandle BoopCooldownHandle;
+
 	UPROPERTY(BlueprintReadOnly)
-	bool bBoopActive;
+	bool bBoopActive = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bBoopOnCooldown = false;
 	
 	virtual void BeginPlay() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -62,6 +63,8 @@ protected:
 	void PushBall(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void DeactivateBoopHitbox();
+
+	void OnBoopCooldown();
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
