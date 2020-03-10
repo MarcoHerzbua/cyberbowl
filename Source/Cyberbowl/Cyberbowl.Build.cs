@@ -1,5 +1,6 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class Cyberbowl : ModuleRules
@@ -8,6 +9,10 @@ public class Cyberbowl : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "Niagara" });
+
+        PublicIncludePaths.AddRange(new string[] {
+            Path.Combine(EngineDirectory, "../Engine/Plugins/FX/Niagara/Source/")
+        });
 	}
 }
