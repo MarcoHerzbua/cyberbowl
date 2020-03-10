@@ -23,6 +23,8 @@ class CYBERBOWL_API AMainMenuPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+	void SetupInputComponent() override;
+
 public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
@@ -98,28 +100,28 @@ protected:
 	
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnIndexReady();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void FPreviousCharacterSelected();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void FNextCharacterSelected();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void FPreviousTeamSelected();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void FNextTeamSelected();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void FSelectionApplied();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void FLobbyJoined();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void FMainMenuNavigated();
 	
 };

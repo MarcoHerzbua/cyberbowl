@@ -19,11 +19,12 @@ class CYBERBOWL_API AMainMenuGameMode : public AGameModeBase
 
 	AMainMenuGameMode(const FObjectInitializer& ObjectInitializer);
 	
-protected:
+public:
 	virtual void BeginPlay() override;
 
-	virtual void Tick(float DeltaSeconds) override;
-
+	virtual void Tick(float DeltaTime) override;
+	
+protected:
 	UFUNCTION()
 	void OnLobbyEntered();
 
@@ -31,7 +32,7 @@ protected:
 	void OnPlayerReadyUnready();
 
 	UFUNCTION()
-	void OpenArena();
+	void StartMatch();
 
 	UPROPERTY()
 	FTimerHandle CountdownTimer;
@@ -60,6 +61,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	int CurrentPlayersTeam2;
 
+	UPROPERTY(BlueprintReadWrite)
 	bool bAllReady;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -67,6 +69,16 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	float currentCooldown = 3.f;
+
+	UPROPERTY()
+	TArray<AActor*> mainMenuPlayerControllers;
+	
+	TSubclassOf<UUserWidget> mainMenuBackgroundWidgetClass;
+	TSubclassOf<APawn> dummyClass;
+	TSubclassOf<UUserWidget> countdownWidgetClass;
+	TSubclassOf<UUserWidget> lobbyNotJoinedWidgetClass;
+	TSubclassOf<UUserWidget> lobbyWidgetClass;
+	TSubclassOf<UWMainMenu> mainMenuWidgetClass;
 	
 	void CreateMainMenu();
 

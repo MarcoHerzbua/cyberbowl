@@ -10,10 +10,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "WLobby.h"
 
-void AMainMenuPlayerController::BeginPlay()
+void AMainMenuPlayerController::SetupInputComponent()
 {
-	mainMenuGameMode = Cast<AMainMenuGameMode>(GetWorld()->GetAuthGameMode());
-	mainMenuGameMode->IndicesReady.AddDynamic(this, &AMainMenuPlayerController::OnIndexReady);
+	Super::SetupInputComponent();
 	
 	InputComponent->BindAction("PreviousCharacter", IE_Pressed, this, &AMainMenuPlayerController::FPreviousCharacterSelected);
 	InputComponent->BindAction("NextCharacter", IE_Pressed, this, &AMainMenuPlayerController::FNextCharacterSelected);
@@ -24,7 +23,14 @@ void AMainMenuPlayerController::BeginPlay()
 	InputComponent->BindAction("MenuBack", IE_Pressed, this, &AMainMenuPlayerController::PopFromMenuStack);
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
-	InputComponent->BindAction("MenuBack", IE_Pressed, this, &AMainMenuPlayerController::PopFromMenuStack);
+}
+
+void AMainMenuPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	mainMenuGameMode = Cast<AMainMenuGameMode>(GetWorld()->GetAuthGameMode());
+	mainMenuGameMode->IndicesReady.AddDynamic(this, &AMainMenuPlayerController::OnIndexReady);
 }
 
 void AMainMenuPlayerController::OnIndexReady()
@@ -91,7 +97,6 @@ void AMainMenuPlayerController::FMainMenuNavigated()
 	MainMenuNavigated.Broadcast();
 }
 
-
 void AMainMenuPlayerController::PushToMenuStack(UUserWidget* newWidget)
 {
 	if (widgetStack.Num() != 0)
@@ -101,6 +106,8 @@ void AMainMenuPlayerController::PushToMenuStack(UUserWidget* newWidget)
 
 	newWidget->AddToViewport();
 	widgetStack.Add(newWidget);
+	
+	UKismetSystemLibrary::PrintString(this, FString(std::to_string(widgetStack.Num()).c_str()));
 }
 
 void AMainMenuPlayerController::PopFromMenuStack()
@@ -110,10 +117,8 @@ void AMainMenuPlayerController::PopFromMenuStack()
 		return;
 	}
 
-	auto topWidget = widgetStack.Last();
-	topWidget->RemoveFromParent();
-	widgetStack.Remove(topWidget);
-
+	widgetStack.Pop()->RemoveFromParent();
+	UKismetSystemLibrary::PrintString(this, FString(std::to_string(widgetStack.Num()).c_str()));
 	widgetStack.Last()->AddToViewport();
 }
 

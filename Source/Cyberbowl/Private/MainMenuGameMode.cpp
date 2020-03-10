@@ -2,6 +2,9 @@
 
 
 #include "MainMenuGameMode.h"
+
+#include <string>
+
 #include "Camera/CameraActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "MainMenuPlayerController.h"
@@ -14,13 +17,32 @@
 AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	DefaultPawnClass = nullptr;
-	HUDClass = nullptr;
+	PrimaryActorTick.bCanEverTick = true;
 	PlayerControllerClass = AMainMenuPlayerController::StaticClass();
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> mainMenuBackgroundWidgetClassFinder(TEXT("/Game/UI/W_MainMenuBackground"));
+	mainMenuBackgroundWidgetClass = mainMenuBackgroundWidgetClassFinder.Class;
+
+	static ConstructorHelpers::FClassFinder<APawn> DummyCharacterFinder(TEXT("/Game/Characters/Dummy/DummyBase"));
+	dummyClass = DummyCharacterFinder.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> countdownWidgetClassFinder(TEXT("/Game/UI/Countdown"));
+	countdownWidgetClass = countdownWidgetClassFinder.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyNotJoinedWidgetClassFinder(TEXT("/Game/UI/W_LobbyNotJoined"));
+	lobbyNotJoinedWidgetClass = lobbyNotJoinedWidgetClassFinder.Class;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyWidgetClassFinder(TEXT("/Game/UI/W_Lobby"));
+	lobbyWidgetClass = lobbyWidgetClassFinder.Class;
+
+	static ConstructorHelpers::FClassFinder<UWMainMenu> mainMenuWidgetClassFinder(TEXT("/Game/UI/W_MainMenu"));
+	mainMenuWidgetClass = mainMenuWidgetClassFinder.Class;
 }
 
 void AMainMenuGameMode::BeginPlay()
 {
+	Super::BeginPlay();
+	
 	CreateMainMenu();
 	
 	SetupCharacterSelection();
@@ -28,20 +50,20 @@ void AMainMenuGameMode::BeginPlay()
 	MainMenuWidget->LobbyEntered.AddDynamic(this, &AMainMenuGameMode::OnLobbyEntered);
 }
 
-void AMainMenuGameMode::Tick(float DeltaSeconds)
+void AMainMenuGameMode::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+	UE_LOG(LogClass, Log, TEXT("Tick"));
 	if (bAllReady)
 	{
-		currentCooldown -= DeltaSeconds;
+		
+		currentCooldown -= DeltaTime;
 	}
 }
 
 void AMainMenuGameMode::OnLobbyEntered()
 {
 	CreatePlayers();
-
-	TArray<AActor*> mainMenuPlayerControllers;
-	UGameplayStatics::GetAllActorsOfClass(this, AMainMenuPlayerController::StaticClass(), mainMenuPlayerControllers);
 
 	for (auto controller : mainMenuPlayerControllers)
 	{
@@ -59,32 +81,26 @@ void AMainMenuGameMode::OnPlayerReadyUnready()
 
 	bAllReady = true;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> countdownWidgetClassFinder(TEXT("/Game/UI/Countdown"));
-	TSubclassOf<class UUserWidget> countdownWidgetClass = countdownWidgetClassFinder.Class;
 	auto countdownWidget = CreateWidget(UGameplayStatics::GetPlayerControllerFromID(this, 0), countdownWidgetClass);
 	countdownWidget->AddToViewport();
 
-	GetWorld()->GetTimerManager().SetTimer(CountdownTimer, this, &AMainMenuGameMode::OpenArena , 3.f, false);
-	UGameplayStatics::OpenLevel(this, FName(TEXT("CyberbowlArenaMap")));
+	GetWorld()->GetTimerManager().SetTimer(CountdownTimer, this, &AMainMenuGameMode::StartMatch , 3.f, false);
 }
 
-void AMainMenuGameMode::OpenArena()
+void AMainMenuGameMode::StartMatch()
 {
+	DeleteUnassignedPlayers();
 	UGameplayStatics::OpenLevel(this, FName(TEXT("CyberbowlArenaMap")));
 }
 
 void AMainMenuGameMode::CreateMainMenu()
 {
 	auto mainMenuControllerPlayer1 = Cast<AMainMenuPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
-
-	// Background
-	static ConstructorHelpers::FClassFinder<UUserWidget> mainMenuBackgroundWidgetClassFinder(TEXT("/Game/UI/W_MainMenuBackground"));
-	TSubclassOf<class UUserWidget> mainMenuBackgroundWidgetClass = mainMenuBackgroundWidgetClassFinder.Class;
+	
 	CreateWidget(mainMenuControllerPlayer1, mainMenuBackgroundWidgetClass)->AddToViewport();
 
 	// Main Menu
-	MainMenuWidget = Cast<UWMainMenu>(CreateWidget(mainMenuControllerPlayer1, UWMainMenu::StaticClass()));
-	MainMenuWidget->AddToViewport();
+	MainMenuWidget = Cast<UWMainMenu>(CreateWidget(mainMenuControllerPlayer1, mainMenuWidgetClass));
 
 	mainMenuControllerPlayer1->PushToMenuStack(MainMenuWidget);
 	FInputModeGameAndUI inputMode;
@@ -95,10 +111,6 @@ void AMainMenuGameMode::CreateMainMenu()
 
 void AMainMenuGameMode::SetupCharacterSelection()
 {
-	auto mainMenuPlayerController = Cast<AMainMenuPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
-
-	static ConstructorHelpers::FClassFinder<APawn> DummyCharacterFinder(TEXT("/Game/Characters/Dummy/DummyBase"));
-	auto dummyClass = DummyCharacterFinder.Class;
 	UGameplayStatics::GetAllActorsOfClass(this, dummyClass, CharacterPreviewDummies);
 
 	UGameplayStatics::GetAllActorsOfClassWithTag(this, ACameraActor::StaticClass(), FName(TEXT("SelectionCam")), CharacterSelectionCams);
@@ -108,20 +120,12 @@ void AMainMenuGameMode::CreatePlayers()
 {
 	for (int i = 1; i <=3; i++)
 	{
-		UGameplayStatics::CreatePlayer(this, i);
+		UGameplayStatics::CreatePlayer(this, i, true);
 	}
 
-	TArray<AActor*> playerControllers;
-	UGameplayStatics::GetAllActorsOfClass(this, AMainMenuPlayerController::StaticClass(), playerControllers);
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyNotJoinedWidgetClassFinder(TEXT("/Game/UI/W_LobbyNotJoined"));
-	TSubclassOf<class UUserWidget> lobbyNotJoinedWidgetClass = lobbyNotJoinedWidgetClassFinder.Class;
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyWidgetClassFinder(TEXT("/Game/UI/W_Lobby"));
-	TSubclassOf<class UUserWidget> lobbyWidgetClass = lobbyWidgetClassFinder.Class;
-
+	UGameplayStatics::GetAllActorsOfClass(this, AMainMenuPlayerController::StaticClass(), mainMenuPlayerControllers);
 	
-	for (auto controller : playerControllers)
+	for (auto controller : mainMenuPlayerControllers)
 	{
 		auto mainMenuController = Cast<AMainMenuPlayerController>(controller);
 		
@@ -138,10 +142,7 @@ void AMainMenuGameMode::CreatePlayers()
 
 void AMainMenuGameMode::DeleteUnassignedPlayers()
 {
-	TArray<AActor*> playerControllers;
-	UGameplayStatics::GetAllActorsOfClass(this, AMainMenuPlayerController::StaticClass(), playerControllers);
-
-	for (auto controller : playerControllers)
+	for (auto controller : mainMenuPlayerControllers)
 	{
 		auto mainMenuController = Cast<AMainMenuPlayerController>(controller);
 		if (!mainMenuController->GetIsAssigned())
