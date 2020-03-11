@@ -6,6 +6,7 @@
 #include "Character/MovementStates/JumpState.h"
 #include "Character/MovementStates/DoubleJumpState.h"
 #include "Engine/Engine.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 
 void UCBCharacterMovementComponent::SetCBMovementMode(ECBMovementMode mode)
 {
@@ -45,6 +46,9 @@ void UCBCharacterMovementComponent::BeginPlay()
 	{
         state.Value->InitializeState(this);
 	}
+
+    animinstance = Cast<UCyberbowlCharacterAnimInstance>(GetOwner()->FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
+   
 }
 
 void UCBCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)

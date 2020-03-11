@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/SphereComponent.h"
+#include "EngineUtils.h"
 #include "GameFramework/PlayerInput.h"
 #include "WallrunComponent.generated.h"
 
@@ -40,5 +41,4 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
 };

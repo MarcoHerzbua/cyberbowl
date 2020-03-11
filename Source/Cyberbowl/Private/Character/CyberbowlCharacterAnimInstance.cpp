@@ -15,8 +15,8 @@ void UCyberbowlCharacterAnimInstance::NativeInitializeAnimation()
 			main = Cast<ACyberbowlCharacter>(pawn);
 		}
 	}
-
-
+	bisIsWallRidingCounterClockWise = false;
+	bisIsWallRidingClockWise = false;
 }
 
 void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
@@ -31,12 +31,10 @@ void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
 		FVector Speed = pawn->GetVelocity();
 		FVector lateralSpeed = FVector(Speed.X, Speed.Y, 0.f);
 		movementSpeed = lateralSpeed.Size();
+		jumpVelocity = Speed.Z;
 
 		bisInAir = pawn->GetMovementComponent()->IsFalling();
 
-		if (main == nullptr)
-		{
-			main = Cast<ACyberbowlCharacter>(pawn);
-		}
 	}
 }
+

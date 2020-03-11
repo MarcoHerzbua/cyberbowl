@@ -42,8 +42,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	ECBMovementMode GetCBMovementMode() { return CBMovementMode; }
+
+	FVector GetCharacterTransform() { return GetOwner()->GetActorLocation(); };
+
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	class UCyberbowlCharacterAnimInstance* animinstance;
+	
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	ECBMovementMode CBMovementMode;
