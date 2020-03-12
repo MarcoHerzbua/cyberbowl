@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 #include "Engine/Engine.h"
 
 UWallrunState::UWallrunState()
@@ -15,6 +16,7 @@ void UWallrunState::InitializeState(UCBCharacterMovementComponent* moveComponent
 	UBaseMovementState::InitializeState(moveComponent);
 
 	DefaultGravityScale = MovementComponent->GravityScale;
+
 }
 
 void UWallrunState::Activate()
@@ -22,6 +24,22 @@ void UWallrunState::Activate()
 	UBaseMovementState::Activate();
 
 	MovementComponent->GravityScale = 0.f;
+
+	float length;
+	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
+	
+	FHitResult wallRunHitResult;
+	EWallRunDirection hitPosition = HitDirection(wallRunHitResult);
+
+	if (hitPosition == EWallRunDirection::WALLRUN_CLOCKWISE)
+	{
+		MovementComponent->animinstance->setIsWallRidingClockWise(true);
+	}
+	
+	else
+	{
+		MovementComponent->animinstance->setIsWallRidingCounterClockWise(true);
+	}
 }
 
 void UWallrunState::Deactivate()
@@ -29,6 +47,9 @@ void UWallrunState::Deactivate()
 	UBaseMovementState::Deactivate();
 
 	MovementComponent->GravityScale = DefaultGravityScale;
+
+	MovementComponent->animinstance->setIsWallRidingClockWise(false);
+	MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
 }
 
 void UWallrunState::OnTick(float DeltaTime)
@@ -54,26 +75,10 @@ void UWallrunState::LaunchCharacter()
 	{
 		return;
 	}
-	auto world = MovementComponent->GetWorld();
-	auto actorLoc = MovementComponent->GetActorLocation();
-	auto end1 = actorLoc + 200.f * WallrunDirection.RotateAngleAxis(90, FVector(0, 0, 1));
-	auto end2 = actorLoc + 200.f * WallrunDirection.RotateAngleAxis(-90, FVector(0, 0, 1));
 
-	FHitResult hit1, hit2;
-	world->LineTraceSingleByProfile(hit1, actorLoc, end1, "WallrunTrace");
-	world->LineTraceSingleByProfile(hit2, actorLoc, end2, "WallrunTrace");
-	//DrawDebugLine(world, MovementComponent->GetActorLocation(), end1, FColor::Red, false, 5, 0, 3.f);
-	//DrawDebugLine(world, MovementComponent->GetActorLocation(), end2, FColor::Blue, false, 5, 0, 3.f);
-	FVector launchVec;
-	if(hit1.bBlockingHit)
-	{
-		launchVec = hit1.Normal;//WallrunDirection.RotateAngleAxis(-90, FVector(0, 0, 1));
-	}
-	else
-	{
-		launchVec = hit2.Normal;//WallrunDirection.RotateAngleAxis(90, FVector(0, 0, 1));
-	}
-
+	FHitResult wallRunHitResult;
+	HitDirection(wallRunHitResult);
+	FVector launchVec = wallRunHitResult.Normal;
 	launchVec = launchVec.RotateAngleAxis(MovementComponent->WallrunLaunchAngle, FVector(0, 0, 1));
 	launchVec *= MovementComponent->WallrunLaunchForce;
 	launchVec.Z = MovementComponent->WallrunLaunchForce;
@@ -86,3 +91,31 @@ void UWallrunState::LaunchCharacter()
 
 	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Running);
 }
+
+EWallRunDirection UWallrunState::HitDirection(FHitResult& hitResult)
+{
+	auto world = MovementComponent->GetWorld();
+	auto actorLoc = MovementComponent->GetActorLocation();
+	auto end1 = actorLoc + 200.f * WallrunDirection.RotateAngleAxis(90, FVector(0, 0, 1));
+	auto end2 = actorLoc + 200.f * WallrunDirection.RotateAngleAxis(-90, FVector(0, 0, 1));
+
+	FHitResult hit1, hit2;
+	world->LineTraceSingleByProfile(hit1, actorLoc, end1, "WallrunTrace");
+	world->LineTraceSingleByProfile(hit2, actorLoc, end2, "WallrunTrace");
+	DrawDebugLine(world, MovementComponent->GetActorLocation(), end1, FColor::Red, false, 5, 0, 3.f);
+	DrawDebugLine(world, MovementComponent->GetActorLocation(), end2, FColor::Blue, false, 5, 0, 3.f);
+	FVector hitVec;
+	if (hit1.bBlockingHit)
+	{
+		hitResult = hit1;
+		UE_LOG(LogTemp, Warning, TEXT("WALLRUN_COUNTERCLOCKWISE"));
+		return EWallRunDirection::WALLRUN_COUNTERCLOCKWISE;//WallrunDirection.RotateAngleAxis(-90, FVector(0, 0, 1));
+	}
+	else
+	{
+		hitResult = hit2;
+		UE_LOG(LogTemp, Warning, TEXT("WALLRUN_CLOCKWISE"));
+		return EWallRunDirection::WALLRUN_CLOCKWISE;//WallrunDirection.RotateAngleAxis(90, FVector(0, 0, 1));
+	}
+}
+

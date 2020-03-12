@@ -2,12 +2,21 @@
 
 #include "CoreMinimal.h"
 #include "Character/MovementStates/BaseMovementState.h"
+#include "K2Node_FunctionResult.h"
 #include "WallrunState.generated.h"
 
 
 /**
  *
  */
+
+enum class EWallRunDirection : uint8
+{
+	WALLRUN_CLOCKWISE,
+	WALLRUN_COUNTERCLOCKWISE
+};
+
+
 UCLASS()
 class CYBERBOWL_API UWallrunState : public UBaseMovementState
 {
@@ -28,4 +37,6 @@ protected:
 
 	UFUNCTION()
 	void LaunchCharacter();
+	EWallRunDirection HitDirection(FHitResult& hitResult);
+	
 };
