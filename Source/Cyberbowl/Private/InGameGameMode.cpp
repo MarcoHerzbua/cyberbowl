@@ -1,21 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Points.h"
+#include "InGameGameMode.h"
 #include <string>
 
-void APoints::BeginPlay()
+void AInGameGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	PointsTeam0 = 0;
 	PointsTeam1 = 0;
 	
-	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &APoints::GameEnd, GamePlayTime);
+	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &AInGameGameMode::GameEnd, GamePlayTime);
 	StartGamePlay.Broadcast();
 
 }
 
-void APoints::GameEnd()
+void AInGameGameMode::GameEnd()
 {
 	TArray<AActor*> team0;
 	TArray<AActor*> team1;
@@ -38,7 +38,7 @@ void APoints::GameEnd()
 }
 
 
-void APoints::Add_Points(AActor* Collider)
+void AInGameGameMode::Add_Points(AActor* Collider)
 {
 	if (Collider->GetName()=="BP_Goal_Collider_Team0")
 	{
@@ -53,17 +53,17 @@ void APoints::Add_Points(AActor* Collider)
 
 	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
 	PauseGamePlay.Broadcast();
-	GetWorldTimerManager().SetTimer(GameIntermediateTimerHandle, this, &APoints::RegroupPlayers, GameIntermediateTime);
+	GetWorldTimerManager().SetTimer(GameIntermediateTimerHandle, this, &AInGameGameMode::RegroupPlayers, GameIntermediateTime);
 	
 }
 
-void APoints::Tick(float DeltaSeconds)
+void AInGameGameMode::Tick(float DeltaSeconds)
 {
 	GameEndTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameEndTimerHandle);
 	GameIntermediateTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameCountdownTimerHandle);
 }
 
-void APoints::SelectGameOverMenu(int LevelIndex)
+void AInGameGameMode::SelectGameOverMenu(int LevelIndex)
 {
 	if (LevelIndex == 1)
 	{
@@ -76,14 +76,14 @@ void APoints::SelectGameOverMenu(int LevelIndex)
 	}
 }
 
-void APoints::RegroupPlayers()
+void AInGameGameMode::RegroupPlayers()
 {
 	Regroup.Broadcast();
-	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &APoints::Restart, GameIntermediateTime);
+	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Restart, GameIntermediateTime);
 
 }
 
-void APoints::Restart()
+void AInGameGameMode::Restart()
 {
 	StartGamePlay.Broadcast();
 	GetWorldTimerManager().UnPauseTimer(GameEndTimerHandle);
