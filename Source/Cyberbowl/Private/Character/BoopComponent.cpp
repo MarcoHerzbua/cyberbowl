@@ -121,6 +121,26 @@ void UBoopComponent::DeactivateBoopHitbox()
 	}
 }
 
+void UBoopComponent::AdjustBoopHitboxTransform(float DeltaTime)
+{
+	if (!CameraManager)
+	{
+		CameraManager = UGameplayStatics::GetPlayerCameraManager(Owner, UGameplayStatics::GetPlayerControllerID(PlayerController));
+	}
+
+	if (CameraManager)
+	{
+		FVector cameraForwardVec = CameraManager->GetActorForwardVector();
+
+		BoopHitbox->SetWorldRotation(cameraForwardVec.Rotation());
+		BoopHitbox->SetWorldLocation(Owner->GetActorLocation() + FVector(cameraForwardVec * BoopHitboxInitialLocation.Size()));
+
+		//DEBUG
+		if (bBoopActive)
+			DrawDebugBox(Owner->GetWorld(), BoopHitbox->GetComponentLocation(), BoopHitbox->GetScaledBoxExtent(), BoopHitbox->GetComponentRotation().Quaternion(), FColor::Red, false, DeltaTime, 0, 3.f);
+	}
+}
+
 void UBoopComponent::OnBoopCooldown()
 {
 	//TODO: fire event
@@ -154,19 +174,7 @@ void UBoopComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			InputComponent->BindAction("Boop", IE_Pressed, this, &UBoopComponent::StartBoop);
 		}
 	}
-	
-	if(auto cameraMngr = UGameplayStatics::GetPlayerCameraManager(Owner, UGameplayStatics::GetPlayerControllerID(PlayerController)))
-	{
-		FVector cameraForwardVec = cameraMngr->GetActorForwardVector();
-		//float viewAngleRadians = FVector::DotProduct(FVector::UpVector, FVector(0, 0, cameraForwardVec.Z));
-		//float viewAngleDegrees = FMath::RadiansToDegrees(viewAngleRadians);
 
-		BoopHitbox->SetWorldRotation(cameraForwardVec.Rotation());
-		BoopHitbox->SetWorldLocation(Owner->GetActorLocation() + FVector(cameraForwardVec * BoopHitboxInitialLocation.Size()));
-		
-		//DEBUG
-		if(bBoopActive)
-			DrawDebugBox(Owner->GetWorld(), BoopHitbox->GetComponentLocation(), BoopHitbox->GetScaledBoxExtent(), BoopHitbox->GetComponentRotation().Quaternion(), FColor::Red, false, DeltaTime, 0, 3.f);
-	}
+	AdjustBoopHitboxTransform(DeltaTime);
 }
 

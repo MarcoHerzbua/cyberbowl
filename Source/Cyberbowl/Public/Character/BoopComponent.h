@@ -39,6 +39,7 @@ protected:
 	UInputComponent* InputComponent;
 	APlayerController* PlayerController;
 	UCBCharacterMovementComponent* MovementComponent;
+	class APlayerCameraManager* CameraManager;
 	
 	class UBoxComponent* BoopHitbox;
 	FVector BoopHitboxInitialLocation;
@@ -63,6 +64,7 @@ protected:
 	void PushBall(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void DeactivateBoopHitbox();
+	void AdjustBoopHitboxTransform(float DeltaTime);
 
 	void OnBoopCooldown();
 public:	
