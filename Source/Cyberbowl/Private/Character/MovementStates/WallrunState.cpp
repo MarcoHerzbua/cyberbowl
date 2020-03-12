@@ -33,13 +33,7 @@ void UWallrunState::Deactivate()
 
 void UWallrunState::OnTick(float DeltaTime)
 {
-	if (!InputComponent)
-	{
-		InputComponent = MovementComponent->GetOwner()->InputComponent;
-		//UE_LOG(LogClass, Error, TEXT("WallrunState no inputcomponent found"));
-		//return;
-		InputComponent->BindAction("Jump", IE_Pressed, this, &UWallrunState::LaunchCharacter);
-	}
+	UBaseMovementState::OnTick(DeltaTime);
 
 	MovementComponent->Velocity.Z = 0;
 
@@ -47,6 +41,11 @@ void UWallrunState::OnTick(float DeltaTime)
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
 
 	MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxCustomMovementSpeed * MovementComponent->WallrunSpeedModifier);
+}
+
+void UWallrunState::BindInputActions()
+{
+	InputComponent->BindAction("WallrunJump", IE_Pressed, this, &UWallrunState::LaunchCharacter);
 }
 
 void UWallrunState::LaunchCharacter()

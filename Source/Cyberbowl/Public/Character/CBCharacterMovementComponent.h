@@ -13,7 +13,8 @@ enum class ECBMovementMode : uint8
 	CBMOVE_Running UMETA(DisplayName="Running"),
 	CBMOVE_Wallrun UMETA(DisplayName="Wallrun"),
 	CBMOVE_Jump UMETA(DisplayName="Jump"),
-	CBMOVE_DoubleJump UMETA(DisplayName="DoubleJump")
+	CBMOVE_DoubleJump UMETA(DisplayName="DoubleJump"),
+	CBMOVE_Dash UMETA(DisplayName="Dash")
 };
 
 /**
@@ -26,16 +27,23 @@ class CYBERBOWL_API UCBCharacterMovementComponent : public UCharacterMovementCom
 
 public:
 	//modifies the speed of the wallrun in relation to the maxMovementSpeed
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunSpeedModifier = 1.5f;
 
 	//modifies the force by which the character gets launched away from the wall when jumping during wallrun
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunLaunchForce = 700.f;
 	
 	//modifies the angle in which the character get launched away from the wall when jumping during wallrun
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunLaunchAngle = 45.f;
+
+	UPROPERTY(EditAnywhere, Category = "Dash Params")
+	float DashDuration = 0.3f;
+
+	UPROPERTY(EditAnywhere, Category = "Dash Params")
+	float DashForce = 10000.f;
+
 	
 	UFUNCTION(BlueprintCallable)
 	void SetCBMovementMode(ECBMovementMode mode);
@@ -54,6 +62,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
+
+	void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration) override;
 /*
  *
  *

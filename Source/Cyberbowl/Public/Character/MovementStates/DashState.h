@@ -2,18 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "Character/MovementStates/BaseMovementState.h"
-#include "WallrunState.generated.h"
+#include "DashState.generated.h"
 
 
 /**
  *
  */
 UCLASS()
-class CYBERBOWL_API UWallrunState : public UBaseMovementState
+class CYBERBOWL_API UDashState : public UBaseMovementState
 {
 	GENERATED_BODY()
 public:
-	UWallrunState();
+	UDashState() {}
 
 	void InitializeState(class UCBCharacterMovementComponent* moveComponent) override;
 	void Activate() override;
@@ -22,10 +22,13 @@ public:
 
 protected:
 	float DefaultGravityScale;
-	FVector WallrunDirection;
+	FVector InitialVelocity;
+	
+	void StopDash();
 
+	UPROPERTY()
+	FTimerHandle DashTimerHandle;
+	
 	void BindInputActions() override;
-
-	UFUNCTION()
-	void LaunchCharacter();
 };
+

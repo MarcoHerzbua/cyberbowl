@@ -4,7 +4,6 @@
 #include "MainMenuPlayerController.h"
 #include <string>
 #include "Blueprint/UserWidget.h"
-#include "Cyberbowl/CyberbowlCharacter.h"
 #include "Engine/World.h"
 #include "GameplayTagsModule.h"
 #include "Kismet/GameplayStatics.h"

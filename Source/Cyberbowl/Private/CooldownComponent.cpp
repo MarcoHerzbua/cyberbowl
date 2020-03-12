@@ -4,7 +4,6 @@
 #include "CooldownComponent.h"
 #include "TimerManager.h"
 
-#include "Cyberbowl/CyberbowlCharacter.h"
 
 // Sets default values for this component's properties
 UCooldownComponent::UCooldownComponent()
