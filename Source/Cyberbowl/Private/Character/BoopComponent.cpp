@@ -8,6 +8,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "Actors/PlayBall.h"
+#include "Components/BoxComponent.h"
+#include "TimerManager.h"
+
+
 
 // Sets default values for this component's properties
 UBoopComponent::UBoopComponent()
@@ -15,6 +19,7 @@ UBoopComponent::UBoopComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	//BoopHitbox = CreateDefaultSubobject<UBoxComponent>(FName("BoopHitbox"));
 }
 
 
@@ -24,55 +29,129 @@ void UBoopComponent::BeginPlay()
 	Super::BeginPlay();
 	Owner = GetOwner();
 
-	MovementComponent = Owner->FindComponentByClass<UCharacterMovementComponent>();
+	MovementComponent = Owner->FindComponentByClass<UCBCharacterMovementComponent>();
+
+	//BoopHitbox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	//BoopHitbox->SetWorldLocationAndRotation(Owner->GetActorLocation() + FVector(Range / 2.f,0,0), Owner->GetActorRotation());
+	////BoopHitbox->SetupAttachment(this->Owner->GetRootComponent());
+	//BoopHitbox->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	//BoopHitbox->SetBoxExtent(FVector(Range, BoxWidth, BoxHeight));
+
+	auto boxComps = GetOwner()->GetComponentsByTag(UBoxComponent::StaticClass(), "BoopHitbox");
+
+	if (boxComps.Num() >= 1)
+	{
+		BoopHitbox = Cast<UBoxComponent>(boxComps[0]);
+	}
+
+	if (!BoopHitbox)
+	{
+		UE_LOG(LogInit, Error, TEXT("No BoopHitbox set in Character Blueprint"));
+	}
+	else
+	{
+		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		BoopHitbox->OnComponentBeginOverlap.AddDynamic(this, &UBoopComponent::PushBall);
+		BoopHitboxInitialLocation = BoopHitbox->GetRelativeLocation();
+		BoopHitbox->SetAbsolute(false, true, false);
+	}
 }
 
 void UBoopComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	Super::EndPlay(EndPlayReason);
 
+	GetWorld()->GetTimerManager().ClearTimer(BoopDurationHandle);
 }
 
 void UBoopComponent::StartBoop()
 {
-	auto cameraMngr = UGameplayStatics::GetPlayerCameraManager(Owner, UGameplayStatics::GetPlayerControllerID(PlayerController));
-
-	FVector cameraForwardVec = cameraMngr->GetActorForwardVector();
-	FRotator cameraRotation = cameraMngr->K2_GetActorRotation();
-
-	TArray<FHitResult> hits;
-	FVector start = Owner->GetActorLocation();
-	FVector end = start + cameraForwardVec * Range;
+	if(bBoopOnCooldown)
+	{
+		return;
+	}
 	
-	auto world = Owner->GetWorld();
-	if(world->SweepMultiByProfile(hits, start, end, cameraRotation.Quaternion(), "PlayBall", FCollisionShape::MakeBox(FVector(100.f, BoxWidth, BoxHeight))))
+	OnBoopStarted.Broadcast();
+
+	//Set Cooldown
+	Owner->GetWorld()->GetTimerManager().SetTimer(BoopCooldownHandle, this, &UBoopComponent::OnBoopCooldown, BoopCooldown);
+	bBoopOnCooldown = true;
+	
+
+	if (!bBoopActive)
 	{
+		Owner->GetWorld()->GetTimerManager().SetTimer(BoopDurationHandle, this, &UBoopComponent::DeactivateBoopHitbox, BoopDuration);
+	
+
+		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		bBoopActive = true;
 	}
-
-	DrawDebugBox(world, start + (cameraForwardVec * Range) / 2, FVector(Range / 2, BoxWidth, BoxHeight), cameraRotation.Quaternion(), FColor::Red, false, 3.f, 0, 3.f);
-
-	for(auto hit : hits)
-	{
-		auto ball = Cast<APlayBall>(hit.Actor);
-		if(ball)
-		{
-			FVector direction = cameraForwardVec;
-			if(MovementComponent->MovementMode == EMovementMode::MOVE_Walking)
-			{
-				direction = direction.RotateAngleAxis(UpwardsAngle, FVector(1, 0, 0));
-			}
-			ball->PushBall(Force, direction);
-		}
-	}
-
 
 }
 
+void UBoopComponent::PushBall(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	auto ball = Cast<APlayBall>(OtherActor);
+	if(!ball)
+	{
+		return;
+	}
+	
+	auto cameraMngr = UGameplayStatics::GetPlayerCameraManager(Owner, UGameplayStatics::GetPlayerControllerID(PlayerController));
+
+	FVector cameraForwardVec = cameraMngr->GetActorForwardVector();
+
+	if (MovementComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Running)
+	{
+		cameraForwardVec = cameraForwardVec.RotateAngleAxis(UpwardsAngle, FVector(1, 0, 0));
+	}
+	ball->PushBall(Force, cameraForwardVec);
+
+	//deactivate hitbox so ball only gets pushed once when inside hitbox
+	DeactivateBoopHitbox();
+}
+
+void UBoopComponent::DeactivateBoopHitbox()
+{
+	if(bBoopActive)
+	{
+		//TODO: fire event
+		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		bBoopActive = false;
+	}
+}
+
+void UBoopComponent::AdjustBoopHitboxTransform(float DeltaTime)
+{
+	if (!CameraManager)
+	{
+		CameraManager = UGameplayStatics::GetPlayerCameraManager(Owner, UGameplayStatics::GetPlayerControllerID(PlayerController));
+	}
+
+	if (CameraManager)
+	{
+		FVector cameraForwardVec = CameraManager->GetActorForwardVector();
+
+		BoopHitbox->SetWorldRotation(cameraForwardVec.Rotation());
+		BoopHitbox->SetWorldLocation(Owner->GetActorLocation() + FVector(cameraForwardVec * BoopHitboxInitialLocation.Size()));
+
+		//DEBUG
+		if (bBoopActive)
+			DrawDebugBox(Owner->GetWorld(), BoopHitbox->GetComponentLocation(), BoopHitbox->GetScaledBoxExtent(), BoopHitbox->GetComponentRotation().Quaternion(), FColor::Red, false, DeltaTime, 0, 3.f);
+	}
+}
+
+void UBoopComponent::OnBoopCooldown()
+{
+	//TODO: fire event
+	bBoopOnCooldown = false;
+}
 
 // Called every frame
 void UBoopComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	//these assignments do not work in BeginPlay(), because playercontroller is assigned afterwards at some point
 	if(!PlayerController)
 	{
@@ -95,5 +174,7 @@ void UBoopComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			InputComponent->BindAction("Boop", IE_Pressed, this, &UBoopComponent::StartBoop);
 		}
 	}
+
+	AdjustBoopHitboxTransform(DeltaTime);
 }
 
