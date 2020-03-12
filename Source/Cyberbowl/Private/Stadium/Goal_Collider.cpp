@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Goal_Collider.h"
+#include "Stadium/Goal_Collider.h"
 #include <string>
 
 // Sets default values

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "FireAbility.h"
+#include "Character/Abilities/FireAbility.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 void UFireAbility::Fire()

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
-#include "InGameGameMode.h"
+#include "GameModesAndInstances/InGameGameMode.h"
 #include "PlayBall.generated.h"
 
 UCLASS()

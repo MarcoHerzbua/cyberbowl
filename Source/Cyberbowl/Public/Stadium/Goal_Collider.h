@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "InGameGameMode.h"
+#include "GameModesAndInstances/InGameGameMode.h"
 #include "Components/BoxComponent.h"
 #include "Goal_Collider.generated.h"
 

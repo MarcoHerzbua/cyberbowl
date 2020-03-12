@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "GameplayTagContainer.h"
-#include "MainMenuGameMode.h"
-#include "WLobby.h"
+#include "GameModesAndInstances/MainMenuGameMode.h"
+#include "Widgets/WLobby.h"
 #include "Character/CyberbowlCharacter.h"
 #include "MainMenuPlayerController.generated.h"
 
