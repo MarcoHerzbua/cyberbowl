@@ -2,27 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "Character/MovementStates/BaseMovementState.h"
-#include "K2Node_FunctionResult.h"
-#include "WallrunState.generated.h"
+#include "DashState.generated.h"
 
 
 /**
  *
  */
-
-enum class EWallRunDirection : uint8
-{
-	WALLRUN_CLOCKWISE,
-	WALLRUN_COUNTERCLOCKWISE
-};
-
-
 UCLASS()
-class CYBERBOWL_API UWallrunState : public UBaseMovementState
+class CYBERBOWL_API UDashState : public UBaseMovementState
 {
 	GENERATED_BODY()
 public:
-	UWallrunState();
+	UDashState() {}
 
 	void InitializeState(class UCBCharacterMovementComponent* moveComponent) override;
 	void Activate() override;
@@ -31,12 +22,13 @@ public:
 
 protected:
 	float DefaultGravityScale;
-	FVector WallrunDirection;
-
-	void BindInputActions() override;
-
-	UFUNCTION()
-	void LaunchCharacter();
-	EWallRunDirection HitDirection(FHitResult& hitResult);
+	FVector InitialVelocity;
 	
+	void StopDash();
+
+	UPROPERTY()
+	FTimerHandle DashTimerHandle;
+	
+	void BindInputActions() override;
 };
+

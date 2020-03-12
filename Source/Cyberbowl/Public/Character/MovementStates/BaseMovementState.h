@@ -1,6 +1,8 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Character/MovementStates/IMovementState.h"
+#include "Components/InputComponent.h"
+
 #include "BaseMovementState.generated.h"
 
 /**
@@ -19,4 +21,8 @@ public:
 
 protected:
 	UCBCharacterMovementComponent* MovementComponent;
+	UPROPERTY()
+	UInputComponent* InputComponent;
+
+	virtual void BindInputActions();
 };

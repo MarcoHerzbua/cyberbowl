@@ -7,7 +7,6 @@
 #include "GameFramework/Actor.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
-#include "../CyberbowlCharacter.h"
 #include "InGameGameMode.generated.h"
 
 

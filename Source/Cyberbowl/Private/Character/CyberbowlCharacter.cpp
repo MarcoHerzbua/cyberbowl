@@ -1,6 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "CyberbowlCharacter.h"
+#include "Character/CyberbowlCharacter.h"
+
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -64,6 +65,8 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ACyberbowlCharacter::Dash);
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACyberbowlCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACyberbowlCharacter::MoveRight);
 
@@ -109,6 +112,17 @@ void ACyberbowlCharacter::Jump()
 	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 
+void ACyberbowlCharacter::Dash()
+{
+	auto CBCharMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
+	if (!CBCharMoveCmp)
+	{
+		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CBCharacterMovementCmp not found"));
+		return;
+	}
+
+	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
+}
 
 void ACyberbowlCharacter::OnResetVR()
 {
@@ -124,6 +138,7 @@ void ACyberbowlCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Lo
 {
 		StopJumping();
 }
+
 
 void ACyberbowlCharacter::TurnAtRate(float Rate)
 {
