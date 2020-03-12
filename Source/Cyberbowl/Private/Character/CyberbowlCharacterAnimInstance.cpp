@@ -2,7 +2,7 @@
 
 #include "Cyberbowl/Public/Character/CyberbowlCharacterAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Cyberbowl/CyberbowlCharacter.h"
+#include "Character/CyberbowlCharacter.h"
 
 
 void UCyberbowlCharacterAnimInstance::NativeInitializeAnimation()
