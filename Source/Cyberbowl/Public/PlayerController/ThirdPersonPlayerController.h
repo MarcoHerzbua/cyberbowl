@@ -9,6 +9,15 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class ECBCharacterType : uint8
+{
+	CBCHRACTERTYPE_FIRE UMETA(DisplayName = "Fire"),
+	CBCHRACTERTYPE_EARTH UMETA(DisplayName = "Earth"),
+	CBCHRACTERTYPE_ICE UMETA(DisplayName = "Ice"),
+	CBCHRACTERTYPE_AIR UMETA(DisplayName = "Air"),
+};
+
 UCLASS()
 class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
 {
