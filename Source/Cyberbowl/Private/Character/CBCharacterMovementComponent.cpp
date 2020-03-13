@@ -17,11 +17,12 @@ void UCBCharacterMovementComponent::SetCBMovementMode(ECBMovementMode mode)
         return;
 	}
     MovementStates[CBMovementMode]->Deactivate();
-	
+
+    auto previousMode = CBMovementMode;
     CBMovementMode = mode;
-
-    MovementStates[CBMovementMode]->Activate();
-
+	
+	MovementStates[CBMovementMode]->Activate(previousMode);
+	
     //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("MoveMode: %i"), CBMovementMode));
 }
 
@@ -51,7 +52,6 @@ void UCBCharacterMovementComponent::BeginPlay()
 	}
 
     animinstance = Cast<UCyberbowlCharacterAnimInstance>(GetOwner()->FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
-   
 }
 
 void UCBCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)

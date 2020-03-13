@@ -5,9 +5,9 @@ void UDoubleJumpState::InitializeState(UCBCharacterMovementComponent* moveCompon
 	UBaseMovementState::InitializeState(moveComponent);
 }
 
-void UDoubleJumpState::Activate()
+void UDoubleJumpState::Activate(ECBMovementMode previousMode)
 {
-	UBaseMovementState::Activate();
+	UBaseMovementState::Activate(previousMode);
 }
 
 void UDoubleJumpState::Deactivate()

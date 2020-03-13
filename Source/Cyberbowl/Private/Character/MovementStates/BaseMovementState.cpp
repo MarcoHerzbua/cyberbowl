@@ -6,7 +6,7 @@ void UBaseMovementState::InitializeState(UCBCharacterMovementComponent* moveComp
 	MovementComponent = moveComponent;
 }
 
-void UBaseMovementState::Activate()
+void UBaseMovementState::Activate(ECBMovementMode previousMode)
 {
 	if (!InputComponent)
 	{
