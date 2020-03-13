@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EarthAbility.h"
+#include "Character/Abilities/EarthAbility.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 void UEarthAbility::Fire()

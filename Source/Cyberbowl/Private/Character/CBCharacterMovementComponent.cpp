@@ -2,10 +2,13 @@
 
 
 #include "Character/CBCharacterMovementComponent.h"
+
+#include "Character/MovementStates/DashState.h"
 #include "Character/MovementStates/WallrunState.h"
 #include "Character/MovementStates/JumpState.h"
 #include "Character/MovementStates/DoubleJumpState.h"
 #include "Engine/Engine.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 
 void UCBCharacterMovementComponent::SetCBMovementMode(ECBMovementMode mode)
 {
@@ -40,11 +43,15 @@ void UCBCharacterMovementComponent::BeginPlay()
     MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, NewObject<UWallrunState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_Jump, NewObject<UJumpState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_DoubleJump, NewObject<UDoubleJumpState>());
+    MovementStates.Add(ECBMovementMode::CBMOVE_Dash, NewObject<UDashState>());
 
 	for(auto state : MovementStates)
 	{
         state.Value->InitializeState(this);
 	}
+
+    animinstance = Cast<UCyberbowlCharacterAnimInstance>(GetOwner()->FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
+   
 }
 
 void UCBCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
@@ -55,6 +62,25 @@ void UCBCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
 	{
         SetCBMovementMode(ECBMovementMode::CBMOVE_Running);
 	}
+}
+
+void UCBCharacterMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid,
+	float BrakingDeceleration)
+{
+    Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
+
+	//if(CBMovementMode == ECBMovementMode::CBMOVE_Running)
+	//{
+	//	if(Acceleration.IsZero())
+	//	{
+	//        Velocity = FVector::ZeroVector;
+	//	}
+	//    else
+	//    {
+	//        Velocity = GetMaxSpeed() * Acceleration.GetSafeNormal();
+	//    }
+	//	
+	//}
 }
 
 /*

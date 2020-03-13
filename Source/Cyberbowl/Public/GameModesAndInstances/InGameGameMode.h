@@ -7,8 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
-#include "../CyberbowlCharacter.h"
-#include "Points.generated.h"
+#include "InGameGameMode.generated.h"
 
 
 /**
@@ -21,7 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRegroupEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartGamePlayEvent);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class CYBERBOWL_API APoints : public AGameModeBase
+class CYBERBOWL_API AInGameGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
