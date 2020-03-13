@@ -32,6 +32,18 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnUltCooldownFinished UltCooldownFinished;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, category = "Cooldowns")
+	float TotalDashCooldown;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, category = "Cooldowns")
+	float TotalUltCooldown;
+
+	UFUNCTION(BlueprintCallable, Category = "CooldownComponent")
+	bool IsDashReady() { return DashReady; }
+	
+	UFUNCTION(BlueprintCallable, Category = "CooldownComponent")
+	bool IsUltReady() { return UltReady; }
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -48,16 +60,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle UltCooldownHandle;
 
-	UPROPERTY(BlueprintReadWrite)
-	float TotalDashCooldown;
-
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly)
 	bool DashReady = true;
 
-	UPROPERTY(BlueprintReadWrite)
-	float TotalUltCooldown;
-
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly)
 	bool UltReady = true;
 
 public:	
