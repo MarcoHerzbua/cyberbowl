@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
 	float ScaleModifier = 3.f;
 		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
+	float MaxSpeed = 4000.f;
+		
 
 protected:
 	// Called when the game starts or when spawned
