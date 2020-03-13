@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameModesAndInstances/InGameGameMode.h"
+#include <string>
 
 UBallCamComponent::UBallCamComponent()
 {
@@ -22,16 +23,34 @@ void UBallCamComponent::BeginPlay()
 	PlayBall = Cast<UStaticMeshComponent>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball->GetComponentByClass(UStaticMeshComponent::StaticClass()));
 }
 
+void UBallCamComponent::Lerp(float from, float to, float seconds)
+{
+	
+}
 
-void UBallCamComponent::FocusBall()
+
+void UBallCamComponent::FocusBall(float deltaTime)
 {
 	FVector ballWorldLocation = PlayBall->GetComponentLocation();
 	FVector cameraBoomWorldLocation = CameraBoom->GetComponentLocation();
 	
 	FRotator lookAtBallRot = UKismetMathLibrary::FindLookAtRotation(ballWorldLocation, cameraBoomWorldLocation);
-	float newPitch = 360 - lookAtBallRot.Pitch;
+	float newPitch = lookAtBallRot.Pitch * (-1);
 	float newYaw = lookAtBallRot.Yaw - 180;
-	CameraBoom->SetWorldRotation(FRotator(newPitch, newYaw, lookAtBallRot.Roll));
+	CameraBoom->SetWorldRotation(FRotator(CameraBoom->GetComponentRotation().Pitch, newYaw, 0));
+
+	float smoothedPitch;
+	
+	if (newPitch > 25.f)
+	{
+		smoothedPitch = FMath::FInterpTo(CameraBoom->GetComponentRotation().Pitch, newPitch, deltaTime, 2.f);
+	}
+	else
+	{
+		smoothedPitch = FMath::FInterpTo(CameraBoom->GetComponentRotation().Pitch, 0, deltaTime, 1.5f);		
+	}
+
+	CameraBoom->SetWorldRotation(FRotator(smoothedPitch, newYaw, 0));
 }
 
 void UBallCamComponent::ToggleBallCam()
@@ -39,6 +58,9 @@ void UBallCamComponent::ToggleBallCam()
 	bShouldFollowBall = !bShouldFollowBall;
 	CameraBoom->bUsePawnControlRotation = !bShouldFollowBall;
 
+	CameraBoom->SetWorldRotation(FRotator(0, 0, 0));
+
+	// This ensures the camera stays the way it was when exiting the ball cam
 	if (!bShouldFollowBall)
 	{
 		FRotator lookAtBallRot = UKismetMathLibrary::FindLookAtRotation(CameraBoom->GetComponentLocation(), PlayBall->GetComponentLocation());
@@ -52,8 +74,10 @@ void UBallCamComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bShouldFollowBall)
+	if (!bShouldFollowBall)
 	{
-		FocusBall();
+		return;
 	}
+
+	FocusBall(DeltaTime);
 }
