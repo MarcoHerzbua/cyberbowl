@@ -3,11 +3,11 @@
 
 #include "BallCamComponent.h"
 
-#include "Cyberbowl/CyberbowlCharacter.h"
+#include "Character/CyberbowlCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Points.h"
+#include "GameModesAndInstances/InGameGameMode.h"
 
 UBallCamComponent::UBallCamComponent()
 {
@@ -19,7 +19,7 @@ void UBallCamComponent::BeginPlay()
 	Super::BeginPlay();
 
 	CameraBoom = Cast<ACyberbowlCharacter>(GetOwner())->GetCameraBoom();
-	PlayBall = Cast<UStaticMeshComponent>(Cast<APoints>(UGameplayStatics::GetGameMode(this))->Ball->GetComponentByClass(UStaticMeshComponent::StaticClass()));
+	PlayBall = Cast<UStaticMeshComponent>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball->GetComponentByClass(UStaticMeshComponent::StaticClass()));
 }
 
 
