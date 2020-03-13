@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MainMenuGameMode.h"
+#include "GameModesAndInstances/MainMenuGameMode.h"
 
 #include <string>
 
 #include "Camera/CameraActor.h"
 #include "Kismet/GameplayStatics.h"
-#include "MainMenuPlayerController.h"
+#include "PlayerController/MainMenuPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
-#include "MainMenuPlayerController.h"
-#include "WMainMenu.h"
+#include "PlayerController/MainMenuPlayerController.h"
+#include "Widgets/WMainMenu.h"
 #include "TimerManager.h"
 
 AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectInitializer)

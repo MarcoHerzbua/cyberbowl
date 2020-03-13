@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Goal_Collider.h"
+#include "Stadium/Goal_Collider.h"
 #include <string>
 
 // Sets default values
@@ -17,7 +17,7 @@ void AGoal_Collider::BeginPlay()
 	Super::BeginPlay();
 	BoxComponent = FindComponentByClass<UBoxComponent>();
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AGoal_Collider::OnBeginOverlap);
-	CurrMode = Cast<APoints>(GetWorld()->GetAuthGameMode());
+	CurrMode = Cast<AInGameGameMode>(GetWorld()->GetAuthGameMode());
 }
 
 // Called every frame

@@ -1,14 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MainMenuPlayerController.h"
+#include "PlayerController/MainMenuPlayerController.h"
 #include <string>
 #include "Blueprint/UserWidget.h"
-#include "Cyberbowl/CyberbowlCharacter.h"
 #include "Engine/World.h"
 #include "GameplayTagsModule.h"
 #include "Kismet/GameplayStatics.h"
-#include "WLobby.h"
+#include "Widgets/WLobby.h"
 
 void AMainMenuPlayerController::SetupInputComponent()
 {

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Points.h"
+#include "GameModesAndInstances/InGameGameMode.h"
 #include "Components/BoxComponent.h"
 #include "Goal_Collider.generated.h"
 
@@ -34,7 +34,7 @@ private:
 	int Points;
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	APoints* CurrMode;
+	AInGameGameMode* CurrMode;
 	
 	UBoxComponent* BoxComponent;
 };
