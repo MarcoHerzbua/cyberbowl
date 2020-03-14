@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameModesAndInstances/InGameGameMode.h"
 #include <string>
+#include "Camera/CameraComponent.h"
 
 UBallCamComponent::UBallCamComponent()
 {
@@ -23,34 +24,24 @@ void UBallCamComponent::BeginPlay()
 	PlayBall = Cast<UStaticMeshComponent>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball->GetComponentByClass(UStaticMeshComponent::StaticClass()));
 }
 
-void UBallCamComponent::Lerp(float from, float to, float seconds)
-{
-	
-}
-
-
 void UBallCamComponent::FocusBall(float deltaTime)
 {
-	FVector ballWorldLocation = PlayBall->GetComponentLocation();
-	FVector cameraBoomWorldLocation = CameraBoom->GetComponentLocation();
-	
-	FRotator lookAtBallRot = UKismetMathLibrary::FindLookAtRotation(ballWorldLocation, cameraBoomWorldLocation);
-	float newPitch = lookAtBallRot.Pitch * (-1);
-	float newYaw = lookAtBallRot.Yaw - 180;
-	CameraBoom->SetWorldRotation(FRotator(CameraBoom->GetComponentRotation().Pitch, newYaw, 0));
+	FRotator lookAtBallRot = UKismetMathLibrary::FindLookAtRotation(PlayBall->GetComponentLocation(), CameraBoom->GetComponentLocation());
+	float lookAtPitch = lookAtBallRot.Pitch * (-1);
+	float lookAtYaw = lookAtBallRot.Yaw + 180;
 
-	float smoothedPitch;
-	
-	if (newPitch > 25.f)
+	FMinimalViewInfo viewInfo;
+	Cast<ACyberbowlCharacter>(GetOwner())->GetFollowCamera()->GetCameraView(deltaTime, viewInfo);
+	float cameraPitch = viewInfo.Rotation.Pitch;
+
+	float smoothedPitch = FMath::FInterpTo(cameraPitch, lookAtPitch, deltaTime, 2.f);
+
+	if (lookAtPitch <= 25.f)
 	{
-		smoothedPitch = FMath::FInterpTo(CameraBoom->GetComponentRotation().Pitch, newPitch, deltaTime, 2.f);
-	}
-	else
-	{
-		smoothedPitch = FMath::FInterpTo(CameraBoom->GetComponentRotation().Pitch, 0, deltaTime, 1.5f);		
+		smoothedPitch = FMath::FInterpTo(cameraPitch, 0, deltaTime, 1.5f);
 	}
 
-	CameraBoom->SetWorldRotation(FRotator(smoothedPitch, newYaw, 0));
+	CameraBoom->SetWorldRotation(FRotator(smoothedPitch, lookAtYaw, 0));
 }
 
 void UBallCamComponent::ToggleBallCam()
@@ -73,7 +64,7 @@ void UBallCamComponent::ToggleBallCam()
 void UBallCamComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	if (!bShouldFollowBall)
 	{
 		return;

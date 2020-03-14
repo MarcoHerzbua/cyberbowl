@@ -18,9 +18,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void Lerp(float from, float to, float seconds);
 	
 	UFUNCTION(BlueprintCallable)
 	void FocusBall(float deltaTime);
@@ -36,9 +33,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bShouldFollowBall;
-
-	UPROPERTY()
-	bool bShouldLerp;
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
