@@ -61,7 +61,7 @@ void UDashState::OnTick(float DeltaTime)
 
 void UDashState::StopDash()
 {
-	FVector newVelocity = MovementComponent->Velocity.GetSafeNormal() * MovementComponent->MaxCustomMovementSpeed;
+	FVector newVelocity = MovementComponent->Velocity.GetSafeNormal() * MovementComponent->MaxWalkSpeed;
 	MovementComponent->StopMovementImmediately();
 	MovementComponent->Velocity = newVelocity;
 
