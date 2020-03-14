@@ -40,14 +40,16 @@ void UBallCamComponent::FocusBall(float deltaTime)
 	{
 		smoothedPitch = FMath::FInterpTo(cameraPitch, 0, deltaTime, 1.5f);
 	}
+	auto controller = Cast<APlayerController>(Cast<ACyberbowlCharacter>(GetOwner())->GetController());
+	float smoothedYaw = FMath::FInterpTo(controller->GetControlRotation().Yaw, lookAtYaw, deltaTime, 3.f);
 
-	CameraBoom->SetWorldRotation(FRotator(smoothedPitch, lookAtYaw, 0));
+	controller->SetControlRotation(FRotator(smoothedPitch, smoothedYaw, 0));
 }
 
 void UBallCamComponent::ToggleBallCam()
 {
 	bShouldFollowBall = !bShouldFollowBall;
-	CameraBoom->bUsePawnControlRotation = !bShouldFollowBall;
+	CameraBoom->bUsePawnControlRotation = true;
 
 	CameraBoom->SetWorldRotation(FRotator(0, 0, 0));
 
