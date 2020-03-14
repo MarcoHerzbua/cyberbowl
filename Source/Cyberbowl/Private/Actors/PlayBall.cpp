@@ -3,6 +3,8 @@
 
 #include "Actors/PlayBall.h"
 
+#include "Engine/Engine.h"
+
 // Sets default values
 APlayBall::APlayBall()
 {
@@ -30,12 +32,15 @@ void APlayBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FVector ballVelocity = GetVelocity();
+	BallStaticMesh->SetAllPhysicsLinearVelocity( ballVelocity.GetClampedToMaxSize(MaxSpeed)) ;
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%s"), *GetVelocity().ToString()));
 }
 
 void APlayBall::PushBall(float force, FVector direction)
 {
 	//BallStaticMesh->ComponentVelocity = FVector(0);
-	//Is this only moving the mesh?
+	//Is this only moving the mesh? -> Marco: the mesh a scene component and the root of the actor, so everything in this actor is moved
 	BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
 }
 

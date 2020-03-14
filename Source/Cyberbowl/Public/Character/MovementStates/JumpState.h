@@ -16,7 +16,7 @@ public:
 	UJumpState() {}
 
 	void InitializeState(class UCBCharacterMovementComponent* moveComponent) override;
-	void Activate() override;
+	void Activate(ECBMovementMode previousMode) override;
 	void Deactivate() override;
 	void OnTick(float DeltaTime) override;
 

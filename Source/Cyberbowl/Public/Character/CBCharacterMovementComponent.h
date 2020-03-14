@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Abilities/CooldownComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/MovementStates/BaseMovementState.h"
@@ -64,7 +65,10 @@ protected:
 
 	UPROPERTY()
 	TMap<ECBMovementMode, UBaseMovementState*> MovementStates;
-	
+
+	//UPROPERTY()
+	//UCooldownComponent* CooldownComponent;
+	//
 	virtual void BeginPlay() override;
 
 	void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;

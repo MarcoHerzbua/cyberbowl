@@ -121,7 +121,17 @@ void ACyberbowlCharacter::Dash()
 		return;
 	}
 
-	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
+	auto cooldownComponent = FindComponentByClass<UCooldownComponent>();
+	if (!cooldownComponent)
+	{
+		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CoolDownComponent not found"));
+		return;	
+	}
+	
+	if(cooldownComponent->IsDashReady())
+	{
+		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);	
+	}
 }
 
 void ACyberbowlCharacter::OnResetVR()

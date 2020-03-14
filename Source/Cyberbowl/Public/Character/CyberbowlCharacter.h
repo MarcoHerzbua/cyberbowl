@@ -28,9 +28,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
+	float TurnRateModifier = 1.f;
+
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
+	float LookUpRateModifier = 1.f;
 
 
 protected:

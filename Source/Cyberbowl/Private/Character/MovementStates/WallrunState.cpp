@@ -19,9 +19,9 @@ void UWallrunState::InitializeState(UCBCharacterMovementComponent* moveComponent
 
 }
 
-void UWallrunState::Activate()
+void UWallrunState::Activate(ECBMovementMode previousMode)
 {
-	UBaseMovementState::Activate();
+	UBaseMovementState::Activate(previousMode);
 
 	MovementComponent->GravityScale = 0.f;
 
@@ -61,7 +61,7 @@ void UWallrunState::OnTick(float DeltaTime)
 	float length;
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
 
-	MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxCustomMovementSpeed * MovementComponent->WallrunSpeedModifier);
+	MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxWalkSpeed * MovementComponent->WallrunSpeedModifier);
 }
 
 void UWallrunState::BindInputActions()
