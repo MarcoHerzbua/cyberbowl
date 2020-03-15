@@ -40,10 +40,36 @@ void UBallCamComponent::FocusBall(float deltaTime)
 	{
 		smoothedPitch = FMath::FInterpTo(cameraPitch, 0, deltaTime, 1.5f);
 	}
+	
 	auto controller = Cast<APlayerController>(Cast<ACyberbowlCharacter>(GetOwner())->GetController());
-	float smoothedYaw = FMath::FInterpTo(controller->GetControlRotation().Yaw, lookAtYaw, deltaTime, 3.f);
 
-	controller->SetControlRotation(FRotator(smoothedPitch, smoothedYaw, 0));
+
+	if (controller->GetControlRotation().Yaw - lookAtYaw < -300)
+	{
+		UKismetSystemLibrary::PrintString(this, "speed -1");
+		controller->AddYawInput(-1);
+	}
+	else if (controller->GetControlRotation().Yaw - lookAtYaw < -180)
+	{
+		UKismetSystemLibrary::PrintString(this, "speed -3");
+		controller->AddYawInput(-3);
+	}	 
+	else if (controller->GetControlRotation().Yaw - lookAtYaw > 300)
+	{
+		UKismetSystemLibrary::PrintString(this, "speed 1");
+		controller->AddYawInput(1);
+	}
+	else if (controller->GetControlRotation().Yaw - lookAtYaw > 180)
+	{
+		UKismetSystemLibrary::PrintString(this, "speed 3");
+		controller->AddYawInput(3);
+	}
+	else
+	{
+		const float smoothedYaw = FMath::FInterpTo(controller->GetControlRotation().Yaw, lookAtYaw, deltaTime, 4.f);
+		controller->SetControlRotation(FRotator(smoothedPitch, smoothedYaw, 0));
+	}
+
 }
 
 void UBallCamComponent::ToggleBallCam()
