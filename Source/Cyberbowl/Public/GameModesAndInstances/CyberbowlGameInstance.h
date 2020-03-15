@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "PlayerController/FPlayerInfo.h"
 #include "CyberbowlGameInstance.generated.h"
+
 
 /**
  * 
@@ -13,5 +15,8 @@ UCLASS()
 class CYBERBOWL_API UCyberbowlGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+		TMap<int, FPlayerInfo> PlayerInfo;
 };
