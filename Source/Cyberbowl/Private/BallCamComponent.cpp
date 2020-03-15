@@ -46,22 +46,22 @@ void UBallCamComponent::FocusBall(float deltaTime)
 
 	if (controller->GetControlRotation().Yaw - lookAtYaw < -300)
 	{
-		UKismetSystemLibrary::PrintString(this, "speed -1");
+		//UKismetSystemLibrary::PrintString(this, "speed -1");
 		controller->AddYawInput(-1);
 	}
 	else if (controller->GetControlRotation().Yaw - lookAtYaw < -180)
 	{
-		UKismetSystemLibrary::PrintString(this, "speed -3");
+		//UKismetSystemLibrary::PrintString(this, "speed -3");
 		controller->AddYawInput(-3);
 	}	 
 	else if (controller->GetControlRotation().Yaw - lookAtYaw > 300)
 	{
-		UKismetSystemLibrary::PrintString(this, "speed 1");
+		//UKismetSystemLibrary::PrintString(this, "speed 1");
 		controller->AddYawInput(1);
 	}
 	else if (controller->GetControlRotation().Yaw - lookAtYaw > 180)
 	{
-		UKismetSystemLibrary::PrintString(this, "speed 3");
+		//UKismetSystemLibrary::PrintString(this, "speed 3");
 		controller->AddYawInput(3);
 	}
 	else
