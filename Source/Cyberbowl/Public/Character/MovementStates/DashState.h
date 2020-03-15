@@ -22,6 +22,7 @@ public:
 
 protected:
 	float DefaultGravityScale;
+	bool bKeepMomentum;
 	//FVector InitialVelocity;
 	FVector DashDirection;
 	ECBMovementMode PreviousMovementMode;
