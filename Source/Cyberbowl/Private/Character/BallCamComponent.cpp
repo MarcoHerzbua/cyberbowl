@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BallCamComponent.h"
+#include "Character/BallCamComponent.h"
 
 #include "Character/CyberbowlCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameModesAndInstances/InGameGameMode.h"
-#include <string>
 #include "Camera/CameraComponent.h"
+
 
 UBallCamComponent::UBallCamComponent()
 {
@@ -46,22 +46,18 @@ void UBallCamComponent::FocusBall(float deltaTime)
 
 	if (controller->GetControlRotation().Yaw - lookAtYaw < -300)
 	{
-		//UKismetSystemLibrary::PrintString(this, "speed -1");
 		controller->AddYawInput(-1);
 	}
 	else if (controller->GetControlRotation().Yaw - lookAtYaw < -180)
 	{
-		//UKismetSystemLibrary::PrintString(this, "speed -3");
 		controller->AddYawInput(-3);
 	}	 
 	else if (controller->GetControlRotation().Yaw - lookAtYaw > 300)
 	{
-		//UKismetSystemLibrary::PrintString(this, "speed 1");
 		controller->AddYawInput(1);
 	}
 	else if (controller->GetControlRotation().Yaw - lookAtYaw > 180)
 	{
-		//UKismetSystemLibrary::PrintString(this, "speed 3");
 		controller->AddYawInput(3);
 	}
 	else
