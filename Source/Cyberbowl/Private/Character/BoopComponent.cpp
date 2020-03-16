@@ -103,7 +103,8 @@ void UBoopComponent::PushBall(UPrimitiveComponent* OverlappedComp, AActor* Other
 
 	if (MovementComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Running)
 	{
-		cameraForwardVec = cameraForwardVec.RotateAngleAxis(UpwardsAngle, FVector(1, 0, 0));
+		cameraForwardVec.Z = FMath::DegreesToRadians(UpwardsAngle);
+		//DrawDebugLine(Owner->GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + 100.f * cameraForwardVec, FColor::Emerald, false, 10.f, 0, 5.f);
 	}
 	ball->PushBall(Force, cameraForwardVec);
 
