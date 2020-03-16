@@ -26,9 +26,6 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		float movementSpeed;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
-		float awayFromWallTime;
-
-		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		float jumpVelocity;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
@@ -40,8 +37,8 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		bool bisIsWallRidingClockWise;
 
-		void setIsWallRidingCounterClockWise(bool bIsCounterClockWise);
-		void setIsWallRidingClockWise(bool bisInWallRidingClockWise);
+		void setIsWallRidingCounterClockWise(bool bIsCounterClockWise) { bisIsWallRidingCounterClockWise = bIsCounterClockWise; };
+		void setIsWallRidingClockWise(bool bisInWallRidingClockWise) { bisIsWallRidingClockWise = bisInWallRidingClockWise; };
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		class APawn* pawn;
