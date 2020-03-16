@@ -9,11 +9,11 @@
 #include "Character/CBCharacterMovementComponent.h"
 
 
-
 // Sets default values for this component's properties
 UWallrunComponent::UWallrunComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	
 }
 
 
@@ -41,24 +41,25 @@ void UWallrunComponent::BeginPlay()
 	}
 
 	MovementComponent = GetOwner()->FindComponentByClass<UCBCharacterMovementComponent>();
+
+	
 }
 
 void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	auto test = JumpInputPressedDuration;
 	//TODO: Should not be handled by tags, but Stadium should have its own Blueprint and walls should have a collision preset (or something similiar) 
 	if(!OtherComp->ComponentTags.Contains("Stadium"))
 	{
   		return;
 	}
 
-	if(MovementComponent->MovementMode == EMovementMode::MOVE_Falling)
+	if (MovementComponent->MovementMode == EMovementMode::MOVE_Falling)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("WallrunCmp valid Wallrun")));
-		
+
 		//push character against the wall 
 		MovementComponent->AddImpulse(SweepResult.Normal * 1000.f);
-		
+
 		MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Wallrun);
 	}
 }
@@ -66,7 +67,11 @@ void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AAc
 void UWallrunComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Running);
+	//This check is necessary to avoid bugs when character just walks up to a wall 
+	if(MovementComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+	{
+		MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+	}
 }
 
 

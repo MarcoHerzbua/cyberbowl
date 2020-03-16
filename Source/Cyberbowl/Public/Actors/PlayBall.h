@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
-#include "Points.h"
+#include "GameModesAndInstances/InGameGameMode.h"
 #include "PlayBall.generated.h"
 
 UCLASS()
@@ -21,6 +21,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
 	float ScaleModifier = 3.f;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
+	float MaxSpeed = 4000.f;
 		
 
 protected:

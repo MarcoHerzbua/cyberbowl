@@ -5,9 +5,9 @@ void UJumpState::InitializeState(UCBCharacterMovementComponent* moveComponent)
 	UBaseMovementState::InitializeState(moveComponent);
 }
 
-void UJumpState::Activate()
+void UJumpState::Activate(ECBMovementMode previousMode)
 {
-	UBaseMovementState::Activate();
+	UBaseMovementState::Activate(previousMode);
 
 }
 
