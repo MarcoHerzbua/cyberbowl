@@ -25,12 +25,12 @@ struct FPlayerInfo
 
 		UPROPERTY(BlueprintReadWrite)
 		int Team;
-	UPROPERTY(BlueprintReadWrite)
+		UPROPERTY(BlueprintReadWrite)
 		ECBCharacterType CharacterType;
 
 	FPlayerInfo()
 	{
-		Team = 0;
+		Team = 1;
 		CharacterType = ECBCharacterType::CBCHRACTERTYPE_FIRE;
 	}
 };

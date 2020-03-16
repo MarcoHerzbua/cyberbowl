@@ -9,7 +9,8 @@ void AInGameGameMode::BeginPlay()
 	Super::BeginPlay();
 	PointsTeam0 = 0;
 	PointsTeam1 = 0;
-	
+
+
 	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &AInGameGameMode::GameEnd, GamePlayTime);
 	StartGamePlay.Broadcast();
 
@@ -36,7 +37,6 @@ void AInGameGameMode::GameEnd()
 	}
 	EndGame.Broadcast();
 }
-
 
 void AInGameGameMode::Add_Points(AActor* Collider)
 {
