@@ -2,7 +2,7 @@
 
 #include "Cyberbowl/Public/Character/CyberbowlCharacterAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Cyberbowl/CyberbowlCharacter.h"
+#include "Character/CyberbowlCharacter.h"
 
 
 void UCyberbowlCharacterAnimInstance::NativeInitializeAnimation()
@@ -15,8 +15,9 @@ void UCyberbowlCharacterAnimInstance::NativeInitializeAnimation()
 			main = Cast<ACyberbowlCharacter>(pawn);
 		}
 	}
-
-
+	bisIsWallRidingCounterClockWise = false;
+	bisIsWallRidingClockWise = false;
+	awayFromWallTime = 0;
 }
 
 void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
@@ -31,12 +32,33 @@ void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
 		FVector Speed = pawn->GetVelocity();
 		FVector lateralSpeed = FVector(Speed.X, Speed.Y, 0.f);
 		movementSpeed = lateralSpeed.Size();
+		jumpVelocity = Speed.Z;
 
 		bisInAir = pawn->GetMovementComponent()->IsFalling();
 
-		if (main == nullptr)
+		if (bisIsWallRidingClockWise == false && bisIsWallRidingCounterClockWise == false)
 		{
-			main = Cast<ACyberbowlCharacter>(pawn);
+			awayFromWallTime += GetWorld()->DeltaTimeSeconds;
 		}
+
 	}
 }
+
+void UCyberbowlCharacterAnimInstance::setIsWallRidingCounterClockWise(bool bIsCounterClockWise)
+{
+	bisIsWallRidingCounterClockWise = bIsCounterClockWise;
+	if (bIsCounterClockWise == true)
+	{
+		awayFromWallTime = 0;
+	}
+}
+
+void UCyberbowlCharacterAnimInstance::setIsWallRidingClockWise(bool bisInWallRidingClockWise)
+{
+	bisIsWallRidingClockWise = bisInWallRidingClockWise;
+	if (bisInWallRidingClockWise == true)
+	{
+		awayFromWallTime = 0;
+	}
+}
+
