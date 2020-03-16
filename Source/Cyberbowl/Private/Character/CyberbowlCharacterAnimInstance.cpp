@@ -17,6 +17,7 @@ void UCyberbowlCharacterAnimInstance::NativeInitializeAnimation()
 	}
 	bisIsWallRidingCounterClockWise = false;
 	bisIsWallRidingClockWise = false;
+	awayFromWallTime = 0;
 }
 
 void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
@@ -35,6 +36,29 @@ void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
 
 		bisInAir = pawn->GetMovementComponent()->IsFalling();
 
+		if (bisIsWallRidingClockWise == false && bisIsWallRidingCounterClockWise == false)
+		{
+			awayFromWallTime += GetWorld()->DeltaTimeSeconds;
+		}
+
+	}
+}
+
+void UCyberbowlCharacterAnimInstance::setIsWallRidingCounterClockWise(bool bIsCounterClockWise)
+{
+	bisIsWallRidingCounterClockWise = bIsCounterClockWise;
+	if (bIsCounterClockWise == true)
+	{
+		awayFromWallTime = 0;
+	}
+}
+
+void UCyberbowlCharacterAnimInstance::setIsWallRidingClockWise(bool bisInWallRidingClockWise)
+{
+	bisIsWallRidingClockWise = bisInWallRidingClockWise;
+	if (bisInWallRidingClockWise == true)
+	{
+		awayFromWallTime = 0;
 	}
 }
 

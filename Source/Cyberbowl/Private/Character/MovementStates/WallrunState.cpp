@@ -24,7 +24,6 @@ void UWallrunState::Activate(ECBMovementMode previousMode)
 	UBaseMovementState::Activate(previousMode);
 
 	MovementComponent->GravityScale = 0.f;
-	MovementComponent->Velocity.Z = 0;
 
 	float length;
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
@@ -57,6 +56,7 @@ void UWallrunState::OnTick(float DeltaTime)
 {
 	UBaseMovementState::OnTick(DeltaTime);
 
+	MovementComponent->Velocity.Z = 0;
 
 	float length;
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
@@ -78,36 +78,18 @@ void UWallrunState::LaunchCharacter()
 
 	FHitResult wallRunHitResult;
 	HitDirection(wallRunHitResult);
-	FVector wallNormal = wallRunHitResult.Normal;
-
-	float launchAngle = MovementComponent->WallrunLaunchAngle;
-	
-	FVector velocityDirectionVec; float length;
-	MovementComponent->Velocity.ToDirectionAndLength(velocityDirectionVec, length);
-
-	//Calculate the angle between the normal pointing away from the wall and the current velocity
-	float angle = FMath::RadiansToDegrees(FMath::Atan2(wallNormal.Y, wallNormal.X) - FMath::Atan2(velocityDirectionVec.Y, velocityDirectionVec.X));
-
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), velocityDirectionVec.X, velocityDirectionVec.Y, velocityDirectionVec.Z));
-
-
-	if(angle <= 0.f || angle >= 180.f)
-	{
-		launchAngle *= -1.f;
-	}
-	
-	FVector launchVec = velocityDirectionVec.RotateAngleAxis(launchAngle, FVector(0, 0, 1));
+	FVector launchVec = wallRunHitResult.Normal;
+	launchVec = launchVec.RotateAngleAxis(MovementComponent->WallrunLaunchAngle, FVector(0, 0, 1));
 	launchVec *= MovementComponent->WallrunLaunchForce;
 	launchVec.Z = MovementComponent->WallrunLaunchForce;
 	
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), launchVec.X, launchVec.Y, launchVec.Z));
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), angle));
-	//DrawDebugLine(MovementComponent->GetWorld(), MovementComponent->GetOwner()->GetActorLocation(), MovementComponent->GetOwner()->GetActorLocation() + launchVec, FColor::Emerald, false, 10.f, 0, 5.f);
+	
 	MovementComponent->AddImpulse(launchVec, true);
 	//auto ownerAsCharacter = Cast<ACharacter>(MovementComponent->GetOwner());
 	//ownerAsCharacter->LaunchCharacter(launchVec, true, true);
 
-	//MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Running);
 }
 
 EWallRunDirection UWallrunState::HitDirection(FHitResult& hitResult)
