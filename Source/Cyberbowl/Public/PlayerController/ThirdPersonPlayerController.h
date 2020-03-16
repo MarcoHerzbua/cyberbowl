@@ -4,15 +4,79 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Character/CyberbowlCharacter.h"
+#include "Blueprint/UserWidget.h"
+#include "FPlayerInfo.h"
 #include "ThirdPersonPlayerController.generated.h"
+
 
 /**
  * 
  */
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallToggledBallCam);
+
 UCLASS()
 class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+	void SetupInputComponent() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnActors();
+
+	UFUNCTION()
+	void OnStartGamePlay();
+
+	UFUNCTION()
+	void OnPauseGamePlay();
+
+	UFUNCTION()
+	void OnRegroup();
+
+	UFUNCTION()
+	void OnEndGame();
+
+	UPROPERTY(Editanywhere)
+	TSubclassOf<ACyberbowlCharacter> fireClass;
+
+	UPROPERTY(Editanywhere)
+	TSubclassOf<ACyberbowlCharacter> earthClass;
+
+	UPROPERTY(Editanywhere)
+	TSubclassOf<ACyberbowlCharacter> iceClass;
+
+	UPROPERTY(Editanywhere)
+	TSubclassOf<ACyberbowlCharacter> airClass;
+
+	UPROPERTY(Editanywhere)
+	TSubclassOf<UUserWidget> baseHudClass;
+
+	UFUNCTION()
+	void CallGameOverMenuNavigated();
+
+	UFUNCTION()
+	void CallToggledBallCam();
+
+public:
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnCallGameOverMenuNavigated OnCallGameOverMenuNavigated;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnCallGameOverMenuNavigated OnCallToggledBallCam;
+
+	UPROPERTY(BlueprintReadOnly)
+	int currPlayerTeam;
+
+	UPROPERTY(BlueprintReadOnly)
+	ECBCharacterType currPlayerType;
+
+	
+protected:
+	ACyberbowlCharacter* character;
+	FVector spawnTransform;
+	FRotator spawnRotation;
 	
 };

@@ -14,6 +14,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 {
 	UBaseMovementState::Activate(previousMode);
 
+	bKeepMomentum = true;
 	float forwardAxisInput = InputComponent->GetAxisValue("MoveForward");
 	float rightAxisInput = InputComponent->GetAxisValue("MoveRight");
 	FVector axisInput = FVector(forwardAxisInput, rightAxisInput, 0.f);
@@ -21,6 +22,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 
 	//Rotate the inputAxis to match with the View Rotation of the camera
 	axisInput = axisInput.RotateAngleAxis(viewRotation.Yaw, FVector::UpVector);
+	FRotator axisInputRotation = axisInput.ToOrientationRotator();
 
 	float finalDashDuration = MovementComponent->DashDuration;
 	if (axisInput.Size() == 0)
@@ -31,6 +33,11 @@ void UDashState::Activate(ECBMovementMode previousMode)
 
 		//FIX: This is needed, otherwise character will not dash upwards when standing still on ground
 		MovementComponent->DoJump(false);
+	}
+	else if (MovementComponent->DashMomentumStopRange.Contains(FMath::Abs(viewRotation.Yaw - axisInputRotation.Yaw)))
+	{
+		bKeepMomentum = false;
+		DashDirection = axisInput;
 	}
 	else
 	{
@@ -63,7 +70,10 @@ void UDashState::StopDash()
 {
 	FVector newVelocity = MovementComponent->Velocity.GetSafeNormal() * MovementComponent->MaxWalkSpeed;
 	MovementComponent->StopMovementImmediately();
-	MovementComponent->Velocity = newVelocity;
+	if(bKeepMomentum)
+	{
+		MovementComponent->Velocity = newVelocity;
+	}
 
 	MovementComponent->SetCBMovementMode(PreviousMovementMode);
 }

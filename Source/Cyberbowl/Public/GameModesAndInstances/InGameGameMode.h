@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
 #include "InGameGameMode.generated.h"
 
 
@@ -73,5 +74,4 @@ private:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 	void GameEnd();
-	
 };
