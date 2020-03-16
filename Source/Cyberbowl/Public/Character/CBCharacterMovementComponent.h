@@ -45,6 +45,18 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Dash Params")
 	float DashForce = 10000.f;
 
+	/*
+	 * 	This is the Range (in degrees) in which the character does not keep momentum after dashing, takes the View of the camera as starting point 
+	 *	Pressing forward on the LeftStick -> 0 degrees
+	 *	Pressing backwards on the LeftStick -> 180 degrees
+	 *	Pressing Right on the LeftStick -> 90 degrees
+	 *	(No need to worry about negative values, we take the absolute of the angle)
+	 */
+	UPROPERTY(EditAnywhere, Category = "Dash Params")
+	FFloatRange DashMomentumStopRange = TRange<float>(45.f, 135.f);
+
+	//UFUNCTION(BlueprintCallable, Category = "Cyberbowl Movement")
+	//void Jump();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetCBMovementMode(ECBMovementMode mode);
