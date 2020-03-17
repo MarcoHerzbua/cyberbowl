@@ -9,19 +9,22 @@
 #include "FPlayerInfo.h"
 #include "ThirdPersonPlayerController.generated.h"
 
-
-/**
- * 
- */
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallToggledBallCam);
+
+class UWNameTag;
 
 UCLASS()
 class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	void BeginPlay() override;
+
+	void Tick(float DeltaSeconds) override;
+
+private:
 	void SetupInputComponent() override;
 
 	UFUNCTION(BlueprintCallable)
@@ -38,6 +41,12 @@ class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
 
 	UFUNCTION()
 	void OnEndGame();
+
+	UFUNCTION()
+	void SetupNameTagWidgets();
+
+	UFUNCTION()
+	void UpdateNameTagPositions();
 
 	UPROPERTY(Editanywhere)
 	TSubclassOf<ACyberbowlCharacter> fireClass;
@@ -78,5 +87,7 @@ protected:
 	ACyberbowlCharacter* character;
 	FVector spawnTransform;
 	FRotator spawnRotation;
-	
+
+	TArray<UWNameTag*> nameTagWidgets;
+	TMap<int, ACyberbowlCharacter*> charactersMap;
 };

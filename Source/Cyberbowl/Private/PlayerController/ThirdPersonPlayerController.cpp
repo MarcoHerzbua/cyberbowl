@@ -7,6 +7,23 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameModesAndInstances/InGameGameMode.h"
+#include "Widgets/WNameTag.h"
+#include "Character/CyberbowlCharacter.h"
+#include "Components/WidgetComponent.h"
+#include "GameModesAndInstances/CyberbowlGameInstance.h"
+#include "Components/Button.h"
+
+void AThirdPersonPlayerController::BeginPlay()
+{
+	SpawnActors();
+	
+	//SetupNameTagWidgets();
+}
+
+void AThirdPersonPlayerController::Tick(float DeltaSeconds)
+{
+	UpdateNameTagPositions();
+}
 
 void AThirdPersonPlayerController::SetupInputComponent()
 {
@@ -86,6 +103,66 @@ void AThirdPersonPlayerController::SpawnActors()
 	gameMode->PauseGamePlay.AddDynamic(this, &AThirdPersonPlayerController::OnPauseGamePlay);
 	gameMode->Regroup.AddDynamic(this, &AThirdPersonPlayerController::OnRegroup);
 	gameMode->EndGame.AddDynamic(this, &AThirdPersonPlayerController::OnEndGame);
+}
+
+void AThirdPersonPlayerController::SetupNameTagWidgets()
+{
+	const int ownPlayerIndex = UGameplayStatics::GetPlayerControllerID(this);
+	TArray<AActor*> playerCharacters;
+	UGameplayStatics::GetAllActorsOfClass(this, ACyberbowlCharacter::StaticClass(), playerCharacters);
+
+	for (auto playerCharacter : playerCharacters)
+	{
+		const auto cyberbowlCharacter = Cast<ACyberbowlCharacter>(playerCharacter);
+		const int playerIndex = UGameplayStatics::GetPlayerControllerID(Cast<AThirdPersonPlayerController>(cyberbowlCharacter->GetController()));
+
+		if (playerIndex != ownPlayerIndex)
+		{
+			charactersMap.Add(playerIndex, cyberbowlCharacter);
+		}
+	}
+
+	auto gameInstance = Cast<UCyberbowlGameInstance>(GetGameInstance());
+	
+	for(const auto indexCharacterPair : charactersMap)
+	{
+		const auto nameTagWidget = Cast<UWNameTag>(CreateWidget(this, UWNameTag::StaticClass()));
+		const auto playerInfo = gameInstance->PlayerInfo.Find(indexCharacterPair.Key);
+		
+		nameTagWidget->CharacterName = ToCharacterName(playerInfo->CharacterType);
+		nameTagWidget->PlayerIndex = indexCharacterPair.Key;
+
+		auto background = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
+		if (playerInfo->Team == 1)
+		{
+			background->SetColorAndOpacity(nameTagWidget->ColorTeam1);
+		}
+		else
+		{
+			background->SetColorAndOpacity(nameTagWidget->ColorTeam2);
+		}
+		
+		nameTagWidgets.AddUnique(nameTagWidget);
+		nameTagWidget->AddToPlayerScreen();
+	}
+}
+
+void AThirdPersonPlayerController::UpdateNameTagPositions()
+{
+	for (auto nameTagWidget : nameTagWidgets)
+	{
+		auto playerCharacter = charactersMap[nameTagWidget->PlayerIndex];
+		const int playerIndex = UGameplayStatics::GetPlayerControllerID(Cast<AThirdPersonPlayerController>(playerCharacter->GetController()));
+
+		if (playerIndex == nameTagWidget->PlayerIndex)
+		{
+			auto widgetComponent = Cast<UWidgetComponent>(playerCharacter->GetComponentByClass(UWidgetComponent::StaticClass()));
+			FVector2D screenCoords;
+			ProjectWorldLocationToScreen(widgetComponent->GetComponentLocation(), screenCoords);
+
+			nameTagWidget->SetPositionInViewport(screenCoords);
+		}
+	}
 }
 
 void AThirdPersonPlayerController::OnStartGamePlay()
