@@ -17,7 +17,7 @@ void AThirdPersonPlayerController::BeginPlay()
 {
 	SpawnActors();
 	
-	//SetupNameTagWidgets();
+	SetupNameTagWidgets();
 }
 
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)
