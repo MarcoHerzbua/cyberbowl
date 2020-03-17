@@ -10,11 +10,12 @@
 #include "Widgets/WNameTag.h"
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
-#include "GameModesAndInstances/CyberbowlGameInstance.h"
 #include "Components/Button.h"
 
 void AThirdPersonPlayerController::BeginPlay()
 {
+	Super::BeginPlay();
+	
 	SpawnActors();
 	
 	SetupNameTagWidgets();
@@ -22,6 +23,8 @@ void AThirdPersonPlayerController::BeginPlay()
 
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
+	
 	UpdateNameTagPositions();
 }
 
@@ -126,7 +129,7 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 	
 	for(const auto indexCharacterPair : charactersMap)
 	{
-		const auto nameTagWidget = Cast<UWNameTag>(CreateWidget(this, UWNameTag::StaticClass()));
+		const auto nameTagWidget = Cast<UWNameTag>(CreateWidget(this, nameTagWidgetClass));
 		const auto playerInfo = gameInstance->PlayerInfo.Find(indexCharacterPair.Key);
 		
 		nameTagWidget->CharacterName = ToCharacterName(playerInfo->CharacterType);
@@ -135,11 +138,11 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 		auto background = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
 		if (playerInfo->Team == 1)
 		{
-			background->SetColorAndOpacity(nameTagWidget->ColorTeam1);
+			background->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
 		}
 		else
 		{
-			background->SetColorAndOpacity(nameTagWidget->ColorTeam2);
+			background->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
 		}
 		
 		nameTagWidgets.AddUnique(nameTagWidget);

@@ -7,17 +7,17 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "FPlayerInfo.h"
+#include "Widgets/WNameTag.h"
 #include "ThirdPersonPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallToggledBallCam);
 
-class UWNameTag;
-
 UCLASS()
 class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
 
 public:
 	void BeginPlay() override;
@@ -62,6 +62,9 @@ private:
 
 	UPROPERTY(Editanywhere)
 	TSubclassOf<UUserWidget> baseHudClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UWNameTag> nameTagWidgetClass;
 
 	UFUNCTION()
 	void CallGameOverMenuNavigated();

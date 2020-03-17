@@ -19,10 +19,4 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FString CharacterName = "Default";
 
-	UPROPERTY(BlueprintReadWrite)
-	FLinearColor ColorTeam1;
-	
-	UPROPERTY(BlueprintReadWrite)
-	FLinearColor ColorTeam2;
-
 };
