@@ -24,6 +24,9 @@ public:
 
 	void Tick(float DeltaSeconds) override;
 
+	UFUNCTION()
+	void SetupNameTagWidgets();
+
 private:
 	void SetupInputComponent() override;
 
@@ -41,12 +44,6 @@ private:
 
 	UFUNCTION()
 	void OnEndGame();
-
-	UFUNCTION()
-	void SetupNameTagWidgets();
-
-	UFUNCTION()
-	void UpdateNameTagPositions();
 
 	UPROPERTY(Editanywhere)
 	TSubclassOf<ACyberbowlCharacter> fireClass;

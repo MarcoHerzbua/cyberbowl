@@ -17,15 +17,11 @@ void AThirdPersonPlayerController::BeginPlay()
 	Super::BeginPlay();
 	
 	SpawnActors();
-	
-	SetupNameTagWidgets();
 }
 
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
-	UpdateNameTagPositions();
 }
 
 void AThirdPersonPlayerController::SetupInputComponent()
@@ -97,6 +93,9 @@ void AThirdPersonPlayerController::SpawnActors()
 
 	Possess(character);
 
+	gameInstance->SpawnedCharacters++;
+	gameInstance->CheckAllCharactersSpawned();
+
 	UUserWidget* baseWidget = CreateWidget<UUserWidget>(this, baseHudClass);
 	baseWidget->AddToPlayerScreen();
 
@@ -110,7 +109,10 @@ void AThirdPersonPlayerController::SpawnActors()
 
 void AThirdPersonPlayerController::SetupNameTagWidgets()
 {
-	const int ownPlayerIndex = UGameplayStatics::GetPlayerControllerID(this);
+
+
+	
+	/*const int ownPlayerIndex = UGameplayStatics::GetPlayerControllerID(this);
 	TArray<AActor*> playerCharacters;
 	UGameplayStatics::GetAllActorsOfClass(this, ACyberbowlCharacter::StaticClass(), playerCharacters);
 
@@ -147,25 +149,7 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 		
 		nameTagWidgets.AddUnique(nameTagWidget);
 		nameTagWidget->AddToPlayerScreen();
-	}
-}
-
-void AThirdPersonPlayerController::UpdateNameTagPositions()
-{
-	for (auto nameTagWidget : nameTagWidgets)
-	{
-		auto playerCharacter = charactersMap[nameTagWidget->PlayerIndex];
-		const int playerIndex = UGameplayStatics::GetPlayerControllerID(Cast<AThirdPersonPlayerController>(playerCharacter->GetController()));
-
-		if (playerIndex == nameTagWidget->PlayerIndex)
-		{
-			auto widgetComponent = Cast<UWidgetComponent>(playerCharacter->GetComponentByClass(UWidgetComponent::StaticClass()));
-			FVector2D screenCoords;
-			ProjectWorldLocationToScreen(widgetComponent->GetComponentLocation(), screenCoords);
-
-			nameTagWidget->SetPositionInViewport(screenCoords);
-		}
-	}
+	}*/
 }
 
 void AThirdPersonPlayerController::OnStartGamePlay()
