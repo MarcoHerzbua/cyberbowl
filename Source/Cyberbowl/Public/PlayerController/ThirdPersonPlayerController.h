@@ -60,9 +60,6 @@ private:
 	UPROPERTY(Editanywhere)
 	TSubclassOf<UUserWidget> baseHudClass;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UWNameTag> nameTagWidgetClass;
-
 	UFUNCTION()
 	void CallGameOverMenuNavigated();
 

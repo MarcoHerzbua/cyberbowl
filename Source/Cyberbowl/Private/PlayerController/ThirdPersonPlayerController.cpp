@@ -11,6 +11,8 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Components/Button.h"
+#include "Components/CapsuleComponent.h"
+#include <string>
 
 void AThirdPersonPlayerController::BeginPlay()
 {
@@ -109,25 +111,25 @@ void AThirdPersonPlayerController::SpawnActors()
 
 void AThirdPersonPlayerController::SetupNameTagWidgets()
 {
+	const int totalPlayers = Cast<UCyberbowlGameInstance>(GetGameInstance())->TotalPlayers;
+	const int ownPlayerIndex = UGameplayStatics::GetPlayerControllerID(this);
 
-
+	TArray<UWidgetComponent*, FDefaultAllocator> widgetComponents;
+	character->GetComponents<UWidgetComponent, FDefaultAllocator>(widgetComponents);
 	
-	/*const int ownPlayerIndex = UGameplayStatics::GetPlayerControllerID(this);
-	TArray<AActor*> playerCharacters;
-	UGameplayStatics::GetAllActorsOfClass(this, ACyberbowlCharacter::StaticClass(), playerCharacters);
-
-	for (auto playerCharacter : playerCharacters)
+	for (int i = 0; i < totalPlayers; i++)
 	{
-		const auto cyberbowlCharacter = Cast<ACyberbowlCharacter>(playerCharacter);
-		const int playerIndex = UGameplayStatics::GetPlayerControllerID(Cast<AThirdPersonPlayerController>(cyberbowlCharacter->GetController()));
-
-		if (playerIndex != ownPlayerIndex)
+		if (i == ownPlayerIndex)
 		{
-			charactersMap.Add(playerIndex, cyberbowlCharacter);
+			widgetComponents[i]->SetOwnerPlayer(this->GetLocalPlayer());
 		}
+		else
+		{
+			widgetComponents[i]->SetOwnerPlayer(UGameplayStatics::GetPlayerControllerFromID(this, 0)->GetLocalPlayer());
+		}	
 	}
 
-	auto gameInstance = Cast<UCyberbowlGameInstance>(GetGameInstance());
+	/*auto gameInstance = Cast<UCyberbowlGameInstance>(GetGameInstance());
 	
 	for(const auto indexCharacterPair : charactersMap)
 	{
