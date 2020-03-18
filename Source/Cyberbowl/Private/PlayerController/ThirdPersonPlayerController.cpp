@@ -125,33 +125,20 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 		}
 		else
 		{
+			Cast<UWNameTag>(widgetComponents[0]->GetUserWidgetObject())->CharacterName = ToCharacterName(currPlayerType);
 			widgetComponents[i]->SetOwnerPlayer(UGameplayStatics::GetPlayerControllerFromID(this, 0)->GetLocalPlayer());
-		}	
-	}
+		}
 
-	/*auto gameInstance = Cast<UCyberbowlGameInstance>(GetGameInstance());
-	
-	for(const auto indexCharacterPair : charactersMap)
-	{
-		const auto nameTagWidget = Cast<UWNameTag>(CreateWidget(this, nameTagWidgetClass));
-		const auto playerInfo = gameInstance->PlayerInfo.Find(indexCharacterPair.Key);
-		
-		nameTagWidget->CharacterName = ToCharacterName(playerInfo->CharacterType);
-		nameTagWidget->PlayerIndex = indexCharacterPair.Key;
-
-		auto background = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
-		if (playerInfo->Team == 1)
+		auto nameplate = Cast<UButton>(Cast<UWNameTag>(widgetComponents[0]->GetUserWidgetObject())->GetWidgetFromName("TeamColorButton"));
+		if (currPlayerTeam == 1)
 		{
-			background->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
+			nameplate->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
 		}
 		else
 		{
-			background->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
+			nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
 		}
-		
-		nameTagWidgets.AddUnique(nameTagWidget);
-		nameTagWidget->AddToPlayerScreen();
-	}*/
+	}
 }
 
 void AThirdPersonPlayerController::OnStartGamePlay()

@@ -13,10 +13,8 @@ class CYBERBOWL_API UWNameTag : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(BlueprintReadWrite)
-	int PlayerIndex;
 	
 	UPROPERTY(BlueprintReadOnly)
-	FString CharacterName = "Default";
+	FString CharacterName = "";
 
 };
