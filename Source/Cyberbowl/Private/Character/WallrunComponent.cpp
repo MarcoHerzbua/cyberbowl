@@ -67,7 +67,11 @@ void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AAc
 void UWallrunComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Running);
+	//This check is necessary to avoid bugs when character just walks up to a wall 
+	if(MovementComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+	{
+		MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+	}
 }
 
 
