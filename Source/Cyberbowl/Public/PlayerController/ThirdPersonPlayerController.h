@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "FPlayerInfo.h"
 #include "Widgets/WNameTag.h"
+#include "Components/WidgetComponent.h"
 #include "ThirdPersonPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
@@ -66,6 +67,9 @@ private:
 	UFUNCTION()
 	void CallToggledBallCam();
 
+	UFUNCTION()
+	void UpdateNameTagWidgetRotations();
+
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallGameOverMenuNavigated OnCallGameOverMenuNavigated;
@@ -85,6 +89,4 @@ protected:
 	FVector spawnTransform;
 	FRotator spawnRotation;
 
-	TArray<UWNameTag*> nameTagWidgets;
-	TMap<int, ACyberbowlCharacter*> charactersMap;
 };

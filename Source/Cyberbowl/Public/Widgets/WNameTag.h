@@ -17,4 +17,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FString CharacterName = "";
 
+	UPROPERTY(BlueprintReadOnly)
+	bool IsAssigned;
+
 };
