@@ -17,6 +17,7 @@
 AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	DefaultPawnClass = nullptr;
 	PrimaryActorTick.bCanEverTick = true;
 	PlayerControllerClass = AMainMenuPlayerController::StaticClass();
 

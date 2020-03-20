@@ -97,5 +97,8 @@ public:
 
 	UFUNCTION()
 	TArray<AActor*> GetCharacterSelectionCams() const;
+
+	UPROPERTY(BlueprintReadWrite)
+	AActor* cinematicCamera;
 	
 };

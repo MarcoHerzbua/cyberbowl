@@ -12,7 +12,7 @@
 void AMainMenuPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	
+
 	InputComponent->BindAction("PreviousCharacter", IE_Pressed, this, &AMainMenuPlayerController::FPreviousCharacterSelected);
 	InputComponent->BindAction("NextCharacter", IE_Pressed, this, &AMainMenuPlayerController::FNextCharacterSelected);
 	InputComponent->BindAction("PreviousTeam", IE_Pressed, this, &AMainMenuPlayerController::FPreviousTeamSelected);
@@ -30,6 +30,7 @@ void AMainMenuPlayerController::BeginPlay()
 	
 	mainMenuGameMode = Cast<AMainMenuGameMode>(GetWorld()->GetAuthGameMode());
 	mainMenuGameMode->IndicesReady.AddDynamic(this, &AMainMenuPlayerController::OnIndexReady);
+	SetViewTarget(Cast<AMainMenuGameMode>(UGameplayStatics::GetGameMode(this))->cinematicCamera);
 }
 
 void AMainMenuPlayerController::OnIndexReady()
