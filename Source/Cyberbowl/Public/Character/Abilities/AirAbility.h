@@ -15,5 +15,13 @@ class CYBERBOWL_API UAirAbility : public UAbilityBase
 	GENERATED_BODY()
 
 	virtual void Fire() override;
+
+protected:
+
+	UPROPERTY(BlueprintReadWrite)
+	float radiusMeters;
+
+	UPROPERTY(BlueprintReadWrite)
+	float grabDurationSeconds;
 	
 };
