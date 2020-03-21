@@ -62,14 +62,12 @@ void AMainMenuPlayerController::OnIndexReady()
 
 void AMainMenuPlayerController::FPreviousCharacterSelected()
 {
-	// ToDo: Disabled until Character visibility is fixed
-	// PreviousCharacterSelected.Broadcast();
+	PreviousCharacterSelected.Broadcast();
 }
 
 void AMainMenuPlayerController::FNextCharacterSelected()
 {
-	// ToDo: Disabled until Character visibility is fixed
-	// NextCharacterSelected.Broadcast();
+	NextCharacterSelected.Broadcast();
 }
 
 void AMainMenuPlayerController::FPreviousTeamSelected()
