@@ -13,6 +13,7 @@
 #include "PlayerController/MainMenuPlayerController.h"
 #include "Widgets/WMainMenu.h"
 #include "TimerManager.h"
+#include "GameModesAndInstances/CyberbowlGameInstance.h"
 
 AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -87,6 +88,7 @@ void AMainMenuGameMode::OnPlayerReadyUnready()
 
 void AMainMenuGameMode::StartMatch()
 {
+	Cast<UCyberbowlGameInstance>(GetGameInstance())->TotalPlayers = TotalPlayers;
 	DeleteUnassignedPlayers();
 	UGameplayStatics::OpenLevel(this, FName(TEXT("CyberbowlArenaMap")));
 }
