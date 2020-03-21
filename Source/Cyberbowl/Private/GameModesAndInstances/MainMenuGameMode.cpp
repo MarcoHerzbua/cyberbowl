@@ -20,10 +20,7 @@ AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectIniti
 	DefaultPawnClass = nullptr;
 	PrimaryActorTick.bCanEverTick = true;
 	PlayerControllerClass = AMainMenuPlayerController::StaticClass();
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> mainMenuBackgroundWidgetClassFinder(TEXT("/Game/UI/W_MainMenuBackground"));
-	mainMenuBackgroundWidgetClass = mainMenuBackgroundWidgetClassFinder.Class;
-
+	
 	static ConstructorHelpers::FClassFinder<APawn> DummyCharacterFinder(TEXT("/Game/Characters/Dummy/DummyBase"));
 	dummyClass = DummyCharacterFinder.Class;
 
@@ -98,8 +95,6 @@ void AMainMenuGameMode::CreateMainMenu()
 {
 	auto mainMenuControllerPlayer1 = Cast<AMainMenuPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
 	
-	CreateWidget(mainMenuControllerPlayer1, mainMenuBackgroundWidgetClass)->AddToViewport();
-
 	// Main Menu
 	MainMenuWidget = Cast<UWMainMenu>(CreateWidget(mainMenuControllerPlayer1, mainMenuWidgetClass));
 
