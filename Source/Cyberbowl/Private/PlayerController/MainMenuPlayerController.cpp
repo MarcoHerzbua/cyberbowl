@@ -27,10 +27,10 @@ void AMainMenuPlayerController::SetupInputComponent()
 void AMainMenuPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	mainMenuGameMode = Cast<AMainMenuGameMode>(GetWorld()->GetAuthGameMode());
 	mainMenuGameMode->IndicesReady.AddDynamic(this, &AMainMenuPlayerController::OnIndexReady);
-	SetViewTarget(Cast<AMainMenuGameMode>(UGameplayStatics::GetGameMode(this))->cinematicCamera);
+	SetViewTarget(mainMenuGameMode->cinematicCamera);
 }
 
 void AMainMenuPlayerController::OnIndexReady()
