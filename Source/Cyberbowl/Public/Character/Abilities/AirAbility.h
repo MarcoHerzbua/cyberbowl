@@ -16,12 +16,24 @@ class CYBERBOWL_API UAirAbility : public UAbilityBase
 
 	virtual void Fire() override;
 
+public:
+	virtual void BeginPlay() override;
+
 protected:
 
+	UFUNCTION(BlueprintCallable)
+	void ConvertMetersToUnrealUnits();
+	
 	UPROPERTY(BlueprintReadWrite)
 	float radiusMeters;
 
 	UPROPERTY(BlueprintReadWrite)
 	float grabDurationSeconds;
+
+	UPROPERTY()
+	AActor* ball;
+
+	UPROPERTY()
+	USceneComponent* ballPulledAttachComponent;
 	
 };
