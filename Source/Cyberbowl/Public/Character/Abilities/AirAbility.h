@@ -6,9 +6,8 @@
 #include "AbilityBase.h"
 #include "AirAbility.generated.h"
 
-/**
- * 
- */
+class APlayBall;
+
 UCLASS(ClassGroup = (Abilities), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API UAirAbility : public UAbilityBase
 {
@@ -19,10 +18,15 @@ class CYBERBOWL_API UAirAbility : public UAbilityBase
 public:
 	virtual void BeginPlay() override;
 
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 protected:
 
 	UFUNCTION(BlueprintCallable)
 	void ConvertMetersToUnrealUnits();
+
+	UFUNCTION()
+	void SetBallUngrabbed();
 	
 	UPROPERTY(BlueprintReadWrite)
 	float radiusMeters;
@@ -31,9 +35,14 @@ protected:
 	float grabDurationSeconds;
 
 	UPROPERTY()
-	AActor* ball;
+	APlayBall* ball;
 
 	UPROPERTY()
 	USceneComponent* ballPulledAttachComponent;
-	
+
+	UPROPERTY()
+	bool bIsInGrabMode;
+
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle GrabModeDurationHandle;
 };

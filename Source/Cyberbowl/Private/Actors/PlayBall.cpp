@@ -56,6 +56,12 @@ void APlayBall::StopBall()
 	BallStaticMesh->SetSimulatePhysics(false);
 }
 
+void APlayBall::ResumeBall()
+{
+	BallStaticMesh->SetEnableGravity(true);
+	BallStaticMesh->SetSimulatePhysics(true);
+}
+
 void APlayBall::ResetBallPosition()
 {
 	BallStaticMesh->SetWorldLocation(StartPosition);

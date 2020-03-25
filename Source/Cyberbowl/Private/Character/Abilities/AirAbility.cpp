@@ -8,13 +8,27 @@
 #include <string>
 #include "DrawDebugHelpers.h"
 #include "Actors/PlayBall.h"
+#include "Character/CyberbowlCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/World.h"
+#include "Actors/PlayBall.h"
 
 void UAirAbility::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	ball = Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball;
-	ballPulledAttachComponent = Cast<USceneComponent>(GetOwner()->GetComponentsByTag(USceneComponent::StaticClass(), "TornadoBallLocation")[0]);
+	ball = Cast<APlayBall>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball);
+	ballPulledAttachComponent = Cast<USceneComponent>(GetOwner()->GetComponentsByTag(USceneComponent::StaticClass(), "TornadoBallLocation").Last());
+}
+
+void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (bIsInGrabMode)
+	{
+		ball->SetActorLocation(ballPulledAttachComponent->GetComponentLocation());
+	}
 }
 
 void UAirAbility::Fire()
@@ -27,14 +41,21 @@ void UAirAbility::Fire()
 	
 	if (distance <= radiusMeters)
 	{
-		UKismetSystemLibrary::PrintString(this, "pulled");
-		Cast<APlayBall>(ball)->StopBall();
-		ball->SetActorLocation(ballPulledAttachComponent->GetComponentLocation());
+		ball->StopBall();
+		bIsInGrabMode = true;
+		GetWorld()->GetTimerManager().SetTimer(GrabModeDurationHandle, this, &UAirAbility::SetBallUngrabbed, grabDurationSeconds, false);
 	}
+	//Cast<ACyberbowlCharacter>(GetOwner())->GetMovementComponent()->ToggleActive();
 }
 
 void UAirAbility::ConvertMetersToUnrealUnits()
 {
 	// Conversion from meters to cm, as unreal functions generally output centimeters, but meters is easier for game design tweaks
 	radiusMeters *= 100.f;
+}
+
+void UAirAbility::SetBallUngrabbed()
+{
+	bIsInGrabMode = false;
+	ball->ResumeBall();
 }

@@ -43,6 +43,9 @@ public:
 	void StopBall();
 
 	UFUNCTION(BlueprintCallable)
+	void ResumeBall();
+
+	UFUNCTION(BlueprintCallable)
 	void PlayBall();
 
 	UFUNCTION(BlueprintCallable)
