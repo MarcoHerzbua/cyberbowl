@@ -7,6 +7,8 @@
 #include "AirAbility.generated.h"
 
 class APlayBall;
+class UCharacterMovementComponent;
+class ACyberbowlCharacter;
 
 UCLASS(ClassGroup = (Abilities), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API UAirAbility : public UAbilityBase
@@ -26,7 +28,7 @@ protected:
 	void ConvertMetersToUnrealUnits();
 
 	UFUNCTION()
-	void SetBallUngrabbed();
+	void ExitGrabMode();
 	
 	UPROPERTY(BlueprintReadWrite)
 	float radiusMeters;
@@ -40,9 +42,15 @@ protected:
 	UPROPERTY()
 	USceneComponent* ballPulledAttachComponent;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	bool bIsInGrabMode;
 
 	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle GrabModeDurationHandle;
+
+	UPROPERTY()
+	UCharacterMovementComponent* movementComp;
+
+	UPROPERTY()
+	ACyberbowlCharacter* character;
 };
