@@ -54,9 +54,9 @@ void UAirAbility::Fire()
 	cylinderEnd.Z += 2000.f;
 	DrawDebugCylinder(GetWorld(), GetOwner()->GetActorLocation(), cylinderEnd, 1000.f, 32, FColor::Red, false, 3.f, 0, 5.f);
 
-	const float distance = FVector::Distance(GetOwner()->GetActorLocation(), ball->GetActorLocation());
+	const float distance = FVector2D::Distance(FVector2D(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y),FVector2D(ball->GetActorLocation().X, ball->GetActorLocation().Y));
 	
-	if (distance <= radiusMeters)
+	if (distance <= grabRadiusMeters)
 	{
 		bIsInGrabMode = true;
 		character->bTurretMode = true;
@@ -80,7 +80,7 @@ void UAirAbility::Fire()
 void UAirAbility::ConvertMetersToUnrealUnits()
 {
 	// Conversion from meters to cm, as unreal functions generally output centimeters, but meters is easier for game design tweaks
-	radiusMeters *= 100.f;
+	grabRadiusMeters *= 100.f;
 }
 
 void UAirAbility::ExitGrabMode()

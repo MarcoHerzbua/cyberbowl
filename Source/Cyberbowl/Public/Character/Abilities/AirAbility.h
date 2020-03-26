@@ -32,7 +32,7 @@ protected:
 	void ExitGrabMode();
 	
 	UPROPERTY(BlueprintReadWrite)
-	float radiusMeters;
+	float grabRadiusMeters;
 
 	UPROPERTY(BlueprintReadWrite)
 	float grabDurationSeconds;
