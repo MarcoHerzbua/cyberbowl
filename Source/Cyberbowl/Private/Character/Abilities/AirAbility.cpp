@@ -37,13 +37,7 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 	if (bIsInGrabMode)
 	{		
-		FRotator cameraLookAt = FRotator(character->GetCameraBoom()->GetTargetRotation().Pitch * (-1), ballLocationSpringArm->GetComponentRotation().Yaw, 0);
-
-		if (UKismetMathLibrary::Abs(cameraLookAt.Pitch) >= 180)
-		{
-			cameraLookAt.Pitch = 0.0f;
-		}
-
+		
 		if (UKismetMathLibrary::Abs(FVector::Distance(ball->GetActorLocation(), ballPulledAttachComponent->GetComponentLocation())) <= 100.f)
 		{
 			ball->AttachToComponent(ballPulledAttachComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -54,6 +48,7 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 			ball->SetActorLocation(ballTarget);
 		}
 
+		const FRotator cameraLookAt = FRotator(character->GetCameraBoom()->GetTargetRotation().Pitch * (-1), ballLocationSpringArm->GetComponentRotation().Yaw, 0);
 		ballLocationSpringArm->SetWorldRotation(cameraLookAt);
 	}
 }
@@ -73,8 +68,8 @@ void UAirAbility::Fire()
 		// Used for character control with right stick
 		character->bTurretMode = true;
 		
-		ball->StopBall();
-		//ball->AttachToComponent(ballPulledAttachComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		//ball->StopBall();
+		ball->BallStaticMesh->SetEnableGravity(false);
 		movementComp->DisableMovement();
 		
 		// Disable BallCam if active
@@ -103,8 +98,9 @@ void UAirAbility::ExitGrabMode()
 	
 	bIsInGrabMode = false;
 	ball->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	ball->ResumeBall();
-	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
+	ball->BallStaticMesh->SetEnableGravity(true);
+
 	character->bTurretMode = false;
 	character->GetCameraBoom()->bUsePawnControlRotation = true;
+	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
 }
