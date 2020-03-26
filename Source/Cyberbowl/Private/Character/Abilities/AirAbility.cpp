@@ -44,9 +44,17 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 			cameraLookAt.Pitch = 0.0f;
 		}
 
+		if (UKismetMathLibrary::Abs(FVector::Distance(ball->GetActorLocation(), ballPulledAttachComponent->GetComponentLocation())) <= 100.f)
+		{
+			ball->AttachToComponent(ballPulledAttachComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		}
+		else
+		{
+			const auto ballTarget = UKismetMathLibrary::VInterpTo(ball->GetActorLocation(), ballPulledAttachComponent->GetComponentLocation(), DeltaTime, succSpeed);
+			ball->SetActorLocation(ballTarget);
+		}
+
 		ballLocationSpringArm->SetWorldRotation(cameraLookAt);
-		auto ballTarget = UKismetMathLibrary::VInterpTo(ball->GetActorLocation(), ballPulledAttachComponent->GetComponentLocation(), DeltaTime, succSpeed);
-		ball->SetActorLocation(ballTarget);
 	}
 }
 
