@@ -5,12 +5,12 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameModesAndInstances/InGameGameMode.h"
-#include <string>
 #include "DrawDebugHelpers.h"
 #include "Actors/PlayBall.h"
 #include "Character/CyberbowlCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
+#include "TimerManager.h"
 #include "Actors/PlayBall.h"
 #include "PlayerController/ThirdPersonPlayerController.h"
 #include "Character/BallCamComponent.h"
@@ -25,7 +25,10 @@ void UAirAbility::BeginPlay()
 	movementComp = Cast<UCharacterMovementComponent>(character->GetMovementComponent());
 
 	ball = Cast<APlayBall>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball);
+	ballLocationSpringArm = Cast<USpringArmComponent>(character->GetComponentsByTag(USpringArmComponent::StaticClass(), "BallLocationArm").Last());
 	ballPulledAttachComponent = Cast<USceneComponent>(character->GetComponentsByTag(USceneComponent::StaticClass(), "TornadoBallLocation").Last());
+
+	ball->OnBallBooped.AddDynamic(this, &UAirAbility::ExitGrabMode);
 }
 
 void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -33,11 +36,15 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (bIsInGrabMode)
-	{
-		auto ballLocationSpringArm = Cast<USpringArmComponent>(character->GetComponentsByTag(USpringArmComponent::StaticClass(), "BallLocationArm").Last());
+	{		
 		FRotator cameraLookAt = FRotator(character->GetCameraBoom()->GetTargetRotation().Pitch * (-1), ballLocationSpringArm->GetComponentRotation().Yaw, 0);
+
+		if (UKismetMathLibrary::Abs(cameraLookAt.Pitch) >= 180)
+		{
+			cameraLookAt.Pitch = 0.0f;
+		}
+		
 		ballLocationSpringArm->SetWorldRotation(cameraLookAt);
-		ball->SetActorLocation(ballPulledAttachComponent->GetComponentLocation());	
 	}
 }
 
@@ -53,38 +60,20 @@ void UAirAbility::Fire()
 	{
 		bIsInGrabMode = true;
 		character->bTurretMode = true;
+		ball->StopBall();
+		ball->AttachToComponent(ballPulledAttachComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		movementComp->DisableMovement();
 		
+		// Disable BallCam if active
 		auto ballCamComp = Cast<UBallCamComponent>(Cast<ACyberbowlCharacter>(GetOwner())->GetComponentByClass(UBallCamComponent::StaticClass()));
 		ballCamComp->DoNotFollow();
-		
-		ball->StopBall();
 
 		GetWorld()->GetTimerManager().SetTimer(GrabModeDurationHandle, this, &UAirAbility::ExitGrabMode, grabDurationSeconds, false);
-
-		// ToDo: Set ball in center of camera, considering the scene component on the character
-
-		/*const auto cameraManager = UGameplayStatics::GetPlayerCameraManager(this, UGameplayStatics::GetPlayerControllerID(Cast<AThirdPersonPlayerController>(Cast<ACyberbowlCharacter>(GetOwner())->Controller)));
-		FVector cameraForwardVector = cameraManager->GetActorForwardVector();
-		
-		FVector cameraLookAtLocation;
-		ball->SetActorLocation(cameraLookAtLocation);*/
-		
-		// ToDo: Rotate the  character towards the ball
 		
 		auto lookAtRotation = UKismetMathLibrary::FindLookAtRotation(character->GetActorLocation(), ball->GetActorLocation());
 		auto newRotation = FRotator(0, lookAtRotation.Yaw, 0);
 		character->SetActorRotation(newRotation);
-		Cast<AThirdPersonPlayerController>(character->GetController())->SetControlRotation(newRotation);
-		
-		// ToDo: Disable movement
-		
-		movementComp->DisableMovement();
-		
-		// ToDo: Rotate character + ball with right stick
-
-		//character->GetViewRotation().Pitch
-		
-		// ToDo: Break GrabMode when ball is affected by Push
+		Cast<AThirdPersonPlayerController>(character->GetController())->SetControlRotation(newRotation);		
 	}
 }
 
@@ -96,7 +85,13 @@ void UAirAbility::ConvertMetersToUnrealUnits()
 
 void UAirAbility::ExitGrabMode()
 {
+	if (!bIsInGrabMode)
+	{
+		return;
+	}
+	
 	bIsInGrabMode = false;
+	ball->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	ball->ResumeBall();
 	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
 	character->bTurretMode = false;

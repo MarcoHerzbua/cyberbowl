@@ -8,6 +8,8 @@
 #include "GameModesAndInstances/InGameGameMode.h"
 #include "PlayBall.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu
+
 UCLASS()
 class CYBERBOWL_API APlayBall : public AActor
 {
@@ -24,6 +26,9 @@ public:
 		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
 	float MaxSpeed = 4000.f;
+
+	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	FOnBallBooped OnBallBooped;
 		
 
 protected:

@@ -9,6 +9,7 @@
 class APlayBall;
 class UCharacterMovementComponent;
 class ACyberbowlCharacter;
+class USpringArmComponent;
 
 UCLASS(ClassGroup = (Abilities), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API UAirAbility : public UAbilityBase
@@ -41,6 +42,9 @@ protected:
 
 	UPROPERTY()
 	USceneComponent* ballPulledAttachComponent;
+
+	UPROPERTY()
+	USpringArmComponent* ballLocationSpringArm;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsInGrabMode;

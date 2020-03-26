@@ -39,6 +39,8 @@ void APlayBall::Tick(float DeltaTime)
 
 void APlayBall::PushBall(float force, FVector direction)
 {
+	OnBallBooped.Broadcast();
+	
 	//BallStaticMesh->ComponentVelocity = FVector(0);
 	//Is this only moving the mesh? -> Marco: the mesh a scene component and the root of the actor, so everything in this actor is moved
 	BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
