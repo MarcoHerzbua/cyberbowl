@@ -35,6 +35,9 @@ protected:
 	float grabRadiusMeters;
 
 	UPROPERTY(BlueprintReadWrite)
+	float succSpeed;
+
+	UPROPERTY(BlueprintReadWrite)
 	float grabDurationSeconds;
 
 	UPROPERTY()
