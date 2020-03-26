@@ -48,10 +48,10 @@ void UWallrunComponent::BeginPlay()
 void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//TODO: Should not be handled by tags, but Stadium should have its own Blueprint and walls should have a collision preset (or something similiar) 
-	if(!OtherComp->ComponentTags.Contains("Stadium"))
-	{
-  		return;
-	}
+	//if(!OtherComp->ComponentTags.Contains("Stadium"))
+	//{
+ // 		return;
+	//}
 
 	if (MovementComponent->MovementMode == EMovementMode::MOVE_Falling)
 	{

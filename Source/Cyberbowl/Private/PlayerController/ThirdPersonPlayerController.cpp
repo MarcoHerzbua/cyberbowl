@@ -7,6 +7,24 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameModesAndInstances/InGameGameMode.h"
+#include "Character/CyberbowlCharacter.h"
+#include "Components/WidgetComponent.h"
+#include "Components/Button.h"
+#include <string>
+
+void AThirdPersonPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	SetAsLocalPlayerController();
+	SpawnActors();
+}
+
+void AThirdPersonPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	UpdateNameTagWidgetRotations();
+}
 
 void AThirdPersonPlayerController::SetupInputComponent()
 {
@@ -77,6 +95,9 @@ void AThirdPersonPlayerController::SpawnActors()
 
 	Possess(character);
 
+	gameInstance->SpawnedCharacters++;
+	gameInstance->CheckAllCharactersSpawned();
+
 	UUserWidget* baseWidget = CreateWidget<UUserWidget>(this, baseHudClass);
 	baseWidget->AddToPlayerScreen();
 
@@ -86,6 +107,55 @@ void AThirdPersonPlayerController::SpawnActors()
 	gameMode->PauseGamePlay.AddDynamic(this, &AThirdPersonPlayerController::OnPauseGamePlay);
 	gameMode->Regroup.AddDynamic(this, &AThirdPersonPlayerController::OnRegroup);
 	gameMode->EndGame.AddDynamic(this, &AThirdPersonPlayerController::OnEndGame);
+}
+
+void AThirdPersonPlayerController::SetupNameTagWidgets()
+{
+	TArray<UWidgetComponent*, FDefaultAllocator> widgetComponents;
+	character->GetComponents<UWidgetComponent, FDefaultAllocator>(widgetComponents);
+
+	TArray<AActor*> playerControllers;
+	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), playerControllers);
+
+	for (auto controller : playerControllers)
+	{
+		auto playerController = Cast<AThirdPersonPlayerController>(controller);
+
+		if (playerController == this)
+			continue;
+		
+		UWidgetComponent* widgetComponent = widgetComponents.Pop();
+		UWNameTag* nameTagWidget = Cast<UWNameTag>(widgetComponent->GetUserWidgetObject());
+		UButton* nameplate = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
+		nameTagWidget->CharacterName = ToCharacterName(currPlayerType);	
+
+		if (currPlayerTeam == 1)
+		{
+			nameplate->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
+		}
+		else
+		{
+			nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
+		}
+
+		//if (playerController != this)
+		//{
+			widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
+			nameTagWidget->SetOwningPlayer(playerController);
+			nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
+			nameTagWidget->IsAssigned = true;
+		//}
+	}
+
+	for (auto widgetComp : widgetComponents)
+	{	
+		bool isAssigned = Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned;
+		if (!isAssigned)
+		{
+			widgetComp->DestroyComponent();
+			UKismetSystemLibrary::PrintString(this, "deleted widget component");
+		}
+	}
 }
 
 void AThirdPersonPlayerController::OnStartGamePlay()
@@ -117,4 +187,9 @@ void AThirdPersonPlayerController::CallGameOverMenuNavigated()
 void AThirdPersonPlayerController::CallToggledBallCam()
 {
 	OnCallToggledBallCam.Broadcast();
+}
+
+void AThirdPersonPlayerController::UpdateNameTagWidgetRotations()
+{
+	
 }

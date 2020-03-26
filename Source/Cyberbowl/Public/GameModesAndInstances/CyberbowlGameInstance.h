@@ -18,5 +18,14 @@ class CYBERBOWL_API UCyberbowlGameInstance : public UGameInstance
 
 public:
 	UPROPERTY(BlueprintReadWrite)
-		TMap<int, FPlayerInfo> PlayerInfo;
+	TMap<int, FPlayerInfo> PlayerInfo;
+
+	UPROPERTY()
+	int TotalPlayers;
+
+	UPROPERTY()
+	int SpawnedCharacters;
+
+	UFUNCTION()
+	void CheckAllCharactersSpawned() const;
 };

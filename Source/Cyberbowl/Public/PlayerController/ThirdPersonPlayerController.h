@@ -7,12 +7,9 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "FPlayerInfo.h"
+#include "Widgets/WNameTag.h"
+#include "Components/WidgetComponent.h"
 #include "ThirdPersonPlayerController.generated.h"
-
-
-/**
- * 
- */
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallToggledBallCam);
@@ -22,6 +19,16 @@ class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+
+public:
+	void BeginPlay() override;
+
+	void Tick(float DeltaSeconds) override;
+
+	UFUNCTION()
+	void SetupNameTagWidgets();
+
+private:
 	void SetupInputComponent() override;
 
 	UFUNCTION(BlueprintCallable)
@@ -60,6 +67,9 @@ class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
 	UFUNCTION()
 	void CallToggledBallCam();
 
+	UFUNCTION()
+	void UpdateNameTagWidgetRotations();
+
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallGameOverMenuNavigated OnCallGameOverMenuNavigated;
@@ -78,5 +88,5 @@ protected:
 	ACyberbowlCharacter* character;
 	FVector spawnTransform;
 	FRotator spawnRotation;
-	
+
 };
