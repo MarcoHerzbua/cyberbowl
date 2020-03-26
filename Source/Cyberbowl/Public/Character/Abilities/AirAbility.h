@@ -10,6 +10,8 @@ class APlayBall;
 class UCharacterMovementComponent;
 class ACyberbowlCharacter;
 class USpringArmComponent;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS(ClassGroup = (Abilities), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API UAirAbility : public UAbilityBase
@@ -30,6 +32,9 @@ protected:
 
 	UFUNCTION()
 	void ExitGrabMode();
+
+	UFUNCTION()
+	void DestroyTornado();
 	
 	UPROPERTY(BlueprintReadWrite)
 	float grabRadiusMeters;
@@ -40,6 +45,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	float grabDurationSeconds;
 
+	UPROPERTY(BlueprintReadWrite)
+	float tornadoDuration;
+	
 	UPROPERTY()
 	APlayBall* ball;
 
@@ -55,9 +63,18 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle GrabModeDurationHandle;
 
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle TornadoEffectDurationHandle;
+
 	UPROPERTY()
 	UCharacterMovementComponent* movementComp;
 
 	UPROPERTY()
 	ACyberbowlCharacter* character;
+
+	UPROPERTY(BlueprintReadWrite)
+	UNiagaraSystem* tornadoEffect;
+
+	UPROPERTY(BlueprintReadOnly)
+	UNiagaraComponent* tornadoComponent;
 };

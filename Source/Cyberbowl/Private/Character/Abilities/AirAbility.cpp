@@ -16,6 +16,9 @@
 #include "Character/BallCamComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 void UAirAbility::BeginPlay()
 {
@@ -80,6 +83,9 @@ void UAirAbility::Fire()
 
 		const auto cameraLookAtRotation = FRotator(0.f, character->GetCameraBoom()->GetTargetRotation().Yaw, 0.f);
 		character->SetActorRotation(cameraLookAtRotation);
+
+		tornadoComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, tornadoEffect, character->GetActorLocation());
+		GetWorld()->GetTimerManager().SetTimer(TornadoEffectDurationHandle, this, &UAirAbility::DestroyTornado, tornadoDuration, false);
 	}
 }
 
@@ -103,4 +109,9 @@ void UAirAbility::ExitGrabMode()
 	character->bTurretMode = false;
 	character->GetCameraBoom()->bUsePawnControlRotation = true;
 	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void UAirAbility::DestroyTornado()
+{
+	tornadoComponent->DestroyComponent();
 }
