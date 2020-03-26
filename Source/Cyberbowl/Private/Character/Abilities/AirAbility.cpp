@@ -69,11 +69,9 @@ void UAirAbility::Fire()
 		ballCamComp->DoNotFollow();
 
 		GetWorld()->GetTimerManager().SetTimer(GrabModeDurationHandle, this, &UAirAbility::ExitGrabMode, grabDurationSeconds, false);
-		
-		auto lookAtRotation = UKismetMathLibrary::FindLookAtRotation(character->GetActorLocation(), ball->GetActorLocation());
-		auto newRotation = FRotator(0, lookAtRotation.Yaw, 0);
-		character->SetActorRotation(newRotation);
-		Cast<AThirdPersonPlayerController>(character->GetController())->SetControlRotation(newRotation);		
+
+		const auto cameraLookAtRotation = FRotator(0.f, character->GetCameraBoom()->GetTargetRotation().Yaw, 0.f);
+		character->SetActorRotation(cameraLookAtRotation);
 	}
 }
 
