@@ -18,40 +18,21 @@ enum class ECBCharacterType : uint8
 	CBCHRACTERTYPE_AIR UMETA(DisplayName = "Air"),
 };
 
-inline const char* ToCharacterName(ECBCharacterType type)
-{
-	switch (type)
-	{
-		case ECBCharacterType::CBCHRACTERTYPE_FIRE:
-			return "Hapala";
-		case ECBCharacterType::CBCHRACTERTYPE_EARTH:
-			return "Jishin";
-		case ECBCharacterType::CBCHRACTERTYPE_ICE:
-			return "Siku";
-		case ECBCharacterType::CBCHRACTERTYPE_AIR:
-			return "Zefyra";
-		default:
-			return "Unknown";
-	}
-}
-
 USTRUCT(BlueprintType)
 struct FPlayerInfo
 {
 	GENERATED_BODY()
+
+		UPROPERTY(BlueprintReadWrite)
+		int Team;
+		UPROPERTY(BlueprintReadWrite)
+		ECBCharacterType CharacterType;
 
 	FPlayerInfo()
 	{
 		Team = 1;
 		CharacterType = ECBCharacterType::CBCHRACTERTYPE_FIRE;
 	}
-
-	UPROPERTY(BlueprintReadWrite)
-	int Team;
-	
-	UPROPERTY(BlueprintReadWrite)
-	ECBCharacterType CharacterType;
-	
 };
 
 UCLASS()

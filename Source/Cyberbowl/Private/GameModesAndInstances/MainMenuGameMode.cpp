@@ -13,15 +13,16 @@
 #include "PlayerController/MainMenuPlayerController.h"
 #include "Widgets/WMainMenu.h"
 #include "TimerManager.h"
-#include "GameModesAndInstances/CyberbowlGameInstance.h"
 
 AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	DefaultPawnClass = nullptr;
 	PrimaryActorTick.bCanEverTick = true;
 	PlayerControllerClass = AMainMenuPlayerController::StaticClass();
-	
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> mainMenuBackgroundWidgetClassFinder(TEXT("/Game/UI/W_MainMenuBackground"));
+	mainMenuBackgroundWidgetClass = mainMenuBackgroundWidgetClassFinder.Class;
+
 	static ConstructorHelpers::FClassFinder<APawn> DummyCharacterFinder(TEXT("/Game/Characters/Dummy/DummyBase"));
 	dummyClass = DummyCharacterFinder.Class;
 
@@ -88,7 +89,6 @@ void AMainMenuGameMode::OnPlayerReadyUnready()
 
 void AMainMenuGameMode::StartMatch()
 {
-	Cast<UCyberbowlGameInstance>(GetGameInstance())->TotalPlayers = TotalPlayers;
 	DeleteUnassignedPlayers();
 	UGameplayStatics::OpenLevel(this, FName(TEXT("CyberbowlArenaMap")));
 }
@@ -97,6 +97,8 @@ void AMainMenuGameMode::CreateMainMenu()
 {
 	auto mainMenuControllerPlayer1 = Cast<AMainMenuPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
 	
+	CreateWidget(mainMenuControllerPlayer1, mainMenuBackgroundWidgetClass)->AddToViewport();
+
 	// Main Menu
 	MainMenuWidget = Cast<UWMainMenu>(CreateWidget(mainMenuControllerPlayer1, mainMenuWidgetClass));
 

@@ -12,7 +12,7 @@
 void AMainMenuPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-
+	
 	InputComponent->BindAction("PreviousCharacter", IE_Pressed, this, &AMainMenuPlayerController::FPreviousCharacterSelected);
 	InputComponent->BindAction("NextCharacter", IE_Pressed, this, &AMainMenuPlayerController::FNextCharacterSelected);
 	InputComponent->BindAction("PreviousTeam", IE_Pressed, this, &AMainMenuPlayerController::FPreviousTeamSelected);
@@ -27,10 +27,9 @@ void AMainMenuPlayerController::SetupInputComponent()
 void AMainMenuPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	mainMenuGameMode = Cast<AMainMenuGameMode>(GetWorld()->GetAuthGameMode());
 	mainMenuGameMode->IndicesReady.AddDynamic(this, &AMainMenuPlayerController::OnIndexReady);
-	SetViewTarget(mainMenuGameMode->cinematicCamera);
 }
 
 void AMainMenuPlayerController::OnIndexReady()
@@ -62,12 +61,14 @@ void AMainMenuPlayerController::OnIndexReady()
 
 void AMainMenuPlayerController::FPreviousCharacterSelected()
 {
-	PreviousCharacterSelected.Broadcast();
+	// ToDo: Disabled until Character visibility is fixed
+	// PreviousCharacterSelected.Broadcast();
 }
 
 void AMainMenuPlayerController::FNextCharacterSelected()
 {
-	NextCharacterSelected.Broadcast();
+	// ToDo: Disabled until Character visibility is fixed
+	// NextCharacterSelected.Broadcast();
 }
 
 void AMainMenuPlayerController::FPreviousTeamSelected()

@@ -2,14 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "Character/MovementStates/BaseMovementState.h"
-//#include "K2Node_FunctionResult.h"
+#include "K2Node_FunctionResult.h"
 #include "WallrunState.generated.h"
 
 
 /**
  *
  */
-UENUM(BlueprintType)
+
 enum class EWallRunDirection : uint8
 {
 	WALLRUN_CLOCKWISE,
@@ -37,7 +37,6 @@ protected:
 
 	UFUNCTION()
 	void LaunchCharacter();
-	UFUNCTION()
 	EWallRunDirection HitDirection(FHitResult& hitResult);
 	
 };
