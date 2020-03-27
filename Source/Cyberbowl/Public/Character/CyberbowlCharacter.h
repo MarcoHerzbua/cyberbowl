@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
 	float LookUpRateModifier = 1.f;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool bTurretMode;
+
 
 protected:
 
