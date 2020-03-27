@@ -26,6 +26,12 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		float movementSpeed;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		float movementTime;
+
+		UPROPERTY(editAnywhere, BlueprintReadWrite)
+		float maxMovementTime;
+
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		float awayFromWallTime;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
@@ -48,4 +54,8 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		class ACyberbowlCharacter* main;
-	};
+
+private:
+	float MaxCharacterSpeed;
+	
+};
