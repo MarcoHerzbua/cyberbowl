@@ -42,7 +42,9 @@ void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
 		movementSpeed = lateralSpeed.Size();
 		jumpVelocity = Speed.Z;
 
-		if (movementSpeedOld>movementSpeed || movementTime < maxMovementTime && movementTime > 0.f) //movementSpeed <= 375.f && movementTime < 4.0f))
+		int movementSpeedPadding = 5.f;
+
+		if ((int)movementSpeedOld- movementSpeedPadding >(int)movementSpeed || movementTime < maxMovementTime && movementTime > 0.f) //movementSpeed <= 375.f && movementTime < 4.0f))
 		{
 			movementTime-= GetWorld()->DeltaTimeSeconds;
 			UE_LOG(LogTemp, Warning, TEXT("Degrading Time :D"));
@@ -51,11 +53,13 @@ void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
 		else if (movementSpeed==0)
 		{
 			movementTime = 0.0f;
+			UE_LOG(LogTemp, Warning, TEXT("MovementTime == 0"));
 		}
 
 		else if (movementSpeed >= 0)
 		{
 			movementTime = maxMovementTime;
+			UE_LOG(LogTemp, Warning, TEXT("MovementTime 0.6f"));
 		}
 		
 		bisInAir = pawn->GetMovementComponent()->IsFalling();
