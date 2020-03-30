@@ -33,6 +33,7 @@ void AThirdPersonPlayerController::SetupInputComponent()
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
 	InputComponent->BindAction("ToggleBallCam", IE_Pressed, this, &AThirdPersonPlayerController::CallToggledBallCam);
+	InputComponent->BindAction("PauseGame", IE_Pressed, this, &AThirdPersonPlayerController::CallPlayerPausedGame);
 }
 
 void AThirdPersonPlayerController::SpawnActors()
@@ -187,6 +188,11 @@ void AThirdPersonPlayerController::CallGameOverMenuNavigated()
 void AThirdPersonPlayerController::CallToggledBallCam()
 {
 	OnCallToggledBallCam.Broadcast();
+}
+
+void AThirdPersonPlayerController::CallPlayerPausedGame()
+{
+	OnPlayerPausedGame.Broadcast(UGameplayStatics::GetPlayerControllerID(this));
 }
 
 void AThirdPersonPlayerController::UpdateNameTagWidgetRotations()

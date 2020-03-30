@@ -2,7 +2,13 @@
 
 
 #include "GameModesAndInstances/InGameGameMode.h"
+#include "PlayerController/ThirdPersonPlayerController.h"
+#include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/Button.h"
+#include "Containers/Array.h"
 #include <string>
+#include "Components/TextBlock.h"
 
 void AInGameGameMode::BeginPlay()
 {
@@ -14,6 +20,16 @@ void AInGameGameMode::BeginPlay()
 	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &AInGameGameMode::GameEnd, GamePlayTime);
 	StartGamePlay.Broadcast();
 
+	TArray<AActor*> controllers;
+	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), controllers);
+
+	for (auto controller : controllers)
+	{
+		auto playerController = Cast<AThirdPersonPlayerController>(controller);
+
+		playerController->OnPlayerPausedGame.AddDynamic(this, &AInGameGameMode::PauseGameForAll);
+		playerControllers.AddUnique(playerController);
+	}
 }
 
 void AInGameGameMode::GameEnd()
@@ -36,6 +52,44 @@ void AInGameGameMode::GameEnd()
 		WinningTeam = 2;
 	}
 	EndGame.Broadcast();
+}
+
+void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
+{
+	UGameplayStatics::SetGlobalTimeDilation(this, 0);
+
+	for (auto playerController : playerControllers)
+	{		
+		if (UGameplayStatics::GetPlayerControllerID(playerController) == playerIndexInitiator)
+		{
+			auto widget = CreateWidget(playerController, WGamePausedInitiator);
+			widget->AddToPlayerScreen();
+			Cast<UButton>(widget->GetWidgetFromName("Button_Resume"))->SetKeyboardFocus();
+			
+			pauseWidgets.AddUnique(widget);
+		}
+		else
+		{
+			auto widget = CreateWidget(playerController, WGamePausedAll);
+			FString widgetText = FString("Player ").Append(std::to_string(++playerIndexInitiator).c_str()).Append(" has paused the game!");
+			Cast<UTextBlock>(widget->GetWidgetFromName("PauseGameInitiatorText"))->SetText(FText::FromString(widgetText));
+			widget->AddToPlayerScreen();
+			
+			pauseWidgets.AddUnique(widget);
+		}
+	}
+}
+
+void AInGameGameMode::ResumeGame()
+{
+	UGameplayStatics::SetGlobalTimeDilation(this, 1);
+
+	for (auto pauseWidget : pauseWidgets)
+	{
+		pauseWidget->RemoveFromParent();
+	}
+	
+	pauseWidgets.Empty();
 }
 
 void AInGameGameMode::Add_Points(AActor* Collider)
