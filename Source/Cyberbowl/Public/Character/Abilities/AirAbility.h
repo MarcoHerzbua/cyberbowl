@@ -20,6 +20,8 @@ class CYBERBOWL_API UAirAbility : public UAbilityBase
 
 	virtual void Fire() override;
 
+	virtual  void Targeting() override;
+
 public:
 	virtual void BeginPlay() override;
 
