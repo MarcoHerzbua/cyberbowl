@@ -64,3 +64,13 @@ void APlayBall::ResetBallPosition()
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *StartPosition.ToString());
 }
 
+void APlayBall::Freeze_Implementation(AActor* instigtr)
+{
+	BallStaticMesh->SetSimulatePhysics(false);
+}
+
+void APlayBall::UnFreeze_Implementation()
+{
+	BallStaticMesh->SetSimulatePhysics(true);
+}
+
