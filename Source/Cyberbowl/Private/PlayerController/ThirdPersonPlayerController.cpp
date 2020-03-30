@@ -182,6 +182,7 @@ void AThirdPersonPlayerController::OnEndGame()
 
 void AThirdPersonPlayerController::CallGameOverMenuNavigated()
 {
+	UKismetSystemLibrary::PrintString(this, "navigated");
 	OnCallGameOverMenuNavigated.Broadcast();
 }
 
