@@ -15,4 +15,6 @@ class CYBERBOWL_API UFireAbility : public UAbilityBase
 	GENERATED_BODY()
 
 	virtual void Fire() override;
+
+	virtual void Targeting() override;
 };
