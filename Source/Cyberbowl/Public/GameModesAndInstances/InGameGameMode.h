@@ -72,10 +72,16 @@ private:
 	void GameEnd();
 
 	UFUNCTION()
+	void TogglePauseGame(int playerIndexInitiator);
+	
+	UFUNCTION()
 	void PauseGameForAll(int playerIndexInitiator);
 
 	UFUNCTION(BlueprintCallable)
-	void ResumeGame();
+	void ResumeGameForAll();
+
+	UPROPERTY()
+	bool bGameIsPaused;
 
 	UPROPERTY()
 	TArray<AThirdPersonPlayerController*> playerControllers;

@@ -27,7 +27,7 @@ void AInGameGameMode::BeginPlay()
 	{
 		auto playerController = Cast<AThirdPersonPlayerController>(controller);
 
-		playerController->OnPlayerPausedGame.AddDynamic(this, &AInGameGameMode::PauseGameForAll);
+		playerController->OnPlayerPausedGame.AddDynamic(this, &AInGameGameMode::TogglePauseGame);
 		playerControllers.AddUnique(playerController);
 	}
 }
@@ -54,6 +54,18 @@ void AInGameGameMode::GameEnd()
 	EndGame.Broadcast();
 }
 
+void AInGameGameMode::TogglePauseGame(int playerIndexInitiator)
+{
+	if (bGameIsPaused)
+	{
+		ResumeGameForAll();
+	}
+	else
+	{
+		PauseGameForAll(playerIndexInitiator);
+	}
+}
+
 void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
 {
 	UGameplayStatics::SetGlobalTimeDilation(this, 0);
@@ -78,9 +90,11 @@ void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
 			pauseWidgets.AddUnique(widget);
 		}
 	}
+
+	bGameIsPaused = true;
 }
 
-void AInGameGameMode::ResumeGame()
+void AInGameGameMode::ResumeGameForAll()
 {
 	UGameplayStatics::SetGlobalTimeDilation(this, 1);
 
@@ -90,6 +104,8 @@ void AInGameGameMode::ResumeGame()
 	}
 	
 	pauseWidgets.Empty();
+
+	bGameIsPaused = false;
 }
 
 void AInGameGameMode::Add_Points(AActor* Collider)
