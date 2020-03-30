@@ -10,7 +10,6 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Components/Button.h"
-#include <string>
 
 void AThirdPersonPlayerController::BeginPlay()
 {
@@ -34,6 +33,8 @@ void AThirdPersonPlayerController::SetupInputComponent()
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
 	InputComponent->BindAction("ToggleBallCam", IE_Pressed, this, &AThirdPersonPlayerController::CallToggledBallCam);
 	InputComponent->BindAction("PauseGame", IE_Pressed, this, &AThirdPersonPlayerController::CallPlayerPausedGame);
+	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationDown);
+	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationUp);
 }
 
 void AThirdPersonPlayerController::SpawnActors()
@@ -182,7 +183,6 @@ void AThirdPersonPlayerController::OnEndGame()
 
 void AThirdPersonPlayerController::CallGameOverMenuNavigated()
 {
-	UKismetSystemLibrary::PrintString(this, "navigated");
 	OnCallGameOverMenuNavigated.Broadcast();
 }
 
@@ -199,4 +199,20 @@ void AThirdPersonPlayerController::CallPlayerPausedGame()
 void AThirdPersonPlayerController::UpdateNameTagWidgetRotations()
 {
 	
+}
+
+void AThirdPersonPlayerController::CallMenuNavigationDown()
+{
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused())
+	{
+		OnMenuNavigatedDown.Broadcast();
+	}
+}
+
+void AThirdPersonPlayerController::CallMenuNavigationUp()
+{
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused())
+	{
+		OnMenuNavigatedUp.Broadcast();
+	}
 }

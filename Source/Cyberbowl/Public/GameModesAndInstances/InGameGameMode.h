@@ -66,6 +66,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Restart();
 
+	UFUNCTION()
+	bool GetIsPaused() const;
+
 private:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;

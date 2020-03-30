@@ -68,6 +68,8 @@ void AInGameGameMode::TogglePauseGame(int playerIndexInitiator)
 
 void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
 {
+	UGameplayStatics::SetGlobalTimeDilation(this, 0);
+	
 	for (auto playerController : playerControllers)
 	{		
 		if (UGameplayStatics::GetPlayerControllerID(playerController) == playerIndexInitiator)
@@ -95,6 +97,8 @@ void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
 
 void AInGameGameMode::ResumeGameForAll()
 {
+	UGameplayStatics::SetGlobalTimeDilation(this, 1);
+	
 	for (auto pauseWidget : pauseWidgets)
 	{
 		pauseWidget->RemoveFromParent();
@@ -154,4 +158,9 @@ void AInGameGameMode::Restart()
 {
 	StartGamePlay.Broadcast();
 	GetWorldTimerManager().UnPauseTimer(GameEndTimerHandle);
+}
+
+bool AInGameGameMode::GetIsPaused() const
+{
+	return bGameIsPaused;
 }
