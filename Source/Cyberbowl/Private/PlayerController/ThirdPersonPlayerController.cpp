@@ -9,6 +9,8 @@
 #include "GameModesAndInstances/InGameGameMode.h"
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
+#include "Character/Abilities/AbilityBase.h"
+#include "Character/Abilities/FireAbility.h"
 #include "Components/Button.h"
 #include <string>
 

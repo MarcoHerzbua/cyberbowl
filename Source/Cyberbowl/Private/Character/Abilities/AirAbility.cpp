@@ -19,6 +19,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Character/Abilities/CooldownComponent.h"
 
 void UAirAbility::BeginPlay()
 {
@@ -26,6 +27,7 @@ void UAirAbility::BeginPlay()
 	
 	character = Cast<ACyberbowlCharacter>(GetOwner());
 	movementComp = Cast<UCharacterMovementComponent>(character->GetMovementComponent());
+	
 
 	ball = Cast<APlayBall>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball);
 	ballLocationSpringArm = Cast<USpringArmComponent>(character->GetComponentsByTag(USpringArmComponent::StaticClass(), "BallLocationArm").Last());
@@ -37,6 +39,15 @@ void UAirAbility::BeginPlay()
 void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	auto charCurrState = character->FindComponentByClass<UAbilityBase>()->CurrState;
+	
+	auto xxx = Super::GetAbilityState();
+
+	if(charCurrState == EAbilityState::ABILITY_FIRE || charCurrState == EAbilityState::ABILITY_TARGETING)
+	{
+		Fire();
+	}
 
 	if (bIsInGrabMode)
 	{		
@@ -55,12 +66,6 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 		ballLocationSpringArm->SetWorldRotation(cameraLookAt);
 	}
 }
-
-void UAirAbility::Targeting()
-{
-	Fire();
-}
-
 
 void UAirAbility::Fire()
 {
@@ -93,6 +98,10 @@ void UAirAbility::Fire()
 		tornadoComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, tornadoEffect, character->GetActorLocation());
 		GetWorld()->GetTimerManager().SetTimer(TornadoEffectDurationHandle, this, &UAirAbility::DestroyTornado, tornadoDuration, false);
 	}
+
+	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
+	cooldownComponent->StartCooldown("Ult");
+	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
 }
 
 void UAirAbility::ConvertMetersToUnrealUnits()

@@ -18,15 +18,15 @@ class CYBERBOWL_API UAirAbility : public UAbilityBase
 {
 	GENERATED_BODY()
 
-	virtual void Fire() override;
+	
 
-	virtual  void Targeting() override;
+	virtual void Fire() override;
 
 public:
 	virtual void BeginPlay() override;
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	
 protected:
 
 	UFUNCTION(BlueprintCallable)
@@ -79,4 +79,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	UNiagaraComponent* tornadoComponent;
+
+	
 };

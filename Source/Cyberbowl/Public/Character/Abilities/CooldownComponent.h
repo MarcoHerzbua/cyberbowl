@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Cyberbowl/Public/Character/CyberbowlCharacter.h"
 #include "CooldownComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDashCooldownStarted);
@@ -72,4 +73,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void StartCooldown(FString ability);
+
+	ACyberbowlCharacter* character;
 };
