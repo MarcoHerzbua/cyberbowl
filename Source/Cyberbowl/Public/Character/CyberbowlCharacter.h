@@ -42,8 +42,10 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bTurretMode;
 
-
-protected:
+	UPROPERTY()
+	float DefaultGravityScale;
+	
+	protected:
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();

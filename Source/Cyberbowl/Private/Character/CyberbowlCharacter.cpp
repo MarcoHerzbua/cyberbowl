@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Character/CBCharacterMovementComponent.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 #include "PlayerController/ThirdPersonPlayerController.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -116,6 +117,7 @@ void ACyberbowlCharacter::Jump()
 
 void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
 {
+	//Check for friendly fire
 	if(auto instigatorAsChar = Cast<ACyberbowlCharacter>(instigtr))
 	{
 		if (auto instigatorController = Cast<AThirdPersonPlayerController>(instigatorAsChar->Controller))
@@ -127,16 +129,25 @@ void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
 			}
 		}
 	}
-	
-	GetCharacterMovement()->StopMovementImmediately();
+
+	auto cbMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
+
+	//Stop Movement & disable Input
+	cbMoveCmp->StopMovementImmediately();
+	DefaultGravityScale = cbMoveCmp->GravityScale;
+	cbMoveCmp->GravityScale = 0.f;
 	DisableInput(Cast<APlayerController>(Controller));
-	
+
+	//Pause all animations
+	CustomTimeDilation = 0.f;
 }
 
 void ACyberbowlCharacter::UnFreeze_Implementation()
 {
+	auto cbMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
+	cbMoveCmp->GravityScale = DefaultGravityScale;
 	EnableInput(Cast<APlayerController>(Controller));
-
+	CustomTimeDilation = 1.f;
 }
 
 void ACyberbowlCharacter::Dash()
