@@ -9,7 +9,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Character/CBCharacterMovementComponent.h"
+#include "PlayerController/ThirdPersonPlayerController.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACyberbowlCharacter
@@ -110,6 +112,31 @@ void ACyberbowlCharacter::Jump()
 	}
 	
 	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+}
+
+void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
+{
+	if(auto instigatorAsChar = Cast<ACyberbowlCharacter>(instigtr))
+	{
+		if (auto instigatorController = Cast<AThirdPersonPlayerController>(instigatorAsChar->Controller))
+		{
+			auto targetController = Cast<AThirdPersonPlayerController>(this->Controller);
+			if(instigatorController->currPlayerTeam == targetController->currPlayerTeam)
+			{
+				return;
+			}
+		}
+	}
+	
+	GetCharacterMovement()->StopMovementImmediately();
+	DisableInput(Cast<APlayerController>(Controller));
+	
+}
+
+void ACyberbowlCharacter::UnFreeze_Implementation()
+{
+	EnableInput(Cast<APlayerController>(Controller));
+
 }
 
 void ACyberbowlCharacter::Dash()

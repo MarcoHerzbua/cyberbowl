@@ -16,6 +16,8 @@ class CYBERBOWL_API UIceAbility : public UAbilityBase
 public:
 	virtual void Fire() override;
 
+	void Targeting() override;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IceAbilityParams")
 	float ConeLength = 500.f;

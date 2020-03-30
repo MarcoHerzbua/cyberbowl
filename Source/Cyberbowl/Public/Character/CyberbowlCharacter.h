@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Actors/IFreezeable.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CyberbowlCharacter.generated.h"
@@ -9,7 +10,7 @@
 
 
 UCLASS(config=Game)
-class ACyberbowlCharacter : public ACharacter
+class ACyberbowlCharacter : public ACharacter, public IFreezeable
 {
 	GENERATED_BODY()
 
@@ -83,5 +84,12 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
+	void Freeze_Implementation(AActor* instigtr) override;
+
+	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
+	void UnFreeze_Implementation() override;
+
 };
 
