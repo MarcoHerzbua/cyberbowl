@@ -29,6 +29,11 @@ void UAbilityBase::Fire()
 	UKismetSystemLibrary::PrintString(this, ((FString)(L"(Base)Fired ability: ")));
 }
 
+void UAbilityBase::Targeting()
+{
+	UKismetSystemLibrary::PrintString(this, ((FString)(L"(Base)Targeting ability: ")));
+}
+
 
 // Called every frame
 void UAbilityBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

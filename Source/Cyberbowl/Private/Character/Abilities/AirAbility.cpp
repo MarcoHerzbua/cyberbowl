@@ -56,6 +56,12 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	}
 }
 
+void UAirAbility::Targeting()
+{
+	Fire();
+}
+
+
 void UAirAbility::Fire()
 {
 	FVector cylinderEnd = GetOwner()->GetActorLocation();

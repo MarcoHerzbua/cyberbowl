@@ -8,3 +8,9 @@ void UFireAbility::Fire()
 {
 	UKismetSystemLibrary::PrintString(this, ((FString)(L"(Fire)Wall-Thingy: ")));
 }
+
+void UFireAbility::Targeting()
+{
+	UKismetSystemLibrary::PrintString(this, ((FString)(L"(Fire)Wall-Thingy: ")));
+}
+
