@@ -83,7 +83,8 @@ void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
 		else
 		{
 			auto widget = CreateWidget(playerController, WGamePausedAll);
-			FString widgetText = FString("Player ").Append(std::to_string(++playerIndexInitiator).c_str()).Append(" has paused the game!");
+			const int indexToActualPlayer = playerIndexInitiator + 1;
+			FString widgetText = FString("Player ").Append(std::to_string(indexToActualPlayer).c_str()).Append(" has paused the game!");
 			Cast<UTextBlock>(widget->GetWidgetFromName("PauseGameInitiatorText"))->SetText(FText::FromString(widgetText));
 			widget->AddToPlayerScreen();
 			
