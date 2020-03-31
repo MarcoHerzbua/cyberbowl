@@ -34,8 +34,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void Targeting();
 
-
-	
+	UFUNCTION(BlueprintCallable)
+	void ResetAbilityState();
 
 public:	
 	// Called every frame
