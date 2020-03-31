@@ -5,9 +5,10 @@
 #include "Actors/IFreezeable.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Character/Abilities/AbilityBase.h"
 #include "CyberbowlCharacter.generated.h"
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable
@@ -48,7 +49,9 @@ public:
 	UPROPERTY()
 	float DefaultTimeDilation;
 	
-	protected:
+protected:
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnCallErrorFeedback forceFeedback;
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
@@ -78,12 +81,18 @@ public:
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 	void Dash();
+
+	void AbilityPressed();
+
+	
+	
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
 	void Jump() override;
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

@@ -39,7 +39,7 @@ void UCooldownComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	character = Cast<ACyberbowlCharacter>(GetOwner());
 	
 }
 
