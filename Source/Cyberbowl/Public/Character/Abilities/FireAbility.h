@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "AbilityBase.h"
+
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "Character/CyberbowlCharacter.h"
 #include "FireAbility.generated.h"
 
@@ -19,6 +22,13 @@ public:
 
 	UFireAbility() = default;
 
+	UPROPERTY(BlueprintReadOnly)
+	UNiagaraComponent* fireComponent;
+	
+	UPROPERTY(BlueprintReadWrite)
+	UNiagaraSystem* fireEffect;
+
+
 private:
 
 	virtual void BeginPlay() override;
@@ -31,4 +41,8 @@ private:
 
 private:
 	ACyberbowlCharacter* character;
+	UCameraComponent* camera;
+	FVector fireWallPosition;
+	bool validTarget;
+
 };
