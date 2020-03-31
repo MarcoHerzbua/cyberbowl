@@ -40,10 +40,6 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//auto charCurrState = character->FindComponentByClass<UAbilityBase>()->CurrState;
-	
-	auto xxx = Super::GetAbilityState();
-
 	if(CurrState == EAbilityState::ABILITY_FIRE || CurrState == EAbilityState::ABILITY_TARGETING)
 	{
 		Fire();
