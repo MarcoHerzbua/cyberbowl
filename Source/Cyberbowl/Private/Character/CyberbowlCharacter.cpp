@@ -15,6 +15,7 @@
 #include "Character/CBCharacterMovementComponent.h"
 #include "Character/CyberbowlCharacterAnimInstance.h"
 #include "PlayerController/ThirdPersonPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACyberbowlCharacter
@@ -61,6 +62,11 @@ ACyberbowlCharacter::ACyberbowlCharacter(const FObjectInitializer& ObjectInitial
 	//
 }
 
+void ACyberbowlCharacter::CallMenuEnter()
+{
+	Cast<AThirdPersonPlayerController>(Controller)->CallMenuEnter();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -70,6 +76,7 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("MenuEnter", IE_Pressed, this, &ACyberbowlCharacter::CallMenuEnter);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ACyberbowlCharacter::Dash);
 
