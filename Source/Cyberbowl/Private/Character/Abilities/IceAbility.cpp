@@ -60,6 +60,7 @@ void UIceAbility::Fire()
 
 void UIceAbility::Targeting()
 {
+
 	//No targeting required for this ability
 	Fire();
 }

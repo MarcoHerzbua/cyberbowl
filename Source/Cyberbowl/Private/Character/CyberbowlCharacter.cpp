@@ -4,6 +4,8 @@
 
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Character/Abilities/AbilityBase.h"
+#include "Character/BoopComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -137,8 +139,10 @@ void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
 	DefaultGravityScale = cbMoveCmp->GravityScale;
 	cbMoveCmp->GravityScale = 0.f;
 	DisableInput(Cast<APlayerController>(Controller));
-
+	//ToggleAbilities(false);
+	
 	//Pause all animations
+	DefaultTimeDilation = CustomTimeDilation;
 	CustomTimeDilation = 0.f;
 }
 
@@ -147,8 +151,27 @@ void ACyberbowlCharacter::UnFreeze_Implementation()
 	auto cbMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
 	cbMoveCmp->GravityScale = DefaultGravityScale;
 	EnableInput(Cast<APlayerController>(Controller));
-	CustomTimeDilation = 1.f;
+	//ToggleAbilities(true);
+	CustomTimeDilation = DefaultTimeDilation;
 }
+
+//DOES NOT deactivate the abilities
+//void ACyberbowlCharacter::ToggleAbilities(bool enable)
+//{
+//	TSet<UActorComponent*> cmps = GetComponents();
+//
+//	for(auto cmp : cmps)
+//	{
+//		if(auto boopCmp = Cast<UBoopComponent>(cmp))
+//		{
+//			boopCmp->SetActive(enable, true);
+//		}
+//		else if (auto abilityCmp = Cast<UAbilityBase>(cmp))
+//		{
+//			abilityCmp->SetActive(enable, true);
+//		}
+//	}
+//}
 
 void ACyberbowlCharacter::Dash()
 {

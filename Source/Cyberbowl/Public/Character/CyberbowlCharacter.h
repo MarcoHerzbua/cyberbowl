@@ -45,6 +45,9 @@ public:
 	UPROPERTY()
 	float DefaultGravityScale;
 	
+	UPROPERTY()
+	float DefaultTimeDilation;
+	
 	protected:
 
 	/** Resets HMD orientation in VR. */
@@ -93,5 +96,7 @@ public:
 	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
 	void UnFreeze_Implementation() override;
 
+	//UFUNCTION(BlueprintCallable, Category = "CyberbowlCharacter")
+	//void ToggleAbilities(bool enable);
 };
 
