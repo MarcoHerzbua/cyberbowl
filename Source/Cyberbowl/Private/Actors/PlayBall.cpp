@@ -39,13 +39,13 @@ void APlayBall::Tick(float DeltaTime)
 
 void APlayBall::PushBall(float force, FVector direction)
 {
-	OnBallBooped.Broadcast();
+	//ball should be pushable when e.g. frozen
+	BallStaticMesh->SetSimulatePhysics(true);
+
+	//Is this only moving the mesh? -> Marco: the mesh is a scene component and the root of the actor, so everything in this actor is moved
+	BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
 	
-	if(BallStaticMesh->IsSimulatingPhysics())
-	{
-		//Is this only moving the mesh? -> Marco: the mesh is a scene component and the root of the actor, so everything in this actor is moved
-		BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
-	}
+	OnBallBooped.Broadcast();
 }
 
 void APlayBall::PlayBall()
