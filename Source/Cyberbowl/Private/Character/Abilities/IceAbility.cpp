@@ -11,8 +11,8 @@
 #include "Engine/Engine.h"
 #include "TimerManager.h"
 #include "GameFramework/PlayerController.h"
-#include "Components/InputComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 void UIceAbility::Fire()
 {
@@ -27,10 +27,15 @@ void UIceAbility::Fire()
 	TArray<FHitResult> hitResults;
 
 	//DEBUG: Draw Cone Shape
-	DrawDebugCone(GetOwner()->GetWorld(), start, direction, ConeLength, coneAngleInRadians, coneAngleInRadians, 12, FColor::Blue, false, FreezeDuration, 0, 4.f);
+	//DrawDebugCone(GetOwner()->GetWorld(), start, direction, ConeLength, coneAngleInRadians, coneAngleInRadians, 12, FColor::Blue, false, FreezeDuration, 0, 4.f);
 	//DrawDebugSphere(GetOwner()->GetWorld(), GetOwner()->GetActorLocation(), coneRadius, 12, FColor::Emerald, false, 4, 0, 2.f);
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), coneRadius));
 
+	//Spawn Niagara Effect
+	FRotator effectRotation = ownerAsPawn->GetControlRotation().Add(0.f, -45.f, 0.f);
+	NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetOwner(), CoCEffect, start, effectRotation);
+	GetWorld()->GetTimerManager().SetTimer(CoCEffectDurationHandle, this, &UIceAbility::DestroyCoCEffect, 1.f);
+	
 	FCollisionQueryParams queryParams;
 	queryParams.AddIgnoredActor(GetOwner());
 	GetOwner()->GetWorld()->SweepMultiByProfile(hitResults, start + direction * coneRadius, end - direction * coneRadius, FQuat(), "OverlapDynamics", shape, queryParams);
@@ -118,4 +123,10 @@ bool UIceAbility::IsWithinCone(FVector hitPoint, FVector coneDirectionNormal)
 	float length = projectedHitPoint.Size();
 	
 	return angleDegrees <= ConeAngle && length <= ConeLength;
+}
+
+void UIceAbility::DestroyCoCEffect()
+{
+	NiagaraComponent->DestroyComponent();
+	NiagaraComponent = nullptr;
 }

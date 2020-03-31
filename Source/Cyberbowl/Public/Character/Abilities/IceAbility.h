@@ -32,8 +32,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IceAbilityParams")
 	float FreezeDuration = 3.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IceAbilityParams")
+	class UNiagaraSystem* CoCEffect;
+
+	UPROPERTY(BlueprintReadOnly, Category = "IceAbility")
+	class UNiagaraComponent* NiagaraComponent;
+
 	UPROPERTY()
 	FTimerHandle FreezeTimerHandle;
+
+	UPROPERTY()
+	FTimerHandle CoCEffectDurationHandle;
 
 	UPROPERTY()
 	TArray<AActor*> FrozenActors;
@@ -42,4 +51,6 @@ protected:
 	void UnfreezeActors();
 	
 	bool IsWithinCone(FVector hitPoint, FVector coneDirectionNormal);
+
+	void DestroyCoCEffect();
 };
