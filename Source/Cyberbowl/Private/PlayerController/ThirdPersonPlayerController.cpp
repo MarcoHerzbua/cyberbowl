@@ -21,8 +21,6 @@ void AThirdPersonPlayerController::BeginPlay()
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	UpdateNameTagWidgetRotations();
 }
 
 void AThirdPersonPlayerController::SetupInputComponent()
@@ -35,6 +33,7 @@ void AThirdPersonPlayerController::SetupInputComponent()
 	InputComponent->BindAction("PauseGame", IE_Pressed, this, &AThirdPersonPlayerController::CallPlayerPausedGame);
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationDown);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationUp);
+	InputComponent->BindAction("MenuEnter", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuEnter);
 }
 
 void AThirdPersonPlayerController::SpawnActors()
@@ -196,11 +195,6 @@ void AThirdPersonPlayerController::CallPlayerPausedGame()
 	OnPlayerPausedGame.Broadcast(UGameplayStatics::GetPlayerControllerID(this));
 }
 
-void AThirdPersonPlayerController::UpdateNameTagWidgetRotations()
-{
-	
-}
-
 void AThirdPersonPlayerController::CallMenuNavigationDown()
 {
 	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused())
@@ -214,5 +208,14 @@ void AThirdPersonPlayerController::CallMenuNavigationUp()
 	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused())
 	{
 		OnMenuNavigatedUp.Broadcast();
+	}
+}
+
+void AThirdPersonPlayerController::CallMenuEnter()
+{
+	// Only Player0 can press buttons apparently, so we have to manually handle it for the others
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused() && UGameplayStatics::GetPlayerControllerID(this) != 0)
+	{
+		OnMenuEnter.Broadcast();
 	}
 }

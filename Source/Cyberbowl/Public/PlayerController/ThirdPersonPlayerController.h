@@ -16,6 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallToggledBallCam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerPausedGame, int, playerIndexInitiator);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedDown);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedUp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuEnter);
 
 UCLASS()
 class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
@@ -74,13 +75,13 @@ private:
 	void CallPlayerPausedGame();
 
 	UFUNCTION()
-	void UpdateNameTagWidgetRotations();
-
-	UFUNCTION()
 	void CallMenuNavigationDown();
 
 	UFUNCTION()
 	void CallMenuNavigationUp();
+
+	UFUNCTION()
+	void CallMenuEnter();
 
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
@@ -97,6 +98,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnMenuNavigatedUp OnMenuNavigatedUp;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuEnter OnMenuEnter;
 
 	UPROPERTY(BlueprintReadOnly)
 	int currPlayerTeam;
