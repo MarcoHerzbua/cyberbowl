@@ -19,6 +19,10 @@ public:
 	void Targeting() override;
 
 protected:
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IceAbilityParams")
 	float ConeLength = 500.f;
 

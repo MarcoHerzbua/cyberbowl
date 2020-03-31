@@ -4,12 +4,14 @@
 #include "Character/Abilities/IceAbility.h"
 
 #include "Actors/IFreezeable.h"
+#include "Character/Abilities/CooldownComponent.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Pawn.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "TimerManager.h"
-
+#include "GameFramework/PlayerController.h"
+#include "Components/InputComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 void UIceAbility::Fire()
@@ -56,13 +58,40 @@ void UIceAbility::Fire()
 	{
 		GetWorld()->GetTimerManager().SetTimer(FreezeTimerHandle, this, &UIceAbility::UnfreezeActors, FreezeDuration);
 	}
+
+	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
+	cooldownComponent->StartCooldown("Ult");
+	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
 }
 
 void UIceAbility::Targeting()
 {
+}
 
-	//No targeting required for this ability
-	Fire();
+void UIceAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if(CurrState == EAbilityState::ABILITY_TARGETING)
+	{
+		float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
+		APawn* ownerAsPawn = Cast<APawn>(GetOwner());
+
+		FVector start = GetOwner()->GetActorLocation();
+		FVector direction = ownerAsPawn->GetControlRotation().Vector();
+		DrawDebugCone(GetOwner()->GetWorld(), start, direction, ConeLength, coneAngleInRadians, coneAngleInRadians, 12, FColor::Blue, false, DeltaTime, 0, 4.f);
+
+	}
+	if(CurrState == EAbilityState::ABILITY_FIRE)
+	{
+		Fire();
+	}
+}
+
+void UIceAbility::BeginPlay()
+{
+	Super::BeginPlay();
+	
 }
 
 void UIceAbility::UnfreezeActors()
