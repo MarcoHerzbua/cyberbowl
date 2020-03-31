@@ -73,7 +73,6 @@ protected:
 	UPROPERTY()
 	TArray<AActor*> mainMenuPlayerControllers;
 	
-	TSubclassOf<UUserWidget> mainMenuBackgroundWidgetClass;
 	TSubclassOf<APawn> dummyClass;
 	TSubclassOf<UUserWidget> countdownWidgetClass;
 	TSubclassOf<UUserWidget> lobbyNotJoinedWidgetClass;
@@ -97,5 +96,8 @@ public:
 
 	UFUNCTION()
 	TArray<AActor*> GetCharacterSelectionCams() const;
+
+	UPROPERTY(BlueprintReadWrite)
+	AActor* cinematicCamera;
 	
 };

@@ -6,6 +6,15 @@
 #include "Components/ActorComponent.h"
 #include "AbilityBase.generated.h"
 
+//UENUM(BlueprintType)
+enum class EAbilityState : uint8
+{
+	ABILITY_TARGETING,
+	ABILITY_KEY_RELEASED,
+	ABILITY_FIRE,
+	ABILITY_COOLDOWN,
+	ABILITY_DEFAULT
+};
 
 UCLASS( ClassGroup=(Abilities), meta=(BlueprintSpawnableComponent) )
 class CYBERBOWL_API UAbilityBase : public UActorComponent
@@ -23,9 +32,18 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void Fire();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void Targeting();
+
+
+	
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	EAbilityState CurrState;
+	virtual EAbilityState GetAbilityState() { return CurrState; };
+	virtual void SetAbilityState(EAbilityState state);
 		
 };

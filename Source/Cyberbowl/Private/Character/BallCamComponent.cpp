@@ -96,3 +96,8 @@ void UBallCamComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 	FocusBall(DeltaTime);
 }
+
+void UBallCamComponent::DoNotFollow()
+{
+	bShouldFollowBall = false;
+}
