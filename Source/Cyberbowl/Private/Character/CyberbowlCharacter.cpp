@@ -141,7 +141,16 @@ void ACyberbowlCharacter::Dash()
 void ACyberbowlCharacter::AbilityPressed()
 {
 	auto cooldownComponent = FindComponentByClass<UCooldownComponent>();
-	auto abilityComponent = FindComponentByClass<UAbilityBase>();
+	TArray<UAbilityBase*, FDefaultAllocator> abilityComponents;
+	GetComponents<UAbilityBase, FDefaultAllocator>(abilityComponents);
+	UAbilityBase* abilityComponent = nullptr;
+	for (auto ability : abilityComponents)
+	{
+		if (ability->GetReadableName()!="AbilityBase")
+		{
+			abilityComponent = ability;
+		}
+	}
 
 	auto abilityState = abilityComponent->GetAbilityState();
 	
