@@ -13,6 +13,10 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallToggledBallCam);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerPausedGame, int, playerIndexInitiator);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedDown);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedUp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuEnter);
 
 UCLASS()
 class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
@@ -68,7 +72,13 @@ private:
 	void CallToggledBallCam();
 
 	UFUNCTION()
-	void UpdateNameTagWidgetRotations();
+	void CallPlayerPausedGame();
+
+	UFUNCTION()
+	void CallMenuNavigationDown();
+
+	UFUNCTION()
+	void CallMenuNavigationUp();
 
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
@@ -77,12 +87,26 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallGameOverMenuNavigated OnCallToggledBallCam;
 
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnPlayerPausedGame OnPlayerPausedGame;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuNavigatedDown OnMenuNavigatedDown;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuNavigatedUp OnMenuNavigatedUp;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuEnter OnMenuEnter;
+
 	UPROPERTY(BlueprintReadOnly)
 	int currPlayerTeam;
 
 	UPROPERTY(BlueprintReadOnly)
 	ECBCharacterType currPlayerType;
 
+	UFUNCTION()
+	void CallMenuEnter();
 	
 protected:
 	ACyberbowlCharacter* character;
