@@ -52,6 +52,10 @@ void UCBCharacterMovementComponent::BeginPlay()
 	}
 
     animinstance = Cast<UCyberbowlCharacterAnimInstance>(GetOwner()->FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
+    if (animinstance)
+    {
+        animinstance->setDashPlayRate(DashDuration);
+    }
 }
 
 void UCBCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)

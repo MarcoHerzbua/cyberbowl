@@ -57,11 +57,13 @@ void UWallrunState::OnTick(float DeltaTime)
 {
 	UBaseMovementState::OnTick(DeltaTime);
 
-
 	float length;
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
 
-	MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxWalkSpeed * MovementComponent->WallrunSpeedModifier);
+	MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);
+
+	FRotator wallrunDirRotator = WallrunDirection.Rotation();
+	MovementComponent->GetCharacterOwner()->SetActorRotation(FRotator(0.f, wallrunDirRotator.Yaw, 0.f));
 }
 
 void UWallrunState::BindInputActions()
@@ -88,10 +90,8 @@ void UWallrunState::LaunchCharacter()
 	//Calculate the angle between the normal pointing away from the wall and the current velocity
 	float angle = FMath::RadiansToDegrees(FMath::Atan2(wallNormal.Y, wallNormal.X) - FMath::Atan2(velocityDirectionVec.Y, velocityDirectionVec.X));
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), velocityDirectionVec.X, velocityDirectionVec.Y, velocityDirectionVec.Z));
-
-
-	if(angle <= 0.f || angle >= 180.f)
+	//TODO: This edge case checking is noob and should be replaced by a better angle calculation 
+	if((angle <= 0.f && angle > -270.f) || angle >= 180.f)
 	{
 		launchAngle *= -1.f;
 	}
@@ -102,10 +102,7 @@ void UWallrunState::LaunchCharacter()
 	
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), launchVec.X, launchVec.Y, launchVec.Z));
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), angle));
-	//DrawDebugLine(MovementComponent->GetWorld(), MovementComponent->GetOwner()->GetActorLocation(), MovementComponent->GetOwner()->GetActorLocation() + launchVec, FColor::Emerald, false, 10.f, 0, 5.f);
-	MovementComponent->AddImpulse(launchVec, true);
-	//auto ownerAsCharacter = Cast<ACharacter>(MovementComponent->GetOwner());
-	//ownerAsCharacter->LaunchCharacter(launchVec, true, true);
+	MovementComponent->GetCharacterOwner()->LaunchCharacter(launchVec, true, true);
 
 	//MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }

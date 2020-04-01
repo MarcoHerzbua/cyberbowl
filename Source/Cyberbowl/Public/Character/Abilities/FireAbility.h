@@ -8,6 +8,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "Character/CyberbowlCharacter.h"
+#include "Character/Abilities/Firewall.h"
 #include "FireAbility.generated.h"
 
 /**
@@ -22,11 +23,15 @@ public:
 
 	UFireAbility() = default;
 
-	UPROPERTY(BlueprintReadOnly)
-	UNiagaraComponent* fireComponent;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float fireWallLifeTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	float targetingLength;
+
 	UPROPERTY(BlueprintReadWrite)
-	UNiagaraSystem* fireEffect;
+	TSubclassOf<AFirewall> fireClass;
 
 
 private:
@@ -43,6 +48,7 @@ private:
 	ACyberbowlCharacter* character;
 	UCameraComponent* camera;
 	FVector fireWallPosition;
-	bool validTarget;
-
+	bool bValidTarget;
+	bool bValidTargetBoxSize;
+	FVector boxScale;
 };
