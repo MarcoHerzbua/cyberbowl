@@ -62,6 +62,9 @@ void UFireAbility::Targeting()
 	AFirewall* dummyActor = GetWorld()->SpawnActor<AFirewall>(fireClass);
 	FVector boxScale = dummyActor->GetBoxExtent();
 	GetWorld()->DestroyActor(dummyActor);
+	FRotator cam = camera->GetRelativeRotation();
+	auto camRotation = character->GetCameraBoom()->GetTargetRotation();
+	FRotator rotation = FRotator(0.f, camRotation.Yaw + 90, 0.f);
 	
 	FHitResult hitResult;
 	world->LineTraceSingleByProfile(hitResult, cameraPos, end, "FireAbilityTrace");
@@ -70,7 +73,7 @@ void UFireAbility::Targeting()
 
 	if (hitResult.bBlockingHit && hitResult.Normal == FVector(0.f, 0.f, 1.f))
 	{
-		DrawDebugBox(world, hitResult.ImpactPoint, FVector(boxScale.X, boxScale.Y, 10), FQuat(0.f, 0.f, 0.f, 0.f), FColor::Blue, false, 0.1f, 0, 5.f);
+		DrawDebugBox(world, hitResult.ImpactPoint, FVector(boxScale.X, boxScale.Y, 10), rotation.Quaternion(), FColor::Blue, false, 0.1f, 0, 5.f);
 		fireWallPosition = hitResult.ImpactPoint;
 		validTarget = true;
 	}
