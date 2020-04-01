@@ -61,6 +61,9 @@ void UWallrunState::OnTick(float DeltaTime)
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
 
 	MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);
+
+	FRotator wallrunDirRotator = WallrunDirection.Rotation();
+	MovementComponent->GetCharacterOwner()->SetActorRotation(FRotator(0.f, wallrunDirRotator.Yaw, 0.f));
 }
 
 void UWallrunState::BindInputActions()
