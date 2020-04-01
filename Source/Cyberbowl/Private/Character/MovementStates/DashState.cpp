@@ -75,7 +75,8 @@ void UDashState::StopDash()
 		MovementComponent->Velocity = newVelocity;
 	}
 
-	MovementComponent->SetCBMovementMode(PreviousMovementMode);
+	//Bugfix: Dashing out of a wallrun should not switch the character back to a wallrunstate after ending dash
+	MovementComponent->SetCBMovementMode(PreviousMovementMode == ECBMovementMode::CBMOVE_Wallrun ? ECBMovementMode::CBMOVE_Jump : PreviousMovementMode);
 }
 
 void UDashState::BindInputActions()

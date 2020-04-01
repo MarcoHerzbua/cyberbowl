@@ -1,15 +1,21 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "Character/CyberbowlCharacter.h"
-
+#include "Character/Abilities/AirAbility.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Character/Abilities/AbilityBase.h"
+#include "Character/BoopComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Character/CBCharacterMovementComponent.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
+#include "PlayerController/ThirdPersonPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACyberbowlCharacter
@@ -53,6 +59,12 @@ ACyberbowlCharacter::ACyberbowlCharacter(const FObjectInitializer& ObjectInitial
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	//
+}
+
+void ACyberbowlCharacter::CallMenuEnter()
+{
+	Cast<AThirdPersonPlayerController>(Controller)->CallMenuEnter();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -64,6 +76,7 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("MenuEnter", IE_Pressed, this, &ACyberbowlCharacter::CallMenuEnter);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ACyberbowlCharacter::Dash);
 
@@ -84,6 +97,9 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ACyberbowlCharacter::OnResetVR);
+
+	//handle ability input
+	PlayerInputComponent->BindAction("Ult", IE_Pressed, this, &ACyberbowlCharacter::AbilityPressed);
 }
 
 void ACyberbowlCharacter::Jump()
@@ -112,6 +128,62 @@ void ACyberbowlCharacter::Jump()
 	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 
+void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
+{
+	//Check for friendly fire
+	if(auto instigatorAsChar = Cast<ACyberbowlCharacter>(instigtr))
+	{
+		if (auto instigatorController = Cast<AThirdPersonPlayerController>(instigatorAsChar->Controller))
+		{
+			auto targetController = Cast<AThirdPersonPlayerController>(this->Controller);
+			if(instigatorController->currPlayerTeam == targetController->currPlayerTeam)
+			{
+				return;
+			}
+		}
+	}
+
+	auto cbMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
+
+	//Stop Movement & disable Input
+	cbMoveCmp->StopMovementImmediately();
+	DefaultGravityScale = cbMoveCmp->GravityScale;
+	cbMoveCmp->GravityScale = 0.f;
+	DisableInput(Cast<APlayerController>(Controller));
+	//ToggleAbilities(false);
+	
+	//Pause all animations
+	DefaultTimeDilation = CustomTimeDilation;
+	CustomTimeDilation = 0.f;
+}
+
+void ACyberbowlCharacter::UnFreeze_Implementation()
+{
+	auto cbMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
+	cbMoveCmp->GravityScale = DefaultGravityScale;
+	EnableInput(Cast<APlayerController>(Controller));
+	//ToggleAbilities(true);
+	CustomTimeDilation = DefaultTimeDilation;
+}
+
+//DOES NOT deactivate the abilities
+//void ACyberbowlCharacter::ToggleAbilities(bool enable)
+//{
+//	TSet<UActorComponent*> cmps = GetComponents();
+//
+//	for(auto cmp : cmps)
+//	{
+//		if(auto boopCmp = Cast<UBoopComponent>(cmp))
+//		{
+//			boopCmp->SetActive(enable, true);
+//		}
+//		else if (auto abilityCmp = Cast<UAbilityBase>(cmp))
+//		{
+//			abilityCmp->SetActive(enable, true);
+//		}
+//	}
+//}
+
 void ACyberbowlCharacter::Dash()
 {
 	auto CBCharMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
@@ -131,6 +203,49 @@ void ACyberbowlCharacter::Dash()
 	if(cooldownComponent->IsDashReady())
 	{
 		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);	
+	}
+}
+
+void ACyberbowlCharacter::AbilityPressed()
+{
+	auto cooldownComponent = FindComponentByClass<UCooldownComponent>();
+	TArray<UAbilityBase*, FDefaultAllocator> abilityComponents;
+	GetComponents<UAbilityBase, FDefaultAllocator>(abilityComponents);
+	UAbilityBase* abilityComponent = nullptr;
+	for (auto ability : abilityComponents)
+	{
+		if (ability->GetReadableName()!="AbilityBase")
+		{
+			abilityComponent = ability;
+		}
+	}
+
+	auto abilityState = abilityComponent->GetAbilityState();
+	
+	if (cooldownComponent->IsUltReady())
+	{
+		abilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
+		
+		if (abilityState == EAbilityState::ABILITY_DEFAULT)
+		{
+			abilityComponent->SetAbilityState(EAbilityState::ABILITY_TARGETING);
+			
+		}
+
+		else if (abilityState == EAbilityState::ABILITY_TARGETING)
+		{
+			abilityComponent->SetAbilityState(EAbilityState::ABILITY_FIRE);
+		}
+
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Error: Something is terribly wrong!"))
+		}
+	}
+
+	else
+	{
+		forceFeedback.Broadcast();
 	}
 }
 

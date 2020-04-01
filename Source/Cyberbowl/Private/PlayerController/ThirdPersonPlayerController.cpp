@@ -9,8 +9,9 @@
 #include "GameModesAndInstances/InGameGameMode.h"
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
+#include "Character/Abilities/AbilityBase.h"
+#include "Character/Abilities/FireAbility.h"
 #include "Components/Button.h"
-#include <string>
 
 void AThirdPersonPlayerController::BeginPlay()
 {
@@ -22,8 +23,6 @@ void AThirdPersonPlayerController::BeginPlay()
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	UpdateNameTagWidgetRotations();
 }
 
 void AThirdPersonPlayerController::SetupInputComponent()
@@ -33,6 +32,9 @@ void AThirdPersonPlayerController::SetupInputComponent()
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
 	InputComponent->BindAction("ToggleBallCam", IE_Pressed, this, &AThirdPersonPlayerController::CallToggledBallCam);
+	InputComponent->BindAction("PauseGame", IE_Pressed, this, &AThirdPersonPlayerController::CallPlayerPausedGame);
+	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationDown);
+	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationUp);
 }
 
 void AThirdPersonPlayerController::SpawnActors()
@@ -189,7 +191,32 @@ void AThirdPersonPlayerController::CallToggledBallCam()
 	OnCallToggledBallCam.Broadcast();
 }
 
-void AThirdPersonPlayerController::UpdateNameTagWidgetRotations()
+void AThirdPersonPlayerController::CallPlayerPausedGame()
 {
-	
+	OnPlayerPausedGame.Broadcast(UGameplayStatics::GetPlayerControllerID(this));
+}
+
+void AThirdPersonPlayerController::CallMenuNavigationDown()
+{
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused())
+	{
+		OnMenuNavigatedDown.Broadcast();
+	}
+}
+
+void AThirdPersonPlayerController::CallMenuNavigationUp()
+{
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused())
+	{
+		OnMenuNavigatedUp.Broadcast();
+	}
+}
+
+void AThirdPersonPlayerController::CallMenuEnter()
+{
+	// Only Player0 can press buttons apparently, so we have to manually handle it for the others
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused() && UGameplayStatics::GetPlayerControllerID(this) != 0)
+	{
+		OnMenuEnter.Broadcast();
+	}
 }
