@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Actors/IFreezeable.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Character/Abilities/AbilityBase.h"
@@ -10,7 +11,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
 
 UCLASS(config=Game)
-class ACyberbowlCharacter : public ACharacter
+class ACyberbowlCharacter : public ACharacter, public IFreezeable
 {
 	GENERATED_BODY()
 
@@ -24,6 +25,9 @@ class ACyberbowlCharacter : public ACharacter
 public:
 	ACyberbowlCharacter();
 	ACyberbowlCharacter(const class FObjectInitializer& ObjectInitializer);
+
+	UFUNCTION()
+		void CallMenuEnter();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -42,10 +46,15 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bTurretMode;
 
+	UPROPERTY()
+	float DefaultGravityScale;
+	
+	UPROPERTY()
+	float DefaultTimeDilation;
+	
+protected:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallErrorFeedback forceFeedback;
-
-protected:
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
@@ -92,5 +101,14 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
+	void Freeze_Implementation(AActor* instigtr) override;
+
+	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
+	void UnFreeze_Implementation() override;
+
+	//UFUNCTION(BlueprintCallable, Category = "CyberbowlCharacter")
+	//void ToggleAbilities(bool enable);
 };
 

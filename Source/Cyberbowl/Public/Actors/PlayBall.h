@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Actors/IFreezeable.h"
 #include "GameModesAndInstances/InGameGameMode.h"
 #include "PlayBall.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu
 
 UCLASS()
-class CYBERBOWL_API APlayBall : public AActor
+class CYBERBOWL_API APlayBall : public AActor, public IFreezeable
 {
 	GENERATED_BODY()
 	
@@ -30,7 +31,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
 	FOnBallBooped OnBallBooped;
 		
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -52,4 +53,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetBallPosition();
+
+	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
+	void Freeze_Implementation(AActor* instigtr) override;
+
+	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
+	void UnFreeze_Implementation() override;
 };

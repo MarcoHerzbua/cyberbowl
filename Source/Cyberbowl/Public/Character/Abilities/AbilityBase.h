@@ -10,7 +10,6 @@
 enum class EAbilityState : uint8
 {
 	ABILITY_TARGETING,
-	ABILITY_KEY_RELEASED,
 	ABILITY_FIRE,
 	ABILITY_COOLDOWN,
 	ABILITY_DEFAULT
@@ -35,8 +34,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void Targeting();
 
-
-	
+	UFUNCTION(BlueprintCallable)
+	void ResetAbilityState();
 
 public:	
 	// Called every frame

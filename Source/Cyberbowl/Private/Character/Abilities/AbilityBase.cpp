@@ -2,7 +2,10 @@
 
 
 #include "Character/Abilities/AbilityBase.h"
+
+#include "Character/Abilities/CooldownComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/Actor.h"
 
 
 // Sets default values for this component's properties
@@ -22,10 +25,12 @@ void UAbilityBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//CurrState = EAbilityState::ABILITY_DEFAULT;
+	auto coolDownCmp = GetOwner()->FindComponentByClass<UCooldownComponent>();
 
-	// ...
-	
+	if(coolDownCmp)
+	{
+		coolDownCmp->UltCooldownFinished.AddDynamic(this, &UAbilityBase::ResetAbilityState);
+	}
 }
 
 void UAbilityBase::Fire()
@@ -36,6 +41,11 @@ void UAbilityBase::Fire()
 void UAbilityBase::Targeting()
 {
 	UKismetSystemLibrary::PrintString(this, ((FString)(L"(Base)Targeting ability: ")));
+}
+
+void UAbilityBase::ResetAbilityState()
+{
+	SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 }
 
 
