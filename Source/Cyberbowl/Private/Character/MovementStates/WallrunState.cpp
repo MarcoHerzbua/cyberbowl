@@ -120,8 +120,8 @@ EWallRunDirection UWallrunState::HitDirection(FHitResult& hitResult)
 	FHitResult hit1, hit2;
 	world->LineTraceSingleByProfile(hit1, actorLoc, end1, "WallrunTrace");
 	world->LineTraceSingleByProfile(hit2, actorLoc, end2, "WallrunTrace");
-	DrawDebugLine(world, MovementComponent->GetActorLocation(), end1, FColor::Red, false, 5, 0, 3.f);
-	DrawDebugLine(world, MovementComponent->GetActorLocation(), end2, FColor::Blue, false, 5, 0, 3.f);
+	//DrawDebugLine(world, MovementComponent->GetActorLocation(), end1, FColor::Red, false, 5, 0, 3.f);
+	//DrawDebugLine(world, MovementComponent->GetActorLocation(), end2, FColor::Blue, false, 5, 0, 3.f);
 	FVector hitVec;
 	if (hit1.bBlockingHit)
 	{
