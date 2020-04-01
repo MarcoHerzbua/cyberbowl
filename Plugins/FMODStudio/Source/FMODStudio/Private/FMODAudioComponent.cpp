@@ -660,7 +660,7 @@ void UFMODAudioComponent::PlayInternal(EFMODSystemContext::Type Context)
         verifyfmod(StudioInstance->setUserData(this));
         verifyfmod(StudioInstance->start());
         UE_LOG(LogFMOD, Verbose, TEXT("Playing component %p"), this);
-        SetActiveFlag(true);
+        SetActive(true);
         SetComponentTickEnabled(true);
     }
 }

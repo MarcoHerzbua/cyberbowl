@@ -52,7 +52,7 @@
 <p>Bank sample data can now be encrypted using FMOD Studio. This implementation is an extension of the Core API FSB encryption feature.</p>
 <p>See the <a href="https://fmod.com/resources/documentation-api?version=2.0&amp;page=welcome-whats-new-200.html#sample-data-encryption">Sample Data Encryption</a> chapter of the <a href="https://fmod.com/resources/documentation-api?version=2.0">FMOD API User Manual</a> for more information.</p>
 <p>To allow bank loading when used with the Studio API, set the key via <a href="https://fmod.com/resources/documentation-api?version=2.0&amp;page=studio-api-system.html#fmod_studio_advancedsettings"><code>FMOD_STUDIO_ADVANCEDSETTINGS::encryptionkey</code></a>. Then if some banks are unencrypted you can use the <a href="https://fmod.com/resources/documentation-api?version=2.0&amp;page=studio-api-system.html#fmod_studio_load_bank_flags"><code>FMOD_STUDIO_LOAD_BANK_UNENCRYPTED</code></a> load flag to ignore the given key.</p>
-<p>The FMOD UE4 Integration settings now have an added field for bank loading, <a href="settings.html#encryption-key">Bank Encryption Key</a>, which will set the <code>FMOD_STUDIO_ADVANCEDSETTINGS::encryptionkey</code> for you.</p>
+<p>The FMOD Integration settings now have an added field for bank loading, <a href="settings.html#encryption-key">Bank Encryption Key</a>, which will set the <code>FMOD_STUDIO_ADVANCEDSETTINGS::encryptionkey</code> for you.</p>
 <p><img alt="Encryption Key" src="images/settings-encryption.png" /></p>
 <h3 id="occlusion-ambient-changes"><a href="#occlusion-ambient-changes">Occlusion &amp; Ambient Changes</a></h3>
 <p>The integration uses Parameters to pass <a href="file:///D:/Source/release.2.0/docs/ue4/build/user-guide.html#occlusion">Occlusion</a> &amp; <a href="file:///D:/Source/release.2.0/docs/ue4/build/user-guide.html#reverb-zones">Ambient</a> information to Studio. The Parameters can be specified in the FMOD UE4 Integration settings:<br />
@@ -63,7 +63,7 @@
 <p>The default Master Bank name has changed from "Master Bank.bank" to "Master.bank". If you are upgrading from an older version or you are using a different name, this will need to be updated in the <a href="file:///D:/Source/release.2.0/docs/ue4/build/settings.html#master-bank-name">Master Bank Name</a> field of the <a href="file:///D:/Source/release.2.0/docs/ue4/build/settings.html">FMOD UE4 Settings</a> so that the Integration can find it.</p>
 <p><img alt="Master Bank Name" src="images/master-bank-name.png" /></p></div>
 
-<p class="manual-footer">UE4 Integration 2.00.08 (2020-03-02). &copy; 2020 Firelight Technologies Pty Ltd.</p>
+<p class="manual-footer">UE4 Integration 2.00.07 (2020-01-17). &copy; 2020 Firelight Technologies Pty Ltd.</p>
 </body>
 </html>
 

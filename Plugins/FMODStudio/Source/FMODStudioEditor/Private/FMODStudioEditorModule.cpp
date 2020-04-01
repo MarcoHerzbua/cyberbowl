@@ -45,7 +45,7 @@
 #include "Misc/MessageDialog.h"
 #include "HAL/FileManager.h"
 #include "Interfaces/IMainFrameModule.h"
-#include "ToolMenus.h"
+#include "Developer/Toolmenus/Public/ToolMenus.h"
 
 #include "fmod_studio.hpp"
 

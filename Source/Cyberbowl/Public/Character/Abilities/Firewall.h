@@ -16,7 +16,6 @@ class CYBERBOWL_API AFirewall : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AFirewall();
-
 	
 
 protected:
@@ -27,11 +26,14 @@ protected:
 
 public:	
 	// Called every frame
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* box;
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* root;
+
+	FVector firewallColliderSize = (FVector(3000, 1000, 1000));
+
+	
 	virtual void Tick(float DeltaTime) override;
-	int GetBoxHeight() { return box->GetUnscaledBoxExtent().Z; };
-	//void SpawnEffect();
+	FVector GetBoxExtent() { return box->GetUnscaledBoxExtent(); };
 };

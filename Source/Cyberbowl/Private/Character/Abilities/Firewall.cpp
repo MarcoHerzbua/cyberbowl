@@ -3,7 +3,7 @@
 
 #include "Character/Abilities/Firewall.h"
 #include "DrawDebugHelpers.h"
-
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 AFirewall::AFirewall()
@@ -15,6 +15,8 @@ AFirewall::AFirewall()
 	RootComponent = root;
 	box = CreateDefaultSubobject<UBoxComponent>(FName("FirewallBox"));
 	box->SetupAttachment(root);
+	box->SetBoxExtent(firewallColliderSize);
+
 	
 }
 
@@ -22,8 +24,6 @@ AFirewall::AFirewall()
 void AFirewall::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	box->SetBoxExtent(FVector(2000, 50, 300));
 	box->SetCollisionProfileName("BlockAllDynamic");
 }
 
@@ -31,11 +31,6 @@ void AFirewall::BeginPlay()
 void AFirewall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	DrawDebugBox(GetWorld(), GetActorLocation(), box->GetUnscaledBoxExtent(), GetActorRotation().Quaternion(), FColor::Black, false, 5, 0, 10);
+	//DrawDebugBox(GetWorld(), GetActorLocation(), box->GetUnscaledBoxExtent(), GetActorRotation().Quaternion(), FColor::Black, false, 1, 0, 10);
 }
-
-//void AFirewall::SpawnEffect()
-//{
-//
-//}
 
