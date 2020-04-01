@@ -80,9 +80,6 @@ private:
 	UFUNCTION()
 	void CallMenuNavigationUp();
 
-	UFUNCTION()
-	void CallMenuEnter();
-
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallGameOverMenuNavigated OnCallGameOverMenuNavigated;
@@ -108,6 +105,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	ECBCharacterType currPlayerType;
 
+	UFUNCTION()
+	void CallMenuEnter();
 	
 protected:
 	ACyberbowlCharacter* character;

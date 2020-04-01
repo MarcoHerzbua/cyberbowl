@@ -35,7 +35,6 @@ void AThirdPersonPlayerController::SetupInputComponent()
 	InputComponent->BindAction("PauseGame", IE_Pressed, this, &AThirdPersonPlayerController::CallPlayerPausedGame);
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationDown);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationUp);
-	InputComponent->BindAction("MenuEnter", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuEnter);
 }
 
 void AThirdPersonPlayerController::SpawnActors()
