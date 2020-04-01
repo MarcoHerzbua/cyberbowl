@@ -95,6 +95,8 @@ void UCyberbowlCharacterAnimInstance::setIsDashing(bool bIsDash)
 
 void UCyberbowlCharacterAnimInstance::setDashPlayRate(float playRate)
 {
-	dashPlayRate = 30*playRate;
+	float playratePerFramesPerSecond = 1.f / 30.f;
+	float playduration = 30.f / playRate;
+	dashPlayRate = playduration*playratePerFramesPerSecond;
 }
 
