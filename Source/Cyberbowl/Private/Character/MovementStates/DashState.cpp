@@ -1,5 +1,6 @@
 #include "Character/MovementStates/DashState.h"
 #include "Character/CBCharacterMovementComponent.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
@@ -49,6 +50,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 	MovementComponent->GravityScale = 0.f;
 	MovementComponent->StopMovementImmediately();
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(DashTimerHandle, this, &UDashState::StopDash, finalDashDuration);
+	MovementComponent->animinstance->setIsDashing(true);
 }
 
 void UDashState::Deactivate()
@@ -59,6 +61,7 @@ void UDashState::Deactivate()
 	MovementComponent->GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
 	DashDirection = FVector::ZeroVector;
 	PreviousMovementMode = ECBMovementMode::CBMOVE_Running;
+	MovementComponent->animinstance->setIsDashing(false);
 }
 
 void UDashState::OnTick(float DeltaTime)

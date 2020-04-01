@@ -17,7 +17,9 @@ void UFireAbility::BeginPlay()
 	character = Cast<ACyberbowlCharacter>(GetOwner());
 	camera = character->GetFollowCamera();
 	fireWallPosition = FVector(0.f);
-	validTarget = false;
+	bValidTarget = false;
+	bValidTargetBoxSize = false;
+	boxScale = FVector(0.f);
 	fireWallLifeTime = 8.f;
 	
 }
@@ -25,7 +27,7 @@ void UFireAbility::BeginPlay()
 
 void UFireAbility::Fire()
 {
-	if(!validTarget)
+	if(!bValidTarget)
 	{
 		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 		return;
@@ -46,7 +48,8 @@ void UFireAbility::Fire()
 	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
-	validTarget = false;
+	bValidTarget = false;
+	bValidTargetBoxSize = false;
 	
 }
 
@@ -59,9 +62,15 @@ void UFireAbility::Targeting()
 	FVector cameraView = camManager->GetActorForwardVector();
 	FVector end = character->GetActorLocation() + cameraView * targetingLength;
 
-	AFirewall* dummyActor = GetWorld()->SpawnActor<AFirewall>(fireClass);
-	FVector boxScale = dummyActor->GetBoxExtent();
-	GetWorld()->DestroyActor(dummyActor);
+	if (!bValidTargetBoxSize)
+	{
+		AFirewall* dummyActor = GetWorld()->SpawnActor<AFirewall>(fireClass);
+		boxScale = dummyActor->GetBoxExtent();
+		GetWorld()->DestroyActor(dummyActor);
+	}
+
+	bValidTargetBoxSize = true;
+	
 	FRotator cam = camera->GetRelativeRotation();
 	auto camRotation = character->GetCameraBoom()->GetTargetRotation();
 	FRotator rotation = FRotator(0.f, camRotation.Yaw + 90, 0.f);
@@ -75,11 +84,11 @@ void UFireAbility::Targeting()
 	{
 		DrawDebugBox(world, hitResult.ImpactPoint, FVector(boxScale.X, boxScale.Y, 10), rotation.Quaternion(), FColor::Blue, false, 0.1f, 0, 5.f);
 		fireWallPosition = hitResult.ImpactPoint;
-		validTarget = true;
+		bValidTarget = true;
 	}
 	else
 	{
-		validTarget = false;
+		bValidTarget = false;
 	}
 	
 }

@@ -48,6 +48,7 @@ private:
 	ACyberbowlCharacter* character;
 	UCameraComponent* camera;
 	FVector fireWallPosition;
-	bool validTarget;
-
+	bool bValidTarget;
+	bool bValidTargetBoxSize;
+	FVector boxScale;
 };
