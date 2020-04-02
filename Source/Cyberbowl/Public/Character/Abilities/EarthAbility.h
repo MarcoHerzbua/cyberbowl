@@ -22,7 +22,11 @@ protected:
 	
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION()
+	void EndLeap();
 
+	void DoLeap();
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinTargetDistance = 500.f;
 
@@ -32,4 +36,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TargetIndicatorRadius = 400.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LeapDuration = 2.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LeapHeight = 2000.f;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector LeapTarget;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector LeapStart;
+
+	UPROPERTY()
+	bool bValidTarget;
+
+	UPROPERTY()
+	FTimerHandle LeapTimerHandle;
 };
+
+
