@@ -29,4 +29,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaxTargetDistance = 3000.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TargetIndicatorRadius = 400.f;
+
 };

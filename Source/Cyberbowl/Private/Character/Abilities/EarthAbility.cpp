@@ -32,11 +32,13 @@ void UEarthAbility::Targeting()
 	
 	if (hitResult.bBlockingHit)
 	{
-		MaxTargetDistance = 3000.f;
 		indicatorSpawnVec = hitResult.ImpactPoint;
+
+		//Edge Case when player aims at the Wall
 		if(hitResult.GetComponent()->GetCollisionProfileName() == "StadiumWall")
 		{
-			FVector hitPointWithOffset = hitResult.ImpactPoint + hitResult.ImpactNormal * 250.f;
+			//get a point a certain distant away from the wall
+			FVector hitPointWithOffset = hitResult.ImpactPoint + hitResult.ImpactNormal * TargetIndicatorRadius;
 
 			FHitResult floorTrace;
 			world->LineTraceSingleByProfile(floorTrace, hitPointWithOffset, hitPointWithOffset + FVector::DownVector * 10000.f, "AbilityTrace");
@@ -52,14 +54,12 @@ void UEarthAbility::Targeting()
 				{
 					indicatorSpawnVec = floorTrace.ImpactPoint;
 				}
-
 			}
-
 		}
+		//case if the player aims at the ground close to character
 		else if(hitResult.Distance < MinTargetDistance)
 		{
 			indicatorSpawnVec = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), hitResult.Distance));
 		}
 	}
 	else
@@ -82,7 +82,7 @@ void UEarthAbility::Targeting()
 		}
 	}
 	
-	DrawDebugCylinder(world, indicatorSpawnVec, indicatorSpawnVec + FVector::UpVector * 100.f, 250.f, 12, FColor::Red, false, 0.01f, 0, 5);
+	DrawDebugCylinder(world, indicatorSpawnVec, indicatorSpawnVec + FVector::UpVector * 100.f, TargetIndicatorRadius, 12, FColor::Red, false, 0.01f, 0, 5);
 }
 
 void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
