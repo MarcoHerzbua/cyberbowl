@@ -2,16 +2,32 @@
 
 
 #include "Character/Abilities/EarthAbility.h"
+
+#include "Character/Abilities/CooldownComponent.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "TimerManager.h"
 
 void UEarthAbility::Fire()
 {
-	UKismetSystemLibrary::PrintString(this, ((FString)(L"(Earth)Pillar-Thingy: ")));
-	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	if(!bValidTarget)
+	{
+		SetAbilityState(EAbilityState::ABILITY_TARGETING);
+		return;
+	}
+
+	if(!GetWorld()->GetTimerManager().IsTimerActive(LeapTimerHandle))
+	{
+		LeapStart = GetOwner()->GetActorLocation();
+		GetWorld()->GetTimerManager().SetTimer(LeapTimerHandle, this, &UEarthAbility::EndLeap, LeapDuration);
+	}
+	else
+	{
+		DoLeap();
+	}
 }
 
 void UEarthAbility::Targeting()
@@ -25,14 +41,14 @@ void UEarthAbility::Targeting()
 	FHitResult hitResult;
 	world->LineTraceSingleByProfile(hitResult, actorLoc, end, "AbilityTrace");
 
-	FVector indicatorSpawnVec;
 	FRotator camViewRotator = ownerAsPawn->GetControlRotation();
 	//Set Pitch to zero cause we are only interested in the Yaw (Roll is always 0)
 	camViewRotator.Pitch = 0.f;
-	
+
+	bValidTarget = true;
 	if (hitResult.bBlockingHit)
 	{
-		indicatorSpawnVec = hitResult.ImpactPoint;
+		LeapTarget = hitResult.ImpactPoint;
 
 		//Edge Case when player aims at the Wall
 		if(hitResult.GetComponent()->GetCollisionProfileName() == "StadiumWall")
@@ -48,18 +64,18 @@ void UEarthAbility::Targeting()
 				float distanceToActor = (floorTrace.ImpactPoint - actorLoc).Size();
 				if (distanceToActor < MinTargetDistance)
 				{
-					//exception: this should block player from firing
+					bValidTarget = false;
 				}
 				else
 				{
-					indicatorSpawnVec = floorTrace.ImpactPoint;
+					LeapTarget = floorTrace.ImpactPoint;
 				}
 			}
 		}
 		//case if the player aims at the ground close to character
 		else if(hitResult.Distance < MinTargetDistance)
 		{
-			indicatorSpawnVec = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
+			LeapTarget = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
 		}
 	}
 	else
@@ -73,16 +89,19 @@ void UEarthAbility::Targeting()
 			float distanceToActor = (floorTrace.ImpactPoint - actorLoc).Size();
 			if(distanceToActor < MinTargetDistance)
 			{
-				indicatorSpawnVec = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
+				LeapTarget = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
 			}
 			else
 			{
-				indicatorSpawnVec = floorTrace.ImpactPoint;
+				LeapTarget = floorTrace.ImpactPoint;
 			}
 		}
 	}
-	
-	DrawDebugCylinder(world, indicatorSpawnVec, indicatorSpawnVec + FVector::UpVector * 100.f, TargetIndicatorRadius, 12, FColor::Red, false, 0.01f, 0, 5);
+
+	if(bValidTarget)
+	{
+		DrawDebugCylinder(world, LeapTarget, LeapTarget + FVector::UpVector * 100.f, TargetIndicatorRadius, 12, FColor::Red, false, 0.01f, 0, 5);
+	}
 }
 
 void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -97,4 +116,33 @@ void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	{
 		Targeting();
 	}
+}
+
+void UEarthAbility::EndLeap()
+{
+	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
+	cooldownComponent->StartCooldown("Ult");
+	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	bValidTarget = false;
+	LeapTarget = FVector::ZeroVector;
+}
+
+void UEarthAbility::DoLeap()
+{
+	float elapsedLeapTime = GetWorld()->GetTimerManager().GetTimerElapsed(LeapTimerHandle);
+
+	if(elapsedLeapTime < 0.f)
+	{
+		UE_LOG(LogActor, Error, TEXT("EarthAbility: Leap Timer is not set. Leap no work"));
+		return;
+	}
+
+	elapsedLeapTime /= LeapDuration;
+	FVector leapMiddle = LeapStart + (LeapTarget - LeapStart) / 2.f + FVector::UpVector * LeapHeight;
+
+	FVector startToMiddle = FMath::Lerp<FVector>(LeapStart, leapMiddle, elapsedLeapTime);
+	FVector middleToEnd = FMath::Lerp<FVector>(leapMiddle, LeapTarget, elapsedLeapTime);
+	FVector leapLocation = FMath::Lerp<FVector>(startToMiddle, middleToEnd, elapsedLeapTime);
+
+	GetOwner()->SetActorLocation(leapLocation, true);
 }
