@@ -110,7 +110,7 @@ void AMainMenuPlayerController::PushToMenuStack(UUserWidget* newWidget)
 
 void AMainMenuPlayerController::PopFromMenuStack()
 {
-	if (widgetStack.Num() == 0)
+	if (widgetStack.Num() <= 1)
 	{
 		return;
 	}
