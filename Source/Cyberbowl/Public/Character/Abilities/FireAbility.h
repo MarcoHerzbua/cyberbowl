@@ -33,6 +33,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<AFirewall> fireClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float targetIndicatorRadius = 400.f;
+
 
 private:
 

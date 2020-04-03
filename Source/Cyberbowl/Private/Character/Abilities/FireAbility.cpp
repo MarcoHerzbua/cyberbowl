@@ -80,15 +80,45 @@ void UFireAbility::Targeting()
 	DrawDebugBox(world, end, FVector(5.f), FColor::Red, false, 5, 0, 3);
 
 
-	if (hitResult.bBlockingHit && hitResult.Normal == FVector(0.f, 0.f, 1.f))
+	if (hitResult.bBlockingHit)
 	{
-		DrawDebugBox(world, hitResult.ImpactPoint, FVector(boxScale.X, boxScale.Y, 10), rotation.Quaternion(), FColor::Blue, false, 0.1f, 0, 5.f);
 		fireWallPosition = hitResult.ImpactPoint;
 		bValidTarget = true;
+
+		if (hitResult.GetComponent()->GetCollisionProfileName() == "StadiumWall")
+		{
+
+			//get a point a certain distant away from the wall
+			FVector hitPointWithOffset = hitResult.ImpactPoint + hitResult.ImpactNormal * targetIndicatorRadius;
+
+			FHitResult floorTrace;
+			world->LineTraceSingleByProfile(floorTrace, hitPointWithOffset, hitPointWithOffset + FVector::DownVector * 10000.f, "AbilityTrace");
+
+			if (floorTrace.bBlockingHit)
+			{
+				bValidTarget = true;
+				DrawDebugBox(world, floorTrace.ImpactPoint, FVector(boxScale.X, boxScale.Y, 10), rotation.Quaternion(), FColor::Blue, false, 0.1f, 0, 5.f);
+				fireWallPosition = floorTrace.ImpactPoint;
+			}
+
+		}
+		else
+		{
+			DrawDebugBox(world, hitResult.ImpactPoint, FVector(boxScale.X, boxScale.Y, 10), rotation.Quaternion(), FColor::Blue, false, 0.1f, 0, 5.f);
+		}
 	}
 	else
 	{
-		bValidTarget = false;
+		FHitResult floorTrace;
+		world->LineTraceSingleByProfile(floorTrace, end, end + FVector::DownVector * 10000.f, "AbilityTrace");
+
+		if (floorTrace.bBlockingHit)
+		{
+			float distanceToActor = (floorTrace.ImpactPoint - character->GetActorLocation()).Size();
+			fireWallPosition = floorTrace.ImpactPoint;
+			bValidTarget = true;
+			DrawDebugBox(world, floorTrace.ImpactPoint, FVector(boxScale.X, boxScale.Y, 10), rotation.Quaternion(), FColor::Blue, false, 0.1f, 0, 5.f);
+		}
 	}
 	
 }
