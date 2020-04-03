@@ -16,6 +16,14 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "TimerManager.h"
 
+void UEarthAbility::BeginPlay()
+{
+	Super::BeginPlay();
+
+	character = Cast<ACyberbowlCharacter>(GetOwner());
+
+}
+
 void UEarthAbility::Fire()
 {
 	if(!bValidTarget)
@@ -26,6 +34,7 @@ void UEarthAbility::Fire()
 
 	if(!GetWorld()->GetTimerManager().IsTimerActive(LeapTimerHandle))
 	{
+		SpawnPillar();
 		LeapStart = GetOwner()->GetActorLocation();
 		GetWorld()->GetTimerManager().SetTimer(LeapTimerHandle, this, &UEarthAbility::EndLeap, LeapDuration);
 	}
@@ -121,6 +130,11 @@ void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	{
 		Targeting();
 	}
+
+	if (!characterController)
+	{
+		characterController = Cast<AThirdPersonPlayerController>(character->GetController());
+	}
 }
 
 void UEarthAbility::EndLeap()
@@ -152,28 +166,7 @@ void UEarthAbility::DoLeap()
 	GetOwner()->SetActorLocation(leapLocation, true);
 }
 
-void UEarthAbility::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	character = Cast<ACyberbowlCharacter>(GetOwner());
 
-}
-
-void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (CurrState == EAbilityState::ABILITY_FIRE)
-	{
-		SpawnPillar();
-	}
-
-	if (!characterController)
-	{
-		characterController = Cast<AThirdPersonPlayerController>(character->GetController());
-	}
-}
 
 void UEarthAbility::SpawnPillar()
 {
@@ -183,8 +176,4 @@ void UEarthAbility::SpawnPillar()
 	pillar->SetLifeSpan(4.f);
 	pillar->SetCurrPlayerTeam(characterController->currPlayerTeam);
 	
-
-	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
-	cooldownComponent->StartCooldown("Ult");
-	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
 }

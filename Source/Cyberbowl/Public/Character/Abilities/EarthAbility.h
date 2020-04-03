@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilityBase.h"
+#include "Character/Abilities/Earthpillar.h"
 #include "EarthAbility.generated.h"
 
 /**
@@ -15,6 +16,8 @@ class CYBERBOWL_API UEarthAbility : public UAbilityBase
 	GENERATED_BODY()
 	
 protected:
+
+	void BeginPlay() override;
 	
 	void Fire() override;
 
@@ -53,6 +56,18 @@ protected:
 
 	UPROPERTY()
 	FTimerHandle LeapTimerHandle;
+
+	AEarthpillar* pillar;
+
+	class AThirdPersonPlayerController* characterController;
+
+	void SpawnPillar();
+
+	class ACyberbowlCharacter* character;
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TSubclassOf<AEarthpillar> earthClass;
 };
 
 
