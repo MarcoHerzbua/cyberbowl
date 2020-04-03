@@ -28,6 +28,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	UNiagaraSystem* fireEffect;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float targetIndicatorRadius = 400.f;
+
 
 private:
 
