@@ -116,12 +116,18 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 	TArray<UWidgetComponent*, FDefaultAllocator> widgetComponents;
 	character->GetComponents<UWidgetComponent, FDefaultAllocator>(widgetComponents);
 
+	// We need to re-activate the components, since they are being deactivated based on the player count last round
+	for (auto widgetComp : widgetComponents)
+	{
+		widgetComp->Activate();
+	}
+
 	TArray<AActor*> playerControllers;
 	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), playerControllers);
 
 	for (auto controller : playerControllers)
 	{
-		auto playerController = Cast<AThirdPersonPlayerController>(controller);
+		const auto playerController = Cast<AThirdPersonPlayerController>(controller);
 
 		if (playerController == this)
 			continue;
@@ -140,22 +146,18 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 			nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
 		}
 
-		//if (playerController != this)
-		//{
-			widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
-			nameTagWidget->SetOwningPlayer(playerController);
-			nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
-			nameTagWidget->IsAssigned = true;
-		//}
+		widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
+		nameTagWidget->SetOwningPlayer(playerController);
+		nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
+		nameTagWidget->IsAssigned = true;
 	}
 
 	for (auto widgetComp : widgetComponents)
-	{	
-		bool isAssigned = Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned;
+	{
+		const bool isAssigned = Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned;
 		if (!isAssigned)
 		{
-			widgetComp->DestroyComponent();
-			UKismetSystemLibrary::PrintString(this, "deleted widget component");
+			widgetComp->Deactivate();
 		}
 	}
 }

@@ -27,5 +27,5 @@ public:
 	int SpawnedCharacters;
 
 	UFUNCTION()
-	void CheckAllCharactersSpawned() const;
+	void CheckAllCharactersSpawned();
 };
