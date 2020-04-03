@@ -9,6 +9,7 @@ void UDashState::InitializeState(UCBCharacterMovementComponent* moveComponent)
 {
 	UBaseMovementState::InitializeState(moveComponent);
 	DefaultGravityScale = MovementComponent->GravityScale;
+	DefaultBrakingFrictionFactor = MovementComponent->BrakingFrictionFactor;
 }
 
 void UDashState::Activate(ECBMovementMode previousMode)
@@ -48,6 +49,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 	//InitialVelocity = MovementComponent->Velocity;
 	PreviousMovementMode = previousMode;
 	MovementComponent->GravityScale = 0.f;
+	MovementComponent->BrakingFrictionFactor = 0.f;
 	MovementComponent->StopMovementImmediately();
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(DashTimerHandle, this, &UDashState::StopDash, finalDashDuration);
 	MovementComponent->animinstance->setIsDashing(true);
@@ -58,6 +60,7 @@ void UDashState::Deactivate()
 	UBaseMovementState::Deactivate();
 
 	MovementComponent->GravityScale = DefaultGravityScale;
+	MovementComponent->BrakingFrictionFactor = DefaultBrakingFrictionFactor;
 	MovementComponent->GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
 	DashDirection = FVector::ZeroVector;
 	PreviousMovementMode = ECBMovementMode::CBMOVE_Running;
