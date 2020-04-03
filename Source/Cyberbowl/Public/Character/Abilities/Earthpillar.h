@@ -34,7 +34,8 @@ public:
 	float maxRise = 200;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float maxLowering = 20;
+	float riseTime = 10.f;
+	
 	
 protected:
 	// Called when the game starts or when spawned
@@ -48,6 +49,7 @@ protected:
 	bool bIsRising;
 	bool bIsLowering;
 	int currPlayerTeam;
+	float maxLowering;
 
 public:	
 	// Called every frame
@@ -56,9 +58,8 @@ public:
 	UFUNCTION()
 	virtual void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-	virtual void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 	void SetCurrPlayerTeam(int playerTeam);
+
+	void SetMaxLoweringPos(float pos);
 
 };

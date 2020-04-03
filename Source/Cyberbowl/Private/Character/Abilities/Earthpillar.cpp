@@ -98,17 +98,20 @@ void AEarthpillar::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 void AEarthpillar::Rising(float DeltaTime)
 {
-	SetActorLocation(GetActorLocation() + GetActorUpVector() * FVector(10.));
-	UE_LOG(LogTemp, Warning, TEXT("Rising :D"));
+	SetActorLocation(GetActorLocation() + GetActorUpVector() * FVector(riseTime * DeltaTime));
 }
 
 void AEarthpillar::Lowering(float DeltaTime)
 {
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(10.));
-	UE_LOG(LogTemp, Warning, TEXT("Lowering:D"));
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(riseTime * DeltaTime));
 }
 
 void AEarthpillar::SetCurrPlayerTeam(int playerTeam)
 {
 	currPlayerTeam = playerTeam;
+}
+
+void AEarthpillar::SetMaxLoweringPos(float pos)
+{
+	maxLowering = pos;
 }

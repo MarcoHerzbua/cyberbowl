@@ -45,6 +45,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float LeapHeight = 2000.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PillarLifeSpan = 4.f;
+
 	UPROPERTY(BlueprintReadOnly)
 	FVector LeapTarget;
 

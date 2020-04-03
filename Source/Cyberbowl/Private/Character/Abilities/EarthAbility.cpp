@@ -170,10 +170,27 @@ void UEarthAbility::DoLeap()
 
 void UEarthAbility::SpawnPillar()
 {
-	FVector spawnLocation = FVector(character->GetActorLocation().X + 150, character->GetActorLocation().Y, character->GetActorLocation().Z);
-	float yawRotation = character->GetCameraBoom()->GetTargetRotation().Yaw - 180;
-	pillar = GetWorld()->SpawnActor<AEarthpillar>(earthClass, spawnLocation, FRotator(20, yawRotation, 0));
-	pillar->SetLifeSpan(4.f);
-	pillar->SetCurrPlayerTeam(characterController->currPlayerTeam);
-	
+	auto world = GetWorld();
+	FHitResult hitResult;
+	FVector actorLocation = character->GetActorLocation();
+	FVector end = FVector(0.f, 0., -10000.f);
+	world->LineTraceSingleByProfile(hitResult, actorLocation, end, "AbilityTrace");
+	FVector earthPillarPosition;
+
+	if (hitResult.bBlockingHit)
+	{
+		earthPillarPosition = hitResult.ImpactPoint;
+		FVector spawnLocation = earthPillarPosition;
+		float yawRotation = character->GetCameraBoom()->GetTargetRotation().Yaw - 180;
+		pillar = GetWorld()->SpawnActor<AEarthpillar>(earthClass, spawnLocation, FRotator(20, yawRotation, 0));
+		pillar->SetLifeSpan(PillarLifeSpan);
+		pillar->SetCurrPlayerTeam(characterController->currPlayerTeam);
+		pillar->SetMaxLoweringPos(spawnLocation.Z);
+	}
+	else
+	{
+		UE_LOG(LogActor, Error, TEXT("EarthAbility: Error when tracing for pillar location."));
+		return;
+	}
+
 }
