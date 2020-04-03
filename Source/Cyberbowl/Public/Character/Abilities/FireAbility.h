@@ -48,7 +48,6 @@ private:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	ACyberbowlCharacter* character;
 	UCameraComponent* camera;
 	FVector fireWallPosition;
 	bool bValidTarget;
