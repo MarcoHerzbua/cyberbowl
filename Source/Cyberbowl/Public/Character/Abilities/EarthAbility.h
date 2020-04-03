@@ -4,35 +4,55 @@
 
 #include "CoreMinimal.h"
 #include "AbilityBase.h"
-#include "Character/Abilities/Earthpillar.h"
 #include "EarthAbility.generated.h"
 
 /**
  * 
  */
-
 UCLASS(ClassGroup = (Abilities), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API UEarthAbility : public UAbilityBase
 {
-
-public:
 	GENERATED_BODY()
 	
-	virtual void Fire() override;
+protected:
+	
+	void Fire() override;
 
-	virtual void BeginPlay() override;
+	void Targeting() override;
+	
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION()
+	void EndLeap();
 
-	UPROPERTY(BlueprintReadWrite)
-	TSubclassOf<AEarthpillar> earthClass;
+	void DoLeap();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MinTargetDistance = 500.f;
 
-private:
-	AEarthpillar* pillar;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxTargetDistance = 3000.f;
 
-	class AThirdPersonPlayerController* characterController;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TargetIndicatorRadius = 400.f;
 
-	void SpawnPillar();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LeapDuration = 2.f;
 
-	class ACyberbowlCharacter* character;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LeapHeight = 2000.f;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector LeapTarget;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector LeapStart;
+
+	UPROPERTY()
+	bool bValidTarget;
+
+	UPROPERTY()
+	FTimerHandle LeapTimerHandle;
 };
+
+

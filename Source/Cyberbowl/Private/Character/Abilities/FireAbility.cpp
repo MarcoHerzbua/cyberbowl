@@ -76,7 +76,7 @@ void UFireAbility::Targeting()
 	FRotator rotation = FRotator(0.f, camRotation.Yaw + 90, 0.f);
 	
 	FHitResult hitResult;
-	world->LineTraceSingleByProfile(hitResult, cameraPos, end, "FireAbilityTrace");
+	world->LineTraceSingleByProfile(hitResult, cameraPos, end, "AbilityTrace");
 	DrawDebugBox(world, end, FVector(5.f), FColor::Red, false, 5, 0, 3);
 
 
