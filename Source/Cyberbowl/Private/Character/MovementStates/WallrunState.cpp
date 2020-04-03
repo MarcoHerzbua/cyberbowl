@@ -91,7 +91,7 @@ void UWallrunState::LaunchCharacter()
 	float angle = FMath::RadiansToDegrees(FMath::Atan2(wallNormal.Y, wallNormal.X) - FMath::Atan2(velocityDirectionVec.Y, velocityDirectionVec.X));
 
 	//TODO: This edge case checking is noob and should be replaced by a better angle calculation 
-	if((angle <= 0.f && angle > -270.f) || angle >= 180.f)
+	if((angle <= 0.f && angle > -269.f) || angle >= 180.f)
 	{
 		launchAngle *= -1.f;
 	}
@@ -101,7 +101,7 @@ void UWallrunState::LaunchCharacter()
 	launchVec.Z = MovementComponent->WallrunLaunchForce;
 	
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), launchVec.X, launchVec.Y, launchVec.Z));
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), angle));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), angle));
 	MovementComponent->GetCharacterOwner()->LaunchCharacter(launchVec, true, true);
 
 	//MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
