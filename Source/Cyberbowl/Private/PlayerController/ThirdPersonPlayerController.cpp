@@ -3,6 +3,8 @@
 
 #include "PlayerController/ThirdPersonPlayerController.h"
 #include "GameModesAndInstances/CyberbowlGameInstance.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Character/BallCamComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
@@ -174,6 +176,10 @@ void AThirdPersonPlayerController::OnRegroup()
 {
 	character->SetActorLocation(spawnTransform);
 	character->SetActorRotation(spawnRotation);
+	UBallCamComponent* ballCam = Cast<UBallCamComponent>(character->FindComponentByClass<UBallCamComponent>());
+	ballCam->DoNotFollow();
+
+	character->GetController()->SetControlRotation(spawnRotation);
 }
 
 void AThirdPersonPlayerController::OnEndGame()
