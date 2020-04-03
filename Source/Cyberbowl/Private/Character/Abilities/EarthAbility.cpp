@@ -32,16 +32,14 @@ void UEarthAbility::Fire()
 		return;
 	}
 
-	if(!GetWorld()->GetTimerManager().IsTimerActive(LeapTimerHandle))
-	{
-		SpawnPillar();
-		LeapStart = GetOwner()->GetActorLocation();
-		GetWorld()->GetTimerManager().SetTimer(LeapTimerHandle, this, &UEarthAbility::EndLeap, LeapDuration);
-	}
-	else
-	{
-		DoLeap();
-	}
+	LeapStart = GetOwner()->GetActorLocation();
+	SpawnPillar();
+	pillar->LaunchActor(GetOwner());
+	
+	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
+	cooldownComponent->StartCooldown("Ult");
+	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	bValidTarget = false;
 }
 
 void UEarthAbility::Targeting()
@@ -137,37 +135,6 @@ void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	}
 }
 
-void UEarthAbility::EndLeap()
-{
-	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
-	cooldownComponent->StartCooldown("Ult");
-	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
-	bValidTarget = false;
-	LeapTarget = FVector::ZeroVector;
-}
-
-void UEarthAbility::DoLeap()
-{
-	float elapsedLeapTime = GetWorld()->GetTimerManager().GetTimerElapsed(LeapTimerHandle);
-
-	if(elapsedLeapTime < 0.f)
-	{
-		UE_LOG(LogActor, Error, TEXT("EarthAbility: Leap Timer is not set. Leap no work"));
-		return;
-	}
-
-	elapsedLeapTime /= LeapDuration;
-	FVector leapMiddle = LeapStart + (LeapTarget - LeapStart) / 2.f + FVector::UpVector * LeapHeight;
-
-	FVector startToMiddle = FMath::Lerp<FVector>(LeapStart, leapMiddle, elapsedLeapTime);
-	FVector middleToEnd = FMath::Lerp<FVector>(leapMiddle, LeapTarget, elapsedLeapTime);
-	FVector leapLocation = FMath::Lerp<FVector>(startToMiddle, middleToEnd, elapsedLeapTime);
-
-	GetOwner()->SetActorLocation(leapLocation, true);
-}
-
-
-
 void UEarthAbility::SpawnPillar()
 {
 	auto world = GetWorld();
@@ -183,6 +150,7 @@ void UEarthAbility::SpawnPillar()
 		FVector spawnLocation = earthPillarPosition;
 		float yawRotation = character->GetCameraBoom()->GetTargetRotation().Yaw - 180;
 		pillar = GetWorld()->SpawnActor<AEarthpillar>(earthClass, spawnLocation, FRotator(20, yawRotation, 0));
+		pillar->InitializePillar(LeapTarget, LeapDuration, LeapHeight);
 		pillar->SetLifeSpan(PillarLifeSpan);
 		pillar->SetCurrPlayerTeam(characterController->currPlayerTeam);
 		pillar->SetMaxLoweringPos(spawnLocation.Z);

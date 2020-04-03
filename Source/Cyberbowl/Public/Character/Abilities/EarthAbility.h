@@ -25,11 +25,6 @@ protected:
 	
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION()
-	void EndLeap();
-
-	void DoLeap();
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinTargetDistance = 500.f;
 
@@ -56,9 +51,6 @@ protected:
 
 	UPROPERTY()
 	bool bValidTarget;
-
-	UPROPERTY()
-	FTimerHandle LeapTimerHandle;
 
 	AEarthpillar* pillar;
 

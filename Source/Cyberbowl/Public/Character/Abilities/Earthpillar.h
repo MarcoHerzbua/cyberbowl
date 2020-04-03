@@ -36,22 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float riseTime = 10.f;
 	
-	
-protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	FRotator rotation;
-
-	void Rising(float DeltaTime);
-	void Lowering(float DeltaTime);
-
-	bool bIsRising;
-	bool bIsLowering;
-	int currPlayerTeam;
-	float maxLowering;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -62,4 +48,42 @@ public:
 
 	void SetMaxLoweringPos(float pos);
 
+	UFUNCTION(BlueprintCallable)
+	void InitializePillar(FVector launchTarget, float launchDuration, float launchHeight);
+	
+	UFUNCTION(BlueprintCallable)
+	void LaunchActor(AActor* actor);
+	
+protected:
+	FRotator rotation;
+
+	void Rising(float DeltaTime);
+	void Lowering(float DeltaTime);
+
+	bool bIsRising;
+	bool bIsLowering;
+	int currPlayerTeam;
+	float maxLowering;
+
+	UPROPERTY()
+	FTimerHandle LaunchTimerHandle;
+
+	UPROPERTY(BlueprintReadOnly)
+	AActor* LaunchedActor;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector LaunchTarget;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector LaunchStart;
+
+	UPROPERTY(BlueprintReadOnly)
+	float LaunchDuration;
+
+	UPROPERTY(BlueprintReadOnly)
+	float LaunchHeight;
+	
+	void TickLaunch();
+
+	void EndLaunch();
 };
