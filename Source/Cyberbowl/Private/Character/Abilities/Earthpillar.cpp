@@ -31,7 +31,6 @@ void AEarthpillar::BeginPlay()
 {
 	Super::BeginPlay();
 	triggerMesh->OnComponentBeginOverlap.AddDynamic(this, &AEarthpillar::BeginOverlap);
-	//triggerMesh->OnComponentEndOverlap.AddDynamic(this, &AEarthpillar::EndOverlap);
 }
 
 // Called every frame
@@ -86,21 +85,6 @@ void AEarthpillar::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		UE_LOG(LogTemp, Warning, TEXT("I'am on the pillar and a Ball :D"));
 	}
 }
-
-//void AEarthpillar::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-//{
-//	ACyberbowlCharacter* overlappingActor = Cast<ACyberbowlCharacter>(OtherActor);
-//	if (overlappingActor)
-//	{
-//		//bIsLowering = true;
-//		//UE_LOG(LogTemp, Warning, TEXT("I'am off the pillar and a Character D:"));
-//	}
-//	else
-//	{
-//		//bIsLowering = true;
-//		//UE_LOG(LogTemp, Warning, TEXT("I'am off the pillar and a Ball D:"));
-//	}
-//}
 
 void AEarthpillar::Rising(float DeltaTime)
 {
