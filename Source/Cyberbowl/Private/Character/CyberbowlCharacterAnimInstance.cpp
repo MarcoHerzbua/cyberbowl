@@ -20,6 +20,7 @@ void UCyberbowlCharacterAnimInstance::NativeInitializeAnimation()
 	awayFromWallTime = 0;
 	movementTime = 0.6f;
 	MaxCharacterSpeed = 0;
+
 }
 
 void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
@@ -85,5 +86,17 @@ void UCyberbowlCharacterAnimInstance::setIsWallRidingClockWise(bool bisInWallRid
 	{
 		awayFromWallTime = 0;
 	}
+}
+
+void UCyberbowlCharacterAnimInstance::setIsDashing(bool bIsDash)
+{
+	bIsDashing = bIsDash;
+}
+
+void UCyberbowlCharacterAnimInstance::setDashPlayRate(float playRate)
+{
+	float playratePerFramesPerSecond = 1.f / 30.f;
+	float playduration = 30.f / playRate;
+	dashPlayRate = playduration*playratePerFramesPerSecond;
 }
 

@@ -100,6 +100,7 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 
 	//handle ability input
 	PlayerInputComponent->BindAction("Ult", IE_Pressed, this, &ACyberbowlCharacter::AbilityPressed);
+	PlayerInputComponent->BindAction("CancelUlt", IE_Pressed, this, &ACyberbowlCharacter::AbilityCanceled);
 }
 
 void ACyberbowlCharacter::Jump()
@@ -199,10 +200,15 @@ void ACyberbowlCharacter::Dash()
 		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CoolDownComponent not found"));
 		return;	
 	}
-	
-	if(cooldownComponent->IsDashReady())
+	if(!cooldownComponent->IsDashReady())
 	{
-		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);	
+		forceFeedback.Broadcast();
+	}
+	
+	if(cooldownComponent->IsDashReady() && !bIsTargetingAbility)
+	{
+		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
+		cooldownComponent->StartCooldown("Dash");
 	}
 }
 
@@ -229,12 +235,13 @@ void ACyberbowlCharacter::AbilityPressed()
 		if (abilityState == EAbilityState::ABILITY_DEFAULT)
 		{
 			abilityComponent->SetAbilityState(EAbilityState::ABILITY_TARGETING);
-			
+			bIsTargetingAbility = true;
 		}
 
 		else if (abilityState == EAbilityState::ABILITY_TARGETING)
 		{
 			abilityComponent->SetAbilityState(EAbilityState::ABILITY_FIRE);
+			bIsTargetingAbility = false;
 		}
 
 		else
@@ -247,6 +254,28 @@ void ACyberbowlCharacter::AbilityPressed()
 	{
 		forceFeedback.Broadcast();
 	}
+}
+
+void ACyberbowlCharacter::AbilityCanceled()
+{
+	if(!bIsTargetingAbility)
+	{
+		return;
+	}
+	
+	TArray<UAbilityBase*, FDefaultAllocator> abilityComponents;
+	GetComponents<UAbilityBase, FDefaultAllocator>(abilityComponents);
+	UAbilityBase* abilityComponent = nullptr;
+	for (auto ability : abilityComponents)
+	{
+		if (ability->GetReadableName() != "AbilityBase")
+		{
+			abilityComponent = ability;
+		}
+	}
+
+	bIsTargetingAbility = false;
+	abilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 }
 
 void ACyberbowlCharacter::OnResetVR()

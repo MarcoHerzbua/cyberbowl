@@ -16,19 +16,21 @@ class CYBERBOWL_API UWallrunComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	float TimeToActivateWallrun = 0.2f;
-	
-	USphereComponent* WallrunCollider;
+	UWallrunComponent();
+
+protected:
 	class UCBCharacterMovementComponent* MovementComponent;
 	APlayerController* PlayerController;
 	TArray<FInputActionKeyMapping> JumpKeyMapping;
 	
-	UWallrunComponent();
-
-protected:
 	UPROPERTY(BlueprintReadOnly)
-	float JumpInputPressedDuration = 0.f;
+	USphereComponent* WallrunCollider;
+	
+	UPROPERTY(BlueprintReadOnly)
+	int CountWallTouches = 0;
+	
+//UPROPERTY(BlueprintReadOnly)
+	//float JumpInputPressedDuration = 0.f;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;

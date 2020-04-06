@@ -25,7 +25,7 @@
 </li>
 <li><a href="#compiling-the-plugin-optional">Compiling the plugin (Optional)</a></li>
 <li><a href="#programming-support">Programming Support</a><ul>
-<li><a href="#programming-with-the-fmod-studio-plugin">Programming with the FMOD Studio plugin</a></li>
+<li><a href="#programming-with-the-fmod-ue4-integration">Programming with the FMOD UE4 Integration</a></li>
 <li><a href="#programming-with-the-fmod-studio-c-api">Programming with the FMOD Studio C++ API</a></li>
 <li><a href="#further-programming-documentation">Further Programming Documentation</a></li>
 </ul>
@@ -105,7 +105,7 @@
 <div class="manual-content api">
 <h1>2. User Guide</h1>
 <p>The FMOD UE4 Integration is a plugin that allows you to use the FMOD APIs and projects from the FMOD Studio authoring tool in your UE4 game.</p>
-<p>Normally you will just need one copy of the UE4 integration. If you develop for multiple platforms at once, you can copy multiple integrations over the top of each other.</p>
+<p>Normally you will just need one copy of the integration. If you develop for multiple platforms at once, you can copy multiple integrations over the top of each other.</p>
 <hr />
 <h2 id="installing-the-integration"><a href="#installing-the-integration">2.1 Installing the integration</a></h2>
 <p>The integration consists of a single FMODStudio folder which can be placed in either the <code>Engine/Plugins</code> directory or your UE4 game's Plugin directory <code>{ProjectName}/Plugins</code>. The next steps show how to install it into your Engine directory, so it will be available for all projects using UE4.</p>
@@ -167,7 +167,7 @@
 </ul>
 <p>To compile the plugin after downloading the source from github, do the following</p>
 <ul>
-<li>Add FMOD dynamic libraries into the <code>FMODStudio/Binaries/Platform/</code> directory. The libs can be obtained in the programmers API download or from the UE4 integration download.</li>
+<li>Add FMOD dynamic libraries into the <code>FMODStudio/Binaries/Platform/</code> directory. The libs can be obtained in the programmers API download or from the FMOD for UE4 download.</li>
 <li>Create a new code project using UE4.</li>
 <li>Copy the plugin into <code>YourGame/Plugins/FMODStudio</code>.</li>
 <li>Regenerate the game's solution or XCode project.</li>
@@ -178,7 +178,7 @@
 <hr />
 <h2 id="programming-support"><a href="#programming-support">2.5 Programming Support</a></h2>
 <p>You are able to interface with the FMOD UE4 Integration and/or the FMOD C++ APIs.</p>
-<h3 id="programming-with-the-fmod-studio-plugin"><a href="#programming-with-the-fmod-studio-plugin">2.5.1 Programming with the FMOD Studio plugin</a></h3>
+<h3 id="programming-with-the-fmod-ue4-integration"><a href="#programming-with-the-fmod-ue4-integration">2.5.1 Programming with the FMOD UE4 Integration</a></h3>
 <p>To reference FMOD Studio, the programmer will need to add the following to their .Build.cs file:</p>
 <ul>
 <li>Add "FMODStudio" to <code>PrivateDependencyModuleNames</code></li>
@@ -230,7 +230,7 @@
 - <a href="https://fmod.com/resources/documentation-api?version=2.0&amp;page=welcome.html">FMOD API Reference</a>.</p>
 <hr />
 <h2 id="making-sounds"><a href="#making-sounds">2.6 Making sounds</a></h2>
-<p>The FMOD Studio UE4 integration provides multiple ways in which Studio events can be played.</p>
+<p>The FMOD UE4 integration provides multiple ways in which Studio events can be played.</p>
 <h3 id="ambient-sounds"><a href="#ambient-sounds">2.6.1 Ambient Sounds</a></h3>
 <p>The simplest way to play a looping ambience, is to drag and drop an event from the content browser into a scene viewport.</p>
 <p><img alt="Drag sample" src="images/drag-ambient.png" /></p>
@@ -252,7 +252,7 @@
 <p><img alt="Listener Override" src="images/set-audio-listener-override.png" /></p>
 <hr />
 <h2 id="working-with-banks"><a href="#working-with-banks">2.8 Working with Banks</a></h2>
-<p>Content created in the FMOD Studio tool is exported into bank files. These bank files can then be loaded within Unreal using the FMOD Studio runtime integration. Banks can contain multiple events, which will implicitly pull in any audio assets they depend on.</p>
+<p>Content created in FMOD Studio is exported into bank files. These bank files can then be loaded within Unreal using the FMOD UE4 integration. Banks can contain multiple events, which will implicitly pull in any audio assets they depend on.</p>
 <p><img alt="Studio bank layout" src="images/studio-bank-layout.png" /></p>
 <p>Loading a bank will load all metadata, which contains information about all the events, parameters, and other data needed for all events assigned to that bank.</p>
 <h3 id="studio-bank-output-directory"><a href="#studio-bank-output-directory">2.8.1 Studio Bank Output Directory</a></h3>
@@ -272,7 +272,7 @@
 <p>Within the Unreal editor, banks are loaded automatically as soon they are built. When correctly configured, any data within banks (e.g. events, mixer strips) should appear within the content browser under <code>Game/FMOD</code> by default.</p>
 <p><img alt="Content view" src="images/content-view.png" /></p>
 <h4 id="in-game"><a href="#in-game">In Game</a></h4>
-<p>The FMOD Studio integration will load all banks by default. If you would like to manually control bank loading, this behavior can be disabled via the load all banks checkbox withing the FMOD Studio settings dialog ("Edit &gt; Project Settings &gt; FMOD Studio").</p>
+<p>The FMOD UE4 integration will load all banks by default. If you would like to manually control bank loading, this behavior can be disabled via the load all banks checkbox withing the FMOD Studio settings dialog ("Edit &gt; Project Settings &gt; FMOD Studio").</p>
 <p>If using split banks, make sure to load the assets bank first and using load sample data on the metadata bank.</p>
 <p>Banks can then manually be loaded and unloaded using the <code>Load Bank</code> and <code>Unload Bank</code> blueprint functions.</p>
 <p><img alt="Banks blueprint" src="images/banks-blueprint.png" /></p>
@@ -311,10 +311,10 @@ Spawned events will not automatically play when spawned.</p>
 <p><img alt="Parameter track" src="images/parameter-track.png" /></p>
 <p>Keyframes may be added to the parameter sub-tracks to control the value of the event parameter during playback of the level sequence. The Unreal Engine 4 curve editor may be used to create rich curves for FMOD event parameters.</p>
 <p><img alt="Parameter keyframe track" src="images/parameter-keyframe-curve.png" /></p>
-<p>The FMOD UE4 integration is unable to validate the range of parameter values set by Sequencer. The FMOD studio runtime will clamp any parameter value outside the range specified in FMOD Studio.</p>
+<p>The FMOD UE4 integration is unable to validate the range of parameter values set by Sequencer. The FMOD Engine will clamp any parameter value outside the range specified in FMOD Studio.</p>
 <hr />
 <h2 id="occlusion"><a href="#occlusion">2.10 Occlusion</a></h2>
-<p>The FMOD integration supports the use of ray casts, to drive a specified parameter, for per instance occlusion of sounds.</p>
+<p>The FMOD UE4 integration supports the use of ray casts, to drive a specified parameter, for per instance occlusion of sounds.</p>
 <h3 id="occlusion-settings"><a href="#occlusion-settings">2.10.1 Occlusion Settings</a></h3>
 <p>To enable occlusion ray casts for FMOD in your UE4 project, set the name of the parameter that will be used for occlusion in Studio.</p>
 <p><img alt="Occlusion Settings" src="images/occlusion-setting.png" /></p>
@@ -323,15 +323,15 @@ You can disable occlusion, per instance, and adjust the Trace Channel in the Com
 <p><img alt="Occlusion Settings" src="images/occlusion.png" /></p>
 <hr />
 <h2 id="reverb-zones"><a href="#reverb-zones">2.11 Reverb Zones</a></h2>
-<p>The FMOD integration supports the use of the standard UE4 audio volumes to trigger Studio's advanced snapshot system.</p>
+<p>The FMOD UE4 integration supports the use of the standard UE4 audio volumes to trigger Studio's advanced snapshot system.</p>
 <h3 id="snapshot-reverb-effects"><a href="#snapshot-reverb-effects">2.11.1 Snapshot Reverb Effects</a></h3>
-<p>The workflow to use reverb zones is to set up snapshots in FMOD Studio. Snapshots can modify global reverb effects, change any bus volume, and modify any DSP value. To help trigger snapshots for reverb effects, the UE4 integration exports all snapshots as reverb effects in the <code>FMOD/Reverbs</code> folder.</p>
+<p>The workflow to use reverb zones is to set up snapshots in FMOD Studio. Snapshots can modify global reverb effects, change any bus volume, and modify any DSP value. To help trigger snapshots for reverb effects, the integration exports all snapshots as reverb effects in the <code>FMOD/Reverbs</code> folder.</p>
 <p><img alt="Reverb assets" src="images/reverb-assets.png" /></p>
 <p>These reverb effects can be dragged into audio volume Reverb Settings panel to be triggered when the audio listener enters the audio zone. It uses the same logic as the inbuilt UE4 audio system to determine which audio volume should be enabled, based on the priority of the volume.</p>
 <p><img alt="Reverb settings" src="images/reverb-settings.png" /></p>
-<p>By default, snapshots apply instantly. To have a snapshot fade in, one of two things can be done. The first is by adding a AHDSR modulation to the intensity dial. The second way is to expose the intensity as a parameter, which allows it to be driven from the UE4 integration.</p>
+<p>By default, snapshots apply instantly. To have a snapshot fade in, one of two things can be done. The first is by adding a AHDSR modulation to the intensity dial. The second way is to expose the intensity as a parameter, which allows it to be driven from the integration.</p>
 <p><img alt="Reverb snapshot intensity" src="images/reverb-snapshot-intensity.png" /></p>
-<p>If the snapshot has its intensity exposed as a parameter, then the UE4 integration will ramp in the intensity over time based on the audio volume's Volume and Fade Time settings. If the snapshot does not expose its intensity as a parameter, then these values will not do anything.</p>
+<p>If the snapshot has its intensity exposed as a parameter, then the integration will ramp in the intensity over time based on the audio volume's Volume and Fade Time settings. If the snapshot does not expose its intensity as a parameter, then these values will not do anything.</p>
 <h3 id="ambient-zone-settings"><a href="#ambient-zone-settings">2.11.2 Ambient Zone Settings</a></h3>
 <p>Another feature of the UE4 audio system is the ability to have an ambient effect applied to selected instances, based on both the listener position and the emitter position. Unlike the global reverb effects, this is something which is applied per instance.</p>
 <p><img alt="Reverb ambient" src="images/reverb-ambient.png" /></p>
@@ -395,8 +395,8 @@ You will need to add these parameter names to the integration settings.</p>
     <span class="k">if</span> <span class="p">(</span><span class="n">AudioComponent</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="n">FMOD</span><span class="o">::</span><span class="n">Studio</span><span class="o">::</span><span class="n">System</span><span class="o">*</span> <span class="n">System</span> <span class="o">=</span> <span class="n">IFMODStudioModule</span><span class="o">::</span><span class="n">Get</span><span class="p">().</span><span class="n">GetStudioSystem</span><span class="p">(</span><span class="n">EFMODSystemContext</span><span class="o">::</span><span class="n">Runtime</span><span class="p">);</span>
-        <span class="n">FMOD</span><span class="o">::</span><span class="n">System</span><span class="o">*</span> <span class="n">LowLevelSystem</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-        <span class="n">System</span><span class="o">-&gt;</span><span class="n">getCoreSystem</span><span class="p">(</span><span class="o">&amp;</span><span class="n">LowLevelSystem</span><span class="p">);</span>
+        <span class="n">FMOD</span><span class="o">::</span><span class="n">System</span><span class="o">*</span> <span class="n">CoreSystem</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+        <span class="n">System</span><span class="o">-&gt;</span><span class="n">getCoreSystem</span><span class="p">(</span><span class="o">&amp;</span><span class="n">CoreSystem</span><span class="p">);</span>
 
         <span class="c1">// Create sound in memory</span>
         <span class="k">static</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">EXAMPLE_SOUND_LEN</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">;</span>
@@ -414,7 +414,7 @@ You will need to add these parameter names to the integration settings.</p>
         <span class="n">SoundInfo</span><span class="p">.</span><span class="n">length</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">EXAMPLE_SOUND_LEN</span><span class="p">;</span>
 
         <span class="n">FMOD</span><span class="o">::</span><span class="n">Sound</span><span class="o">*</span> <span class="n">Sound</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">LowLevelSystem</span><span class="o">-&gt;</span><span class="n">createSound</span><span class="p">(</span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="kt">char</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">ExampleData</span><span class="p">),</span> <span class="n">FMOD_OPENMEMORY</span> <span class="o">|</span> <span class="n">FMOD_OPENRAW</span> <span class="o">|</span> <span class="n">FMOD_LOOP_OFF</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">SoundInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Sound</span><span class="p">)</span> <span class="o">==</span> <span class="n">FMOD_OK</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">CoreSystem</span><span class="o">-&gt;</span><span class="n">createSound</span><span class="p">(</span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="kt">char</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">ExampleData</span><span class="p">),</span> <span class="n">FMOD_OPENMEMORY</span> <span class="o">|</span> <span class="n">FMOD_OPENRAW</span> <span class="o">|</span> <span class="n">FMOD_LOOP_OFF</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">SoundInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Sound</span><span class="p">)</span> <span class="o">==</span> <span class="n">FMOD_OK</span><span class="p">)</span>
         <span class="p">{</span>
             <span class="n">AudioComponent</span><span class="o">-&gt;</span><span class="n">SetProgrammerSound</span><span class="p">(</span><span class="n">Sound</span><span class="p">);</span>
             <span class="c1">// Note: Need to remember to release the sound *after* the audio component has finished using it.</span>
@@ -477,8 +477,24 @@ If any platforms require specific steps, they can be found in <a href="platform-
 
 
 <h3 id="disabling-unreal-audio-device"><a href="#disabling-unreal-audio-device">2.15.5 Disabling Unreal Audio Device</a></h3>
-<p>By default FMOD Studio works side-by-side with the inbuilt Unreal audio device. To disable the Unreal audio while leaving the FMOD Studio audio, the standard Unreal ini file setting can be used.</p>
-<p>For windows, add a new file <code>/Config/Windows/WindowsEngine.ini</code> with this section:</p>
+<p>By default FMOD Studio works side-by-side with the inbuilt Unreal audio device on the following platforms:</p>
+<ul>
+<li>Windows Desktop</li>
+<li>Universal Windows Platform</li>
+<li>Linux</li>
+<li>MacOS</li>
+<li>Android</li>
+<li>PS4</li>
+<li>Switch</li>
+<li>Stadia</li>
+</ul>
+<p>Any of the platforms listed below will not work with the inbuilt Unreal audio:</p>
+<ul>
+<li>iOS / tvOS - Both UE4 and FMOD require exclusive control of the AudioSession to correctly handle interruptions.</li>
+<li>Xbox One - Both UE4 and FMOD will attempt to consume all of the available XMA resources, this will cause the second system to fail initialization.</li>
+</ul>
+<p>To disable the Unreal audio while leaving the FMOD Studio audio, the standard Unreal ini file setting can be used.</p>
+<p>For each required platform, add a new file <code>/Config/{Platform}/{Platform}Engine.ini</code> with this section:</p>
 <div class="highlight language-xml"><pre><span></span>[Audio]
 AudioDeviceModuleName=
 </pre></div>
@@ -492,7 +508,7 @@ AudioDeviceModuleName=
 +CulturesToStage=en
 </pre></div></div>
 
-<p class="manual-footer">UE4 Integration 2.00.07 (2020-01-17). &copy; 2020 Firelight Technologies Pty Ltd.</p>
+<p class="manual-footer">UE4 Integration 2.00.08 (2020-03-02). &copy; 2020 Firelight Technologies Pty Ltd.</p>
 </body>
 </html>
 

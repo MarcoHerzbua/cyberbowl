@@ -46,8 +46,16 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		bool bisIsWallRidingClockWise;
 
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		bool bIsDashing;
+
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		float dashPlayRate = 1.f;
+
 		void setIsWallRidingCounterClockWise(bool bIsCounterClockWise);
 		void setIsWallRidingClockWise(bool bisInWallRidingClockWise);
+		void setIsDashing(bool bDash);
+		void setDashPlayRate(float playRate);
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		class APawn* pawn;

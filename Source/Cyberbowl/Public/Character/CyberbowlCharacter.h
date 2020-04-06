@@ -46,6 +46,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bTurretMode;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsTargetingAbility;
+
 	UPROPERTY()
 	float DefaultGravityScale;
 	
@@ -87,7 +90,7 @@ protected:
 
 	void AbilityPressed();
 
-	
+	void AbilityCanceled();
 	
 protected:
 	// APawn interface
