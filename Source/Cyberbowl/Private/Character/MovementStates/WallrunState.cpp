@@ -91,7 +91,7 @@ void UWallrunState::LaunchCharacter()
 	float angle = FMath::RadiansToDegrees(FMath::Atan2(wallNormal.Y, wallNormal.X) - FMath::Atan2(velocityDirectionVec.Y, velocityDirectionVec.X));
 
 	//TODO: This edge case checking is noob and should be replaced by a better angle calculation 
-	if((angle <= 0.f && angle > -270.f) || angle >= 180.f)
+	if((angle <= 0.f && angle > -269.f) || angle >= 180.f)
 	{
 		launchAngle *= -1.f;
 	}

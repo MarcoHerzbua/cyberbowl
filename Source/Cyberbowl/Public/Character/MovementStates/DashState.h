@@ -22,6 +22,7 @@ public:
 
 protected:
 	float DefaultGravityScale;
+	float DefaultBrakingFrictionFactor;
 	bool bKeepMomentum;
 	//FVector InitialVelocity;
 	FVector DashDirection;
