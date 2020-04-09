@@ -53,6 +53,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void LaunchActor(AActor* actor);
+
+	float GetPillarLocationZ();
 	
 protected:
 	FRotator rotation;

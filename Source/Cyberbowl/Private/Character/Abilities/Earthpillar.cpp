@@ -155,3 +155,9 @@ void AEarthpillar::LaunchActor(AActor* actor)
 		UE_LOG(LogTemp, Warning, TEXT("EarthPillar: Another Actor is currently launching"));
 	}
 }
+
+float AEarthpillar::GetPillarLocationZ()
+{
+	auto boundingBox = GetComponentsBoundingBox(true);
+	return boundingBox.Min.Z;
+}

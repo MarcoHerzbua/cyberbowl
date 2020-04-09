@@ -60,6 +60,8 @@ protected:
 
 	class ACyberbowlCharacter* character;
 
+	float pillarHeigth;
+
 public:
 	UPROPERTY(BlueprintReadWrite)
 	TSubclassOf<AEarthpillar> earthClass;

@@ -154,6 +154,8 @@ void UEarthAbility::SpawnPillar()
 		pillar->SetLifeSpan(PillarLifeSpan);
 		pillar->SetCurrPlayerTeam(characterController->currPlayerTeam);
 		pillar->SetMaxLoweringPos(spawnLocation.Z);
+		pillar->GetPillarLocationZ();
+		pillar->SetActorLocation(pillar->GetActorLocation() - FVector(0, pillar->GetPillarLocationZ(), 0));
 	}
 	else
 	{
