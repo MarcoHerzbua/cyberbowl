@@ -35,6 +35,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float riseTime = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float loweringTime = 10.f;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
