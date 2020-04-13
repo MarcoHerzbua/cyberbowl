@@ -28,7 +28,10 @@ public:
 	AActor* GoalColliderTeam0;
 	UPROPERTY(BlueprintReadWrite)
 	AActor* GoalColliderTeam1;
-	void Add_Points(AActor* Collider);
+
+	UFUNCTION()
+	void Add_Points(int teamIndex);
+	
 	UPROPERTY(BlueprintReadWrite)
 	int PointsTeam0;
 	UPROPERTY(BlueprintReadWrite)

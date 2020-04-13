@@ -9,12 +9,21 @@
 #include "Containers/Array.h"
 #include <string>
 #include "Components/TextBlock.h"
+#include "Stadium/Goal_Collider.h"
 
 void AInGameGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	PointsTeam0 = 0;
 	PointsTeam1 = 0;
+
+	TArray<AActor*> outGoals;
+	UGameplayStatics::GetAllActorsOfClass(this, AGoal_Collider::StaticClass(), outGoals);
+
+	for (auto actor : outGoals)
+	{
+		Cast<AGoal_Collider>(actor)->OnGoalScored.AddDynamic(this, &AInGameGameMode::Add_Points);
+	}
 
 
 	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &AInGameGameMode::GameEnd, GamePlayTime);
@@ -109,14 +118,14 @@ void AInGameGameMode::ResumeGameForAll()
 	bGameIsPaused = false;
 }
 
-void AInGameGameMode::Add_Points(AActor* Collider)
+void AInGameGameMode::Add_Points(int teamIndex)
 {
-	if (Collider->GetName()=="BP_Goal_Collider_Team0")
+	if (teamIndex == 0)
 	{
 		PointsTeam1 += 1;
 		ScoringTeam = 1;
 	}
-	else if (Collider->GetName() == "BP_Goal_Collider_Team1")
+	else if (teamIndex == 1)
 	{
 		PointsTeam0 += 1;
 		ScoringTeam = 0;
