@@ -93,7 +93,7 @@ void AEarthpillar::Rising(float DeltaTime)
 
 void AEarthpillar::Lowering(float DeltaTime)
 {
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(riseTime * DeltaTime));
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(loweringTime * DeltaTime));
 }
 
 void AEarthpillar::TickLaunch()
