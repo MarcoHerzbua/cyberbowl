@@ -7,19 +7,26 @@
 #include "GameFramework/GameModeBase.h"
 #include "TutorialGameMode.generated.h"
 
-/**
- * 
- */
+class UTutorialState;
+
 UCLASS()
 class CYBERBOWL_API ATutorialGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-
+	
 public:
-	UPROPERTY(BlueprintReadWrite)
-	APlayBall* Ball;
-	UPROPERTY(BlueprintReadWrite)
-	AActor* GoalColliderTeam0;
-	UPROPERTY(BlueprintReadWrite)
-	AActor* GoalColliderTeam1;
+	UFUNCTION(BlueprintCallable)
+	void AdvanceTutorial();
+
+	void BeginPlay() override;
+
+	void Tick(float DeltaSeconds) override;
+
+protected:
+	void SetupStates();
+	
+	TQueue<UTutorialState*> tutorialStates;
+
+	UPROPERTY()
+	UTutorialState* currentState;
 };
