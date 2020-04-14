@@ -7,12 +7,10 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "FPlayerInfo.h"
-#include "Widgets/WNameTag.h"
 #include "Components/WidgetComponent.h"
 #include "ThirdPersonPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallToggledBallCam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerPausedGame, int, playerIndexInitiator);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedDown);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedUp);
@@ -69,9 +67,6 @@ private:
 	void CallGameOverMenuNavigated();
 
 	UFUNCTION()
-	void CallToggledBallCam();
-
-	UFUNCTION()
 	void CallPlayerPausedGame();
 
 	UFUNCTION()
@@ -83,9 +78,6 @@ private:
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallGameOverMenuNavigated OnCallGameOverMenuNavigated;
-
-	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnCallGameOverMenuNavigated OnCallToggledBallCam;
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnPlayerPausedGame OnPlayerPausedGame;

@@ -52,10 +52,9 @@ void AMainMenuGameMode::BeginPlay()
 void AMainMenuGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogClass, Log, TEXT("Tick"));
+	
 	if (bAllReady)
-	{
-		
+	{	
 		currentCooldown -= DeltaTime;
 	}
 }
