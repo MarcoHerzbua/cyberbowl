@@ -9,6 +9,7 @@
 #include "TimerManager.h"
 #include "Character/CBCharacterMovementComponent.h"
 #include "Engine/Engine.h"
+#include "Kismet/KismetMathLibrary.h"
 // Sets default values
 AEarthpillar::AEarthpillar()
 {
@@ -75,6 +76,7 @@ void AEarthpillar::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		if (controller->currPlayerTeam == currPlayerTeam)
 		{
 			LaunchActor(OtherActor);
+			bAdjustRotation = false;
 			UE_LOG(LogTemp, Warning, TEXT("I'am on the pillar and a Character :D"));
 		}
 	}
@@ -93,7 +95,7 @@ void AEarthpillar::Rising(float DeltaTime)
 
 void AEarthpillar::Lowering(float DeltaTime)
 {
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(riseTime * DeltaTime));
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(loweringTime * DeltaTime));
 }
 
 void AEarthpillar::TickLaunch()
@@ -113,6 +115,18 @@ void AEarthpillar::TickLaunch()
 	FVector leapLocation = FMath::Lerp<FVector>(startToMiddle, middleToEnd, elapsedLeapTime);
 
 	LaunchedActor->SetActorLocation(leapLocation, true);
+
+	if (!bAdjustRotation)
+	{
+		FVector start2middle = leapMiddle - LaunchStart;
+		auto launchAngle = (FVector::UpVector.X * start2middle.X + FVector::UpVector.Y * start2middle.Y + FVector::UpVector.Z * start2middle.Z) / (FVector::UpVector.Size() * start2middle.Size());
+		auto launchAngleDegr = (launchAngle * 180) / PI;
+		auto currRotation = GetActorRotation();
+
+		//SetActorRotation(FRotator(launchAngle));
+		SetActorRotation(FRotator(90-launchAngleDegr, currRotation.Yaw, currRotation.Roll));
+		bAdjustRotation = true;
+	}
 }
 
 void AEarthpillar::EndLaunch()

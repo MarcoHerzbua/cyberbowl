@@ -29,18 +29,7 @@ void UWallrunState::Activate(ECBMovementMode previousMode)
 	float length;
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
 	
-	FHitResult wallRunHitResult;
-	EWallRunDirection hitPosition = HitDirection(wallRunHitResult);
-
-	if (hitPosition == EWallRunDirection::WALLRUN_CLOCKWISE)
-	{
-		MovementComponent->animinstance->setIsWallRidingClockWise(true);
-	}
-	
-	else
-	{
-		MovementComponent->animinstance->setIsWallRidingCounterClockWise(true);
-	}
+	currInitializeAnimationFrames = 0;
 }
 
 void UWallrunState::Deactivate()
@@ -51,6 +40,7 @@ void UWallrunState::Deactivate()
 
 	MovementComponent->animinstance->setIsWallRidingClockWise(false);
 	MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
+	
 }
 
 void UWallrunState::OnTick(float DeltaTime)
@@ -61,7 +51,27 @@ void UWallrunState::OnTick(float DeltaTime)
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
 
 	MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);
+	
+	//More then one Tick is needed to finalize the WallRunDirection, therefore the frist 5 Ticks are used to correct the Animation.
+	if (currInitializeAnimationFrames < initializeAnimationFrames)
+	{
+		FHitResult wallRunHitResult;
+		EWallRunDirection hitPosition = HitDirection(wallRunHitResult);
 
+		if (hitPosition == EWallRunDirection::WALLRUN_CLOCKWISE)
+		{
+			MovementComponent->animinstance->setIsWallRidingClockWise(true);
+			MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
+		}
+
+		else
+		{
+			MovementComponent->animinstance->setIsWallRidingCounterClockWise(true);
+			MovementComponent->animinstance->setIsWallRidingClockWise(false);
+		}
+		currInitializeAnimationFrames++;
+	}
+	
 	FRotator wallrunDirRotator = WallrunDirection.Rotation();
 	MovementComponent->GetCharacterOwner()->SetActorRotation(FRotator(0.f, wallrunDirRotator.Yaw, 0.f));
 }

@@ -32,6 +32,8 @@ public:
 protected:
 	float DefaultGravityScale;
 	FVector WallrunDirection;
+	const int initializeAnimationFrames = 5;
+	int currInitializeAnimationFrames;
 
 	void BindInputActions() override;
 
