@@ -1,9 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "PlayerController/ThirdPersonPlayerController.h"
 #include "GameModesAndInstances/CyberbowlGameInstance.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Character/BallCamComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,13 +9,13 @@
 #include "GameModesAndInstances/InGameGameMode.h"
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
-#include "Character/Abilities/AbilityBase.h"
-#include "Character/Abilities/FireAbility.h"
 #include "Components/Button.h"
+#include "Widgets/WNameTag.h"
 
 void AThirdPersonPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	SetAsLocalPlayerController();
 	SpawnActors();
 }
@@ -33,7 +31,6 @@ void AThirdPersonPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
-	InputComponent->BindAction("ToggleBallCam", IE_Pressed, this, &AThirdPersonPlayerController::CallToggledBallCam);
 	InputComponent->BindAction("PauseGame", IE_Pressed, this, &AThirdPersonPlayerController::CallPlayerPausedGame);
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationDown);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationUp);
@@ -192,11 +189,6 @@ void AThirdPersonPlayerController::OnEndGame()
 void AThirdPersonPlayerController::CallGameOverMenuNavigated()
 {
 	OnCallGameOverMenuNavigated.Broadcast();
-}
-
-void AThirdPersonPlayerController::CallToggledBallCam()
-{
-	OnCallToggledBallCam.Broadcast();
 }
 
 void AThirdPersonPlayerController::CallPlayerPausedGame()

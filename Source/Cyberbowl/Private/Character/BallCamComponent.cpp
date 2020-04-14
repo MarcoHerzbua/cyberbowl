@@ -2,8 +2,6 @@
 
 
 #include "Character/BallCamComponent.h"
-
-
 #include "Actors/PlayBall.h"
 #include "Character/CyberbowlCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -86,7 +84,6 @@ void UBallCamComponent::ToggleBallCam()
 	}
 }
 
-// Called every frame
 void UBallCamComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
