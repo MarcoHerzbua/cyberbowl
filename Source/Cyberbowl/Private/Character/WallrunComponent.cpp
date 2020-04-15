@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerInput.h"
 #include "Character/CBCharacterMovementComponent.h"
+#include "Character/MovementStates/WallrunState.h"
 
 
 // Sets default values for this component's properties
@@ -48,7 +49,8 @@ void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AAc
 	if (MovementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Running)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("WallrunCmp valid Wallrun")));
-		CountWallTouches++;
+		//CountWallTouches++;
+
 		//push character against the wall 
 		MovementComponent->AddImpulse(SweepResult.Normal * 1000.f);
 
@@ -62,8 +64,12 @@ void UWallrunComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* 
 	//This check is necessary to avoid bugs when character just walks up to a wall 
 	if(MovementComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
 	{
-		CountWallTouches--;
-		if(CountWallTouches == 0)
+		//CountWallTouches--;
+		//if(CountWallTouche == 0)
+
+		auto movementState = Cast<UWallrunState>(MovementComponent->GetCBMovementState());
+
+		if(!movementState->IsLaunching())
 		{
 			MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 		}
@@ -96,10 +102,10 @@ void UWallrunComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		JumpKeyMapping = PlayerController->PlayerInput->GetKeysForAction("Jump");
 	}
 
-	if(MovementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Wallrun)
-	{
-		CountWallTouches = 0;
-	}
+	//if(MovementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Wallrun)
+	//{
+	//	CountWallTouches = 0;
+	//}
 
 	//if(PlayerController)
 	//{
