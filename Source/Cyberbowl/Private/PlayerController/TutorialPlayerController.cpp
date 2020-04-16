@@ -3,3 +3,14 @@
 
 #include "PlayerController/TutorialPlayerController.h"
 
+void ATutorialPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("AdvanceTutorial", IE_Pressed, this, &ATutorialPlayerController::CallOnAdvanceTutorial);
+}
+
+void ATutorialPlayerController::CallOnAdvanceTutorial()
+{
+	OnAdvanceTutorial.Broadcast();
+}

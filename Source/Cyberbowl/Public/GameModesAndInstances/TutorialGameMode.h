@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "Containers/Queue.h"
 #include "CoreMinimal.h"
-#include "Actors/PlayBall.h"
 #include "GameFramework/GameModeBase.h"
 #include "TutorialGameMode.generated.h"
 
-class UTutorialState;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTutorialFinished);
+
+class ATutorialLectureBase;
 
 UCLASS()
 class CYBERBOWL_API ATutorialGameMode : public AGameModeBase
@@ -22,11 +24,13 @@ public:
 
 	void Tick(float DeltaSeconds) override;
 
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnTutorialFinished OnTutorialFinished;
+
 protected:
-	void SetupStates();
-	
-	TQueue<UTutorialState*> tutorialStates;
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<ATutorialLectureBase>> lecturesList;
 
 	UPROPERTY()
-	UTutorialState* currentState;
+	ATutorialLectureBase* currentLecture;
 };
