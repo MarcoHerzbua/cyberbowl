@@ -34,7 +34,7 @@ void UIceAbility::Fire()
 	//Spawn Niagara Effect
 	FRotator effectRotation = ownerAsPawn->GetControlRotation().Add(0.f, -45.f, 0.f);
 	NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetOwner(), CoCEffect, start, effectRotation);
-	GetWorld()->GetTimerManager().SetTimer(CoCEffectDurationHandle, this, &UIceAbility::DestroyCoCEffect, 1.f);
+	//GetWorld()->GetTimerManager().SetTimer(CoCEffectDurationHandle, this, &UIceAbility::DestroyCoCEffect, 1.f);
 	
 	FCollisionQueryParams queryParams;
 	queryParams.AddIgnoredActor(GetOwner());
@@ -71,6 +71,12 @@ void UIceAbility::Fire()
 
 void UIceAbility::Targeting()
 {
+	float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
+	APawn* ownerAsPawn = Cast<APawn>(GetOwner());
+
+	FVector start = GetOwner()->GetActorLocation();
+	FVector direction = ownerAsPawn->GetControlRotation().Vector();
+	DrawDebugCone(GetOwner()->GetWorld(), start, direction, ConeLength, coneAngleInRadians, coneAngleInRadians, 12, FColor::Blue, false, 0.01, 0, 4.f);
 }
 
 void UIceAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -79,13 +85,7 @@ void UIceAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 	if(CurrState == EAbilityState::ABILITY_TARGETING)
 	{
-		float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
-		APawn* ownerAsPawn = Cast<APawn>(GetOwner());
-
-		FVector start = GetOwner()->GetActorLocation();
-		FVector direction = ownerAsPawn->GetControlRotation().Vector();
-		DrawDebugCone(GetOwner()->GetWorld(), start, direction, ConeLength, coneAngleInRadians, coneAngleInRadians, 12, FColor::Blue, false, DeltaTime, 0, 4.f);
-
+		Targeting();
 	}
 	if(CurrState == EAbilityState::ABILITY_FIRE)
 	{

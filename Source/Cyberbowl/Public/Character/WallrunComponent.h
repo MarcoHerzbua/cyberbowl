@@ -26,12 +26,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	USphereComponent* WallrunCollider;
 	
-	UPROPERTY(BlueprintReadOnly)
-	int CountWallTouches = 0;
-	
-//UPROPERTY(BlueprintReadOnly)
-	//float JumpInputPressedDuration = 0.f;
-	
+	//UPROPERTY(BlueprintReadOnly)
+	//int CountWallTouches = 0;
+		
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
