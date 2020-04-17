@@ -52,7 +52,8 @@ void ATutorialLectureBase::AdvanceLecture()
 		currentWidget->RemoveFromParent();
 	}
 	
-	currentWidget = CreateWidget(tutorialPlayerController, widgetsList[0]);
+	currentWidget = Cast<UTutorialWidgetBase>(CreateWidget(tutorialPlayerController, widgetsList[0]));
+	currentWidget->SetTutorialLecture(this);
 	currentWidget->AddToViewport();
 
 	widgetsList.RemoveAt(0);

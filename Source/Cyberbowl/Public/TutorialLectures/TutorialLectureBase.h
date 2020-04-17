@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Widgets/TutorialWidgetBase.h"
 #include "TutorialLectureBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLectureFinished);
@@ -26,7 +27,7 @@ public:
 
 	virtual void Exit();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void AdvanceLecture();
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
@@ -40,11 +41,11 @@ protected:
 	TQueue<FString> lectureTasks;
 	FString currentTask;
 
-	UPROPERTY(EditDefaultsOnly)
-	TArray<TSubclassOf<UUserWidget>> widgetsList;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<UTutorialWidgetBase>> widgetsList;
 
 	UPROPERTY()
-	UUserWidget* currentWidget;
+	UTutorialWidgetBase* currentWidget;
 
 	ATutorialPlayerController* tutorialPlayerController;
 
