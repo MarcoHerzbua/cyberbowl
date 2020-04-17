@@ -65,7 +65,12 @@ ACyberbowlCharacter::ACyberbowlCharacter(const FObjectInitializer& ObjectInitial
 
 void ACyberbowlCharacter::CallMenuEnter()
 {
-	Cast<AThirdPersonPlayerController>(Controller)->CallMenuEnter();
+	auto thirdPersonController = Cast<AThirdPersonPlayerController>(Controller);
+
+	if (thirdPersonController)
+	{
+		thirdPersonController->CallMenuEnter();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
