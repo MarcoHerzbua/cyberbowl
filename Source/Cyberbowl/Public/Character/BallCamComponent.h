@@ -13,17 +13,21 @@ class CYBERBOWL_API UBallCamComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UBallCamComponent();
 
-protected:
 	virtual void BeginPlay() override;
-	
-	UFUNCTION(BlueprintCallable)
-	void FocusBall(float deltaTime);
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleBallCam();
+	
+	UFUNCTION(BlueprintCallable)
+	void DoNotFollow();
+
+protected:
+	UFUNCTION(BlueprintCallable)
+	void FocusBall(float deltaTime);
 
 	UPROPERTY(BlueprintReadOnly)
 	class USpringArmComponent* CameraBoom;
@@ -34,9 +38,4 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bShouldFollowBall;
 
-public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UFUNCTION()
-	void DoNotFollow();
 };

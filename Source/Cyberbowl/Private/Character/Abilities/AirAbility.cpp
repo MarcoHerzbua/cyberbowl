@@ -29,7 +29,7 @@ void UAirAbility::BeginPlay()
 	movementComp = Cast<UCharacterMovementComponent>(character->GetMovementComponent());
 	
 
-	ball = Cast<APlayBall>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball);
+	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
 	ballLocationSpringArm = Cast<USpringArmComponent>(character->GetComponentsByTag(USpringArmComponent::StaticClass(), "BallLocationArm").Last());
 	ballPulledAttachComponent = Cast<USceneComponent>(character->GetComponentsByTag(USceneComponent::StaticClass(), "TornadoBallLocation").Last());
 

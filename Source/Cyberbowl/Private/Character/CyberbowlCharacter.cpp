@@ -5,6 +5,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Character/Abilities/AbilityBase.h"
+#include "Character/BallCamComponent.h"
 #include "Character/BoopComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -91,16 +92,11 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ACyberbowlCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ACyberbowlCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ACyberbowlCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ACyberbowlCharacter::OnResetVR);
-
-	//handle ability input
+	// Handle ability input
 	PlayerInputComponent->BindAction("Ult", IE_Pressed, this, &ACyberbowlCharacter::AbilityPressed);
 	PlayerInputComponent->BindAction("CancelUlt", IE_Pressed, this, &ACyberbowlCharacter::AbilityCanceled);
+
+	PlayerInputComponent->BindAction("ToggleBallCam", IE_Pressed, this, &ACyberbowlCharacter::CallOnBallCamToggled);
 }
 
 void ACyberbowlCharacter::Jump()
@@ -278,19 +274,11 @@ void ACyberbowlCharacter::AbilityCanceled()
 	abilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 }
 
-void ACyberbowlCharacter::OnResetVR()
+void ACyberbowlCharacter::CallOnBallCamToggled()
 {
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
+	Cast<UBallCamComponent>(GetComponentByClass(UBallCamComponent::StaticClass()))->ToggleBallCam();
 
-void ACyberbowlCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		Jump();
-}
-
-void ACyberbowlCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		StopJumping();
+	OnToggledBallCam.Broadcast();
 }
 
 

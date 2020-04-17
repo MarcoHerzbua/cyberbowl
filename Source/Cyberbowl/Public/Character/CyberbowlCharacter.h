@@ -9,6 +9,7 @@
 #include "CyberbowlCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallCamToggled);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable
@@ -27,7 +28,7 @@ public:
 	ACyberbowlCharacter(const class FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION()
-		void CallMenuEnter();
+	void CallMenuEnter();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -54,13 +55,13 @@ public:
 	
 	UPROPERTY()
 	float DefaultTimeDilation;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnBallCamToggled OnToggledBallCam;
 	
 protected:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallErrorFeedback forceFeedback;
-
-	/** Resets HMD orientation in VR. */
-	void OnResetVR();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -80,17 +81,13 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
-
-	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
-
 	void Dash();
 
 	void AbilityPressed();
 
 	void AbilityCanceled();
+
+	void CallOnBallCamToggled();
 	
 protected:
 	// APawn interface
