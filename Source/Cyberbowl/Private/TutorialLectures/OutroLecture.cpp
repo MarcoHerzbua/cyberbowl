@@ -21,4 +21,21 @@ void AOutroLecture::Exit()
 void AOutroLecture::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetupTasks();
+}
+
+void AOutroLecture::SetupTasks()
+{
+	lectureTasks.Enqueue(taskPressedContinue);
+}
+
+void AOutroLecture::OnPressedContinue()
+{
+	if (currentTask != taskPressedContinue)
+	{
+		return;
+	}
+
+	AdvanceLecture();
 }

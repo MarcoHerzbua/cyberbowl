@@ -19,4 +19,9 @@ public:
 protected:
 	void BeginPlay() override;
 
+	void SetupTasks() override;
+
+	// Lecture tasks
+	FString taskPressedContinue;
+	void OnPressedContinue();
 };

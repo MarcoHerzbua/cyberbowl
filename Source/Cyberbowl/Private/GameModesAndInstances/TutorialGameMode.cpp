@@ -27,6 +27,7 @@ void ATutorialGameMode::AdvanceTutorial()
 	if (currentLecture)
 	{
 		currentLecture->Exit();
+		currentLecture->Destroy();
 	}
 	
 	currentLecture = Cast<ATutorialLectureBase>(GetWorld()->SpawnActor(lecturesList[0]));

@@ -27,13 +27,18 @@ public:
 	virtual void Exit();
 
 	UFUNCTION()
-	virtual void AdvanceLecture();
+	void AdvanceLecture();
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnLectureFinished OnLectureFinished;
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void SetupTasks();
+
+	TQueue<FString> lectureTasks;
+	FString currentTask;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<UUserWidget>> widgetsList;
@@ -44,4 +49,5 @@ protected:
 	ATutorialPlayerController* tutorialPlayerController;
 
 	ATutorialGameMode* tutorialGameMode;
+
 };

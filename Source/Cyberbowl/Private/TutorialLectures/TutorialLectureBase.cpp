@@ -17,7 +17,13 @@ void ATutorialLectureBase::BeginPlay()
 	tutorialPlayerController = Cast<ATutorialPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
 	tutorialGameMode = Cast<ATutorialGameMode>(UGameplayStatics::GetGameMode(this));
 
+	// Debug purposes
+	// ToDo: Remove
 	tutorialPlayerController->OnAdvanceTutorial.AddDynamic(this, &ATutorialLectureBase::AdvanceLecture);
+}
+
+void ATutorialLectureBase::SetupTasks()
+{
 }
 
 void ATutorialLectureBase::Enter()
@@ -33,12 +39,14 @@ void ATutorialLectureBase::Exit()
 
 void ATutorialLectureBase::AdvanceLecture()
 {
-	if (widgetsList. Num() <= 0)
+	if (lectureTasks.IsEmpty())
 	{
 		OnLectureFinished.Broadcast();
 		return;
 	}
 
+	lectureTasks.Dequeue(currentTask);
+	
 	if (currentWidget)
 	{
 		currentWidget->RemoveFromParent();
