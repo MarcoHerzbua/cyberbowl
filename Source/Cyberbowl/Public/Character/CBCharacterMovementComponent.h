@@ -35,6 +35,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunLaunchForce = 700.f;
 	
+	//modifies the force by which the character gets launched UPWARDS from the wall when jumping during wallrun
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
+	float WallrunUpwardsLaunchForce = 3000.f;
+	
+	//modifies how long the character is launched (how long the Launch Forces are applied to the char, similar to Dash)
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
+	float WallrunLaunchDuration = 0.1f;
+	
 	//modifies the angle in which the character get launched away from the wall when jumping during wallrun
 	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunLaunchAngle = 45.f;
@@ -63,6 +71,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	ECBMovementMode GetCBMovementMode() { return CBMovementMode; }
+
+	UFUNCTION(BlueprintCallable)
+	UBaseMovementState* GetCBMovementState() { return MovementStates.Contains(GetCBMovementMode()) ? MovementStates[GetCBMovementMode()] : nullptr; }
 
 	FVector GetCharacterTransform() { return GetOwner()->GetActorLocation(); };
 

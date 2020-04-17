@@ -6,6 +6,7 @@
 #include "DrawDebugHelpers.h"
 #include "Character/CyberbowlCharacterAnimInstance.h"
 #include "Engine/Engine.h"
+#include "TimerManager.h"
 
 UWallrunState::UWallrunState()
 {
@@ -29,18 +30,7 @@ void UWallrunState::Activate(ECBMovementMode previousMode)
 	float length;
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
 	
-	FHitResult wallRunHitResult;
-	EWallRunDirection hitPosition = HitDirection(wallRunHitResult);
-
-	if (hitPosition == EWallRunDirection::WALLRUN_CLOCKWISE)
-	{
-		MovementComponent->animinstance->setIsWallRidingClockWise(true);
-	}
-	
-	else
-	{
-		MovementComponent->animinstance->setIsWallRidingCounterClockWise(true);
-	}
+	currInitializeAnimationFrames = 0;
 }
 
 void UWallrunState::Deactivate()
@@ -51,6 +41,7 @@ void UWallrunState::Deactivate()
 
 	MovementComponent->animinstance->setIsWallRidingClockWise(false);
 	MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
+	
 }
 
 void UWallrunState::OnTick(float DeltaTime)
@@ -59,9 +50,37 @@ void UWallrunState::OnTick(float DeltaTime)
 
 	float length;
 	MovementComponent->Velocity.ToDirectionAndLength(WallrunDirection, length);
+	WallrunDirection.Z = 0.f;
 
-	MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);
+	if(bIsLaunching)
+	{
+		MovementComponent->Velocity = LaunchVector;
+	}
+	else
+	{
+		MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);		
+	}
+	
+	//More then one Tick is needed to finalize the WallRunDirection, therefore the frist 5 Ticks are used to correct the Animation.
+	if (currInitializeAnimationFrames < initializeAnimationFrames)
+	{
+		FHitResult wallRunHitResult;
+		EWallRunDirection hitPosition = HitDirection(wallRunHitResult);
 
+		if (hitPosition == EWallRunDirection::WALLRUN_CLOCKWISE)
+		{
+			MovementComponent->animinstance->setIsWallRidingClockWise(true);
+			MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
+		}
+
+		else
+		{
+			MovementComponent->animinstance->setIsWallRidingCounterClockWise(true);
+			MovementComponent->animinstance->setIsWallRidingClockWise(false);
+		}
+		currInitializeAnimationFrames++;
+	}
+	
 	FRotator wallrunDirRotator = WallrunDirection.Rotation();
 	MovementComponent->GetCharacterOwner()->SetActorRotation(FRotator(0.f, wallrunDirRotator.Yaw, 0.f));
 }
@@ -82,27 +101,24 @@ void UWallrunState::LaunchCharacter()
 	HitDirection(wallRunHitResult);
 	FVector wallNormal = wallRunHitResult.Normal;
 
-	float launchAngle = MovementComponent->WallrunLaunchAngle;
-	
-	FVector velocityDirectionVec; float length;
-	MovementComponent->Velocity.ToDirectionAndLength(velocityDirectionVec, length);
-
 	//Calculate the angle between the normal pointing away from the wall and the current velocity
-	float angle = FMath::RadiansToDegrees(FMath::Atan2(wallNormal.Y, wallNormal.X) - FMath::Atan2(velocityDirectionVec.Y, velocityDirectionVec.X));
+	float angleRadians = FMath::UnwindRadians(FMath::Atan2(wallNormal.Y, wallNormal.X) - FMath::Atan2(WallrunDirection.Y, WallrunDirection.X));
+	float angle = FMath::RadiansToDegrees(angleRadians);
+	angle = FMath::Clamp(angle, -MovementComponent->WallrunLaunchAngle, MovementComponent->WallrunLaunchAngle);
 
-	//TODO: This edge case checking is noob and should be replaced by a better angle calculation 
-	if((angle <= 0.f && angle > -269.f) || angle >= 180.f)
-	{
-		launchAngle *= -1.f;
-	}
-	
-	FVector launchVec = velocityDirectionVec.RotateAngleAxis(launchAngle, FVector(0, 0, 1));
+	FVector launchVec = WallrunDirection.RotateAngleAxis(angle, FVector::UpVector);
+
 	launchVec *= MovementComponent->WallrunLaunchForce;
-	launchVec.Z = MovementComponent->WallrunLaunchForce;
+	launchVec.Z = MovementComponent->WallrunUpwardsLaunchForce;
 	
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), launchVec.X, launchVec.Y, launchVec.Z));
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), angle));
-	MovementComponent->GetCharacterOwner()->LaunchCharacter(launchVec, true, true);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), angleUp));
+
+	bIsLaunching = true;
+	LaunchVector = launchVec;
+	MovementComponent->animinstance->setIsDashing(true);
+	MovementComponent->GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &UWallrunState::EndWallrun, MovementComponent->WallrunLaunchDuration);
+	//MovementComponent->GetCharacterOwner()->LaunchCharacter(launchVec, true, true);
 
 	//MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
@@ -132,5 +148,13 @@ EWallRunDirection UWallrunState::HitDirection(FHitResult& hitResult)
 		UE_LOG(LogTemp, Warning, TEXT("WALLRUN_CLOCKWISE"));
 		return EWallRunDirection::WALLRUN_CLOCKWISE;//WallrunDirection.RotateAngleAxis(90, FVector(0, 0, 1));
 	}
+}
+
+void UWallrunState::EndWallrun()
+{
+	bIsLaunching = false;
+	LaunchVector = WallrunDirection = FVector::ZeroVector;
+	MovementComponent->animinstance->setIsDashing(false);
+	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 

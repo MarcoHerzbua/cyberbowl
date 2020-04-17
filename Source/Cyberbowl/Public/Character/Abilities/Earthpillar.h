@@ -67,6 +67,7 @@ protected:
 
 	bool bIsRising;
 	bool bIsLowering;
+	bool bAdjustRotation;
 	int currPlayerTeam;
 	float maxLowering;
 

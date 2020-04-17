@@ -29,9 +29,19 @@ public:
 	void Deactivate() override;
 	void OnTick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	bool IsLaunching() { return bIsLaunching; }
+	
 protected:
 	float DefaultGravityScale;
 	FVector WallrunDirection;
+	FVector LaunchVector;
+	const int initializeAnimationFrames = 5;
+	int currInitializeAnimationFrames;
+	bool bIsLaunching = false;
+
+	UPROPERTY()
+	FTimerHandle LaunchTimerHandle;
 
 	void BindInputActions() override;
 
@@ -39,5 +49,6 @@ protected:
 	void LaunchCharacter();
 	UFUNCTION()
 	EWallRunDirection HitDirection(FHitResult& hitResult);
-	
+	UFUNCTION()
+	void EndWallrun();
 };
