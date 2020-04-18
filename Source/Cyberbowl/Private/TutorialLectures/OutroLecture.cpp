@@ -2,6 +2,7 @@
 
 
 #include "TutorialLectures/OutroLecture.h"
+#include "PlayerController/TutorialPlayerController.h"
 
 void AOutroLecture::Tick(float DeltaTime)
 {
@@ -11,11 +12,15 @@ void AOutroLecture::Tick(float DeltaTime)
 void AOutroLecture::Enter()
 {
 	Super::Enter();
+
+	tutorialPlayerController->SetInputMode(FInputModeUIOnly());
 }
 
 void AOutroLecture::Exit()
 {
 	Super::Exit();
+
+	tutorialPlayerController->SetInputMode(FInputModeGameAndUI());
 }
 
 void AOutroLecture::BeginPlay()
