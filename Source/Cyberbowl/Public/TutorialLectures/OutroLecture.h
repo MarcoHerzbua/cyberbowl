@@ -22,7 +22,7 @@ protected:
 	void SetupTasks() override;
 	
 	// Lecture tasks
-	FString taskPressedContinue;
+	FString taskPressedContinue = "taskPressedContinue";
 	void OnPressedContinue();
 
 };

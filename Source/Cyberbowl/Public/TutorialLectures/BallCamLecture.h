@@ -24,7 +24,7 @@ protected:
 	void SetupTasks() override;
 
 	// Lecture tasks
-	FString taskBallCamToggled;
+	FString taskBallCamToggled = "taskBallCamToggled";
 
 	UFUNCTION()
 	void OnBallCamToggled();

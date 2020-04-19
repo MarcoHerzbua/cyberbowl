@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "TutorialLectures/TutorialLectureBase.h"
-#include "IntroLecture.generated.h"
+#include "JumpLecture.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class CYBERBOWL_API AIntroLecture : public ATutorialLectureBase
+class CYBERBOWL_API AJumpLecture : public ATutorialLectureBase
 {
 	GENERATED_BODY()
 	
@@ -18,10 +21,15 @@ public:
 	
 protected:
 	void BeginPlay() override;
-
 	void SetupTasks() override;
 
 	// Lecture tasks
-	FString taskPressedContinue = "taskPressedContinue";
-	void OnPressedContinue();
+	FString taskJump = "taskJump";
+	FString taskDoubleJump = "taskDoubleJump";
+	
+	UFUNCTION()
+	void OnJump();
+
+	UFUNCTION()
+	void OnDoubleJump();
 };

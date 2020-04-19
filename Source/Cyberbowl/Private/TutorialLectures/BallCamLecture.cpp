@@ -3,7 +3,6 @@
 
 #include "TutorialLectures/BallCamLecture.h"
 #include "Character/CyberbowlCharacter.h"
-#include "PlayerController/TutorialPlayerController.h"
 
 void ABallCamLecture::Tick(float DeltaTime)
 {

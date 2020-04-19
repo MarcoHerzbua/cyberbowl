@@ -10,6 +10,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallCamToggled);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJump);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable
@@ -58,6 +60,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnBallCamToggled OnToggledBallCam;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnJump OnJump;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnDoubleJump OnDoubleJump;
 	
 protected:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")

@@ -120,10 +120,12 @@ void ACyberbowlCharacter::Jump()
 	}
 	
 	Super::Jump();
+	OnJump.Broadcast();
 
 	if(CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
 	{
 		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
+		OnDoubleJump.Broadcast();
 		return;
 	}
 	

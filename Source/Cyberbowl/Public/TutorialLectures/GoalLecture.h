@@ -24,7 +24,7 @@ protected:
 	void SetupTasks() override;
 
 	// Lecture tasks
-	FString taskScoredGoal;
+	FString taskScoredGoal = "taskScoredGoal";
 
 	UFUNCTION()
 	void OnGoalScored(int teamIndex);
