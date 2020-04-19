@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Character/Abilities/AbilityBase.h"
+#include "PlayerController/FPlayerInfo.h"
 #include "CyberbowlCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
@@ -130,5 +131,11 @@ public:
 	void BeginPlay() override;
 	//UFUNCTION(BlueprintCallable, Category = "CyberbowlCharacter")
 	//void ToggleAbilities(bool enable);
+
+
+	// Please don't use this method without supervision, thank you
+	// If you do, I'll find you
+	void TutorialNameTagSetup(int team, ECBCharacterType characterType);
+	
 };
 

@@ -15,8 +15,11 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Character/CBCharacterMovementComponent.h"
 #include "Character/CyberbowlCharacterAnimInstance.h"
+#include "Components/Button.h"
 #include "PlayerController/ThirdPersonPlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/WidgetComponent.h"
+#include "Widgets/WNameTag.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACyberbowlCharacter
@@ -343,4 +346,48 @@ void ACyberbowlCharacter::MoveRight(float Value)
 	//	// add movement in that direction
 	//	AddMovementInput(Direction, Value);
 	//}
+}
+
+void ACyberbowlCharacter::TutorialNameTagSetup(int team, ECBCharacterType characterType)
+{
+	TArray<UWidgetComponent*, FDefaultAllocator> widgetComponents;
+	GetComponents<UWidgetComponent, FDefaultAllocator>(widgetComponents);
+
+	for (auto widgetComp : widgetComponents)
+	{
+		widgetComp->Activate();
+	}
+
+	TArray<AActor*> playerControllers;
+	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), playerControllers);
+
+	auto playerController = UGameplayStatics::GetPlayerControllerFromID(this, 0);
+
+	UWidgetComponent* widgetComponent = widgetComponents.Pop();
+	UWNameTag* nameTagWidget = Cast<UWNameTag>(widgetComponent->GetUserWidgetObject());
+	UButton* nameplate = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
+	nameTagWidget->CharacterName = ToCharacterName(characterType);
+
+	if (team == 1)
+	{
+		nameplate->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
+	}
+	else
+	{
+		nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
+	}
+
+	widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
+	nameTagWidget->SetOwningPlayer(playerController);
+	nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
+	nameTagWidget->IsAssigned = true;
+
+	for (auto widgetComp : widgetComponents)
+	{
+		const bool isAssigned = Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned;
+		if (!isAssigned)
+		{
+			widgetComp->Deactivate();
+		}
+	}
 }
