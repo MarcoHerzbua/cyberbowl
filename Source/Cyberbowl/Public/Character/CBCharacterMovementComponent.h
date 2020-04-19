@@ -18,9 +18,8 @@ enum class ECBMovementMode : uint8
 	CBMOVE_Dash UMETA(DisplayName="Dash")
 };
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVertDash);
+
 UCLASS()
 class CYBERBOWL_API UCBCharacterMovementComponent : public UCharacterMovementComponent
 {
@@ -81,6 +80,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	class UCyberbowlCharacterAnimInstance* animinstance;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnVertDash OnVertDash;
+
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -108,11 +111,12 @@ protected:
 	void PhysCustom(float deltaTime, int32 Iterations) override;
 
 	void PhysWallrun(float deltaTime, int32 Iterations);
+
+	UFUNCTION()
+	void CallOnVerticalDash();
 /*
  *
  *
  * 
  */
 };
-
-

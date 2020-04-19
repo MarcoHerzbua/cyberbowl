@@ -170,6 +170,14 @@ void ACyberbowlCharacter::UnFreeze_Implementation()
 	CustomTimeDilation = DefaultTimeDilation;
 }
 
+void ACyberbowlCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	auto movementComp = Cast<UCBCharacterMovementComponent>(GetComponentByClass(UCBCharacterMovementComponent::StaticClass()));
+	movementComp->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
+}
+
 //DOES NOT deactivate the abilities
 //void ACyberbowlCharacter::ToggleAbilities(bool enable)
 //{
@@ -212,6 +220,8 @@ void ACyberbowlCharacter::Dash()
 	{
 		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
 		cooldownComponent->StartCooldown("Dash");
+
+		OnDash.Broadcast();
 	}
 }
 
@@ -286,6 +296,11 @@ void ACyberbowlCharacter::CallOnBallCamToggled()
 	Cast<UBallCamComponent>(GetComponentByClass(UBallCamComponent::StaticClass()))->ToggleBallCam();
 
 	OnToggledBallCam.Broadcast();
+}
+
+void ACyberbowlCharacter::CallOnVerticalDash()
+{
+	OnVerticalDash.Broadcast();
 }
 
 

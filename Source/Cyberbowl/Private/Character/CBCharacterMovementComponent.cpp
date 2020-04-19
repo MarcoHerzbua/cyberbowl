@@ -39,12 +39,15 @@ void UCBCharacterMovementComponent::BeginPlay()
 	Super::BeginPlay();
 	
     CBMovementMode = ECBMovementMode::CBMOVE_Running;
-	
+
     MovementStates.Add(ECBMovementMode::CBMOVE_Running, NewObject<UBaseMovementState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, NewObject<UWallrunState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_Jump, NewObject<UJumpState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_DoubleJump, NewObject<UDoubleJumpState>());
-    MovementStates.Add(ECBMovementMode::CBMOVE_Dash, NewObject<UDashState>());
+
+    auto dashState = NewObject<UDashState>();
+    dashState->OnUpDash.AddDynamic(this, &UCBCharacterMovementComponent::CallOnVerticalDash);
+    MovementStates.Add(ECBMovementMode::CBMOVE_Dash, dashState);
 
 	for(auto state : MovementStates)
 	{
@@ -175,4 +178,9 @@ void UCBCharacterMovementComponent::PhysWallrun(float deltaTime, int32 Iteration
         Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
     }
 
+}
+
+void UCBCharacterMovementComponent::CallOnVerticalDash()
+{
+    OnVertDash.Broadcast();
 }

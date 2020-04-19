@@ -12,6 +12,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallCamToggled);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJump);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable
@@ -66,6 +68,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnDoubleJump OnDoubleJump;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnDash OnDash;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnVerticalDash OnVerticalDash;
 	
 protected:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
@@ -96,6 +104,9 @@ protected:
 	void AbilityCanceled();
 
 	void CallOnBallCamToggled();
+
+	UFUNCTION()
+	void CallOnVerticalDash();
 	
 protected:
 	// APawn interface
@@ -116,6 +127,7 @@ public:
 	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
 	void UnFreeze_Implementation() override;
 
+	void BeginPlay() override;
 	//UFUNCTION(BlueprintCallable, Category = "CyberbowlCharacter")
 	//void ToggleAbilities(bool enable);
 };
