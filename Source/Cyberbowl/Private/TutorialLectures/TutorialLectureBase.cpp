@@ -3,6 +3,7 @@
 #include "TutorialLectures/TutorialLectureBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerController/TutorialPlayerController.h"
+#include "Character/CyberbowlCharacter.h"
 #include "GameModesAndInstances/TutorialGameMode.h"
 
 ATutorialLectureBase::ATutorialLectureBase()
@@ -17,6 +18,7 @@ void ATutorialLectureBase::BeginPlay()
 	SetupTasks();
 
 	tutorialPlayerController = Cast<ATutorialPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
+	tutorialCharacter = Cast<ACyberbowlCharacter>(tutorialPlayerController->GetPawn());
 	tutorialGameMode = Cast<ATutorialGameMode>(UGameplayStatics::GetGameMode(this));
 
 	// Debug purposes

@@ -11,6 +11,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLectureFinished);
 
 class ATutorialPlayerController;
+class ACyberbowlCharacter;
 class ATutorialGameMode;
 
 UCLASS(Abstract)
@@ -38,7 +39,7 @@ protected:
 
 	virtual void SetupTasks();
 
-	virtual void AdvanceIfCurrentTask(const FString& performedTask);
+	void AdvanceIfCurrentTask(const FString& performedTask);
 
 	TQueue<FString> lectureTasks;
 	FString currentTask;
@@ -50,6 +51,8 @@ protected:
 	UTutorialWidgetBase* currentWidget;
 
 	ATutorialPlayerController* tutorialPlayerController;
+
+	ACyberbowlCharacter* tutorialCharacter;
 
 	ATutorialGameMode* tutorialGameMode;
 

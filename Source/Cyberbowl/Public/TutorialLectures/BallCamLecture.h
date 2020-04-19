@@ -14,4 +14,19 @@ class CYBERBOWL_API ABallCamLecture : public ATutorialLectureBase
 {
 	GENERATED_BODY()
 	
+public:
+	void Tick(float DeltaTime) override;
+	void Enter() override;
+	void Exit() override;
+	
+protected:
+	void BeginPlay() override;
+	void SetupTasks() override;
+
+	// Lecture tasks
+	FString taskBallCamToggled;
+
+	UFUNCTION()
+	void OnBallCamToggled();
+
 };
