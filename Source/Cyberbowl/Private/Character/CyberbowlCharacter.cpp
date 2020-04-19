@@ -19,6 +19,7 @@
 #include "PlayerController/ThirdPersonPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
+#include "PlayerController/TutorialPlayerController.h"
 #include "Widgets/WNameTag.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -353,17 +354,10 @@ void ACyberbowlCharacter::TutorialNameTagSetup(int team, ECBCharacterType charac
 	TArray<UWidgetComponent*, FDefaultAllocator> widgetComponents;
 	GetComponents<UWidgetComponent, FDefaultAllocator>(widgetComponents);
 
-	for (auto widgetComp : widgetComponents)
-	{
-		widgetComp->Activate();
-	}
-
-	TArray<AActor*> playerControllers;
-	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), playerControllers);
-
-	auto playerController = UGameplayStatics::GetPlayerControllerFromID(this, 0);
+	
 
 	UWidgetComponent* widgetComponent = widgetComponents.Pop();
+	widgetComponent->Activate();
 	UWNameTag* nameTagWidget = Cast<UWNameTag>(widgetComponent->GetUserWidgetObject());
 	UButton* nameplate = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
 	nameTagWidget->CharacterName = ToCharacterName(characterType);
@@ -377,6 +371,8 @@ void ACyberbowlCharacter::TutorialNameTagSetup(int team, ECBCharacterType charac
 		nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
 	}
 
+	const auto playerController = Cast<ATutorialPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
+	
 	widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
 	nameTagWidget->SetOwningPlayer(playerController);
 	nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
@@ -384,10 +380,7 @@ void ACyberbowlCharacter::TutorialNameTagSetup(int team, ECBCharacterType charac
 
 	for (auto widgetComp : widgetComponents)
 	{
-		const bool isAssigned = Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned;
-		if (!isAssigned)
-		{
-			widgetComp->Deactivate();
-		}
+		if (!Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned)
+		widgetComp->DestroyComponent();
 	}
 }

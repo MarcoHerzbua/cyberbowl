@@ -3,6 +3,9 @@
 
 #include "PlayerController/TutorialPlayerController.h"
 
+#include "Character/CyberbowlCharacter.h"
+#include "Components/WidgetComponent.h"
+
 void ATutorialPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -13,4 +16,16 @@ void ATutorialPlayerController::SetupInputComponent()
 void ATutorialPlayerController::CallOnAdvanceTutorial()
 {
 	OnAdvanceTutorial.Broadcast();
+}
+
+void ATutorialPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	auto widgets = Cast<ACyberbowlCharacter>(GetCharacter())->GetComponentsByClass(UWidgetComponent::StaticClass());
+
+	for (auto widget : widgets)
+	{
+		widget->DestroyComponent();
+	}
 }
