@@ -9,6 +9,7 @@
 #include "DrawDebugHelpers.h"
 #include "Actors/PlayBall.h"
 #include "Components/BoxComponent.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 #include "TimerManager.h"
 
 
@@ -85,6 +86,7 @@ void UBoopComponent::StartBoop()
 
 		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		bBoopActive = true;
+		MovementComponent->animinstance->setIsBooping(true);
 	}
 
 }
@@ -119,6 +121,7 @@ void UBoopComponent::DeactivateBoopHitbox()
 		//TODO: fire event
 		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		bBoopActive = false;
+		MovementComponent->animinstance->setIsBooping(false);
 	}
 }
 
