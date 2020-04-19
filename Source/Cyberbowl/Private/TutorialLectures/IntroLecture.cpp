@@ -26,8 +26,6 @@ void AIntroLecture::Exit()
 void AIntroLecture::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SetupTasks();
 }
 
 void AIntroLecture::SetupTasks()
@@ -37,10 +35,5 @@ void AIntroLecture::SetupTasks()
 
 void AIntroLecture::OnPressedContinue()
 {
-	if (currentTask != taskPressedContinue)
-	{
-		return;
-	}
-
-	AdvanceLecture();
+	AdvanceIfCurrentTask(taskPressedContinue);
 }

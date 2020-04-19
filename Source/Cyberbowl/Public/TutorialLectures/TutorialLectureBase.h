@@ -38,6 +38,8 @@ protected:
 
 	virtual void SetupTasks();
 
+	virtual void AdvanceIfCurrentTask(const FString& performedTask);
+
 	TQueue<FString> lectureTasks;
 	FString currentTask;
 

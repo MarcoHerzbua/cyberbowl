@@ -26,8 +26,6 @@ void AOutroLecture::Exit()
 void AOutroLecture::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SetupTasks();
 }
 
 void AOutroLecture::SetupTasks()
@@ -37,10 +35,5 @@ void AOutroLecture::SetupTasks()
 
 void AOutroLecture::OnPressedContinue()
 {
-	if (currentTask != taskPressedContinue)
-	{
-		return;
-	}
-
-	AdvanceLecture();
+	AdvanceIfCurrentTask(taskPressedContinue);
 }

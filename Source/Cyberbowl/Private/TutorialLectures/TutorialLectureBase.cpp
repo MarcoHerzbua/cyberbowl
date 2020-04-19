@@ -14,6 +14,8 @@ void ATutorialLectureBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetupTasks();
+
 	tutorialPlayerController = Cast<ATutorialPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
 	tutorialGameMode = Cast<ATutorialGameMode>(UGameplayStatics::GetGameMode(this));
 
@@ -24,6 +26,14 @@ void ATutorialLectureBase::BeginPlay()
 
 void ATutorialLectureBase::SetupTasks()
 {
+}
+
+void ATutorialLectureBase::AdvanceIfCurrentTask(const FString& performedTask)
+{
+	if (currentTask == performedTask)
+	{
+		AdvanceLecture();
+	}
 }
 
 void ATutorialLectureBase::Enter()
