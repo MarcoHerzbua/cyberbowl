@@ -5,10 +5,8 @@
 //#include "K2Node_FunctionResult.h"
 #include "WallrunState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunFinish, float, timeOnWall, bool, launchedAway);
 
-/**
- *
- */
 UENUM(BlueprintType)
 enum class EWallRunDirection : uint8
 {
@@ -31,6 +29,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsLaunching() { return bIsLaunching; }
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnWallrunFinish OnWallrunFinish;
 	
 protected:
 	float DefaultGravityScale;
@@ -51,4 +52,6 @@ protected:
 	EWallRunDirection HitDirection(FHitResult& hitResult);
 	UFUNCTION()
 	void EndWallrun();
+
+	float timeOnWall;
 };

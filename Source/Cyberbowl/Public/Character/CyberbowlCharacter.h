@@ -15,6 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJump);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunEnd, float, timeOnWall, bool, launchedAway);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable
@@ -75,6 +76,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnVerticalDash OnVerticalDash;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnWallrunEnd OnWallrunEnd;
 	
 protected:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
@@ -104,10 +108,14 @@ protected:
 
 	void AbilityCanceled();
 
+	UFUNCTION()
 	void CallOnBallCamToggled();
 
 	UFUNCTION()
 	void CallOnVerticalDash();
+
+	UFUNCTION()
+	void CallOnWallRunEnd(float timeOnWall, bool launchedAway);
 	
 protected:
 	// APawn interface

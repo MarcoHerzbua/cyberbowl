@@ -22,9 +22,10 @@ void ATutorialPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto widgets = Cast<ACyberbowlCharacter>(GetCharacter())->GetComponentsByClass(UWidgetComponent::StaticClass());
+	TArray<UActorComponent*> widgetComponents;
+	Cast<ACyberbowlCharacter>(GetCharacter())->GetComponents(UWidgetComponent::StaticClass(), widgetComponents);
 
-	for (auto widget : widgets)
+	for (auto widget : widgetComponents)
 	{
 		widget->DestroyComponent();
 	}

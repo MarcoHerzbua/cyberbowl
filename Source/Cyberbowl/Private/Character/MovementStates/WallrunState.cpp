@@ -58,7 +58,8 @@ void UWallrunState::OnTick(float DeltaTime)
 	}
 	else
 	{
-		MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);		
+		MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);
+		timeOnWall += DeltaTime;
 	}
 	
 	//More then one Tick is needed to finalize the WallRunDirection, therefore the frist 5 Ticks are used to correct the Animation.
@@ -118,6 +119,7 @@ void UWallrunState::LaunchCharacter()
 	LaunchVector = launchVec;
 	MovementComponent->animinstance->setIsDashing(true);
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &UWallrunState::EndWallrun, MovementComponent->WallrunLaunchDuration);
+	
 	//MovementComponent->GetCharacterOwner()->LaunchCharacter(launchVec, true, true);
 
 	//MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
@@ -156,5 +158,8 @@ void UWallrunState::EndWallrun()
 	LaunchVector = WallrunDirection = FVector::ZeroVector;
 	MovementComponent->animinstance->setIsDashing(false);
 	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+
+	OnWallrunFinish.Broadcast(timeOnWall, true);
+	timeOnWall = 0.f;
 }
 

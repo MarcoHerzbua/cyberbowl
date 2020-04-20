@@ -180,6 +180,7 @@ void ACyberbowlCharacter::BeginPlay()
 	
 	auto movementComp = Cast<UCBCharacterMovementComponent>(GetComponentByClass(UCBCharacterMovementComponent::StaticClass()));
 	movementComp->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
+	movementComp->OnWallRunFinished.AddDynamic(this, &ACyberbowlCharacter::CallOnWallRunEnd);
 }
 
 //DOES NOT deactivate the abilities
@@ -305,6 +306,11 @@ void ACyberbowlCharacter::CallOnBallCamToggled()
 void ACyberbowlCharacter::CallOnVerticalDash()
 {
 	OnVerticalDash.Broadcast();
+}
+
+void ACyberbowlCharacter::CallOnWallRunEnd(float timeOnWall, bool launchedAway)
+{
+	OnWallrunEnd.Broadcast(timeOnWall, launchedAway);
 }
 
 

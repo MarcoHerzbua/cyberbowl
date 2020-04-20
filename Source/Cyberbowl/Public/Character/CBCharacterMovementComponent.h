@@ -19,6 +19,7 @@ enum class ECBMovementMode : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVertDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallRunFinished, float, timeOnWall, bool, launchedAway);
 
 UCLASS()
 class CYBERBOWL_API UCBCharacterMovementComponent : public UCharacterMovementComponent
@@ -84,7 +85,9 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnVertDash OnVertDash;
 
-	
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnWallRunFinished OnWallRunFinished;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	ECBMovementMode CBMovementMode;
@@ -114,6 +117,9 @@ protected:
 
 	UFUNCTION()
 	void CallOnVerticalDash();
+
+	UFUNCTION()
+	void CallOnWallRunFinished(float timeOnWall, bool launchedAway);
 /*
  *
  *
