@@ -15,8 +15,12 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Character/CBCharacterMovementComponent.h"
 #include "Character/CyberbowlCharacterAnimInstance.h"
+#include "Components/Button.h"
 #include "PlayerController/ThirdPersonPlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/WidgetComponent.h"
+#include "PlayerController/TutorialPlayerController.h"
+#include "Widgets/WNameTag.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACyberbowlCharacter
@@ -65,7 +69,12 @@ ACyberbowlCharacter::ACyberbowlCharacter(const FObjectInitializer& ObjectInitial
 
 void ACyberbowlCharacter::CallMenuEnter()
 {
-	Cast<AThirdPersonPlayerController>(Controller)->CallMenuEnter();
+	auto thirdPersonController = Cast<AThirdPersonPlayerController>(Controller);
+
+	if (thirdPersonController)
+	{
+		thirdPersonController->CallMenuEnter();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -115,10 +124,12 @@ void ACyberbowlCharacter::Jump()
 	}
 	
 	Super::Jump();
+	OnJump.Broadcast();
 
 	if(CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
 	{
 		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
+		OnDoubleJump.Broadcast();
 		return;
 	}
 	
@@ -163,6 +174,15 @@ void ACyberbowlCharacter::UnFreeze_Implementation()
 	CustomTimeDilation = DefaultTimeDilation;
 }
 
+void ACyberbowlCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	auto movementComp = Cast<UCBCharacterMovementComponent>(GetComponentByClass(UCBCharacterMovementComponent::StaticClass()));
+	movementComp->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
+	movementComp->OnWallRunFinished.AddDynamic(this, &ACyberbowlCharacter::CallOnWallRunEnd);
+}
+
 //DOES NOT deactivate the abilities
 //void ACyberbowlCharacter::ToggleAbilities(bool enable)
 //{
@@ -205,6 +225,8 @@ void ACyberbowlCharacter::Dash()
 	{
 		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
 		cooldownComponent->StartCooldown("Dash");
+
+		OnDash.Broadcast();
 	}
 }
 
@@ -281,6 +303,16 @@ void ACyberbowlCharacter::CallOnBallCamToggled()
 	OnToggledBallCam.Broadcast();
 }
 
+void ACyberbowlCharacter::CallOnVerticalDash()
+{
+	OnVerticalDash.Broadcast();
+}
+
+void ACyberbowlCharacter::CallOnWallRunEnd(float timeOnWall, bool launchedAway)
+{
+	OnWallrunEnd.Broadcast(timeOnWall, launchedAway);
+}
+
 
 void ACyberbowlCharacter::TurnAtRate(float Rate)
 {
@@ -321,4 +353,40 @@ void ACyberbowlCharacter::MoveRight(float Value)
 	//	// add movement in that direction
 	//	AddMovementInput(Direction, Value);
 	//}
+}
+
+void ACyberbowlCharacter::TutorialNameTagSetup(int team, ECBCharacterType characterType)
+{
+	TArray<UWidgetComponent*, FDefaultAllocator> widgetComponents;
+	GetComponents<UWidgetComponent, FDefaultAllocator>(widgetComponents);
+
+	
+
+	UWidgetComponent* widgetComponent = widgetComponents.Pop();
+	widgetComponent->Activate();
+	UWNameTag* nameTagWidget = Cast<UWNameTag>(widgetComponent->GetUserWidgetObject());
+	UButton* nameplate = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
+	nameTagWidget->CharacterName = ToCharacterName(characterType);
+
+	if (team == 1)
+	{
+		nameplate->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
+	}
+	else
+	{
+		nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
+	}
+
+	const auto playerController = Cast<ATutorialPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
+	
+	widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
+	nameTagWidget->SetOwningPlayer(playerController);
+	nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
+	nameTagWidget->IsAssigned = true;
+
+	for (auto widgetComp : widgetComponents)
+	{
+		if (!Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned)
+		widgetComp->DestroyComponent();
+	}
 }

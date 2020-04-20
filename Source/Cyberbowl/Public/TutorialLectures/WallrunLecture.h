@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "TutorialLectures/TutorialLectureBase.h"
-#include "IntroLecture.generated.h"
+#include "WallrunLecture.generated.h"
+
 
 UCLASS()
-class CYBERBOWL_API AIntroLecture : public ATutorialLectureBase
+class CYBERBOWL_API AWallrunLecture : public ATutorialLectureBase
 {
 	GENERATED_BODY()
 	
@@ -18,10 +19,11 @@ public:
 	
 protected:
 	void BeginPlay() override;
-
 	void SetupTasks() override;
 
 	// Lecture tasks
-	FString taskPressedContinue = "taskPressedContinue";
-	void OnPressedContinue();
+	FString taskWallrunLaunch = "taskWallrunLaunch";
+
+	UFUNCTION()
+	void OnWallrunEnd(float timeOnWall, bool launchedAway);
 };

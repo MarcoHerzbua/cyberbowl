@@ -5,11 +5,13 @@
 #include "Blueprint/UserWidget.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Widgets/TutorialWidgetBase.h"
 #include "TutorialLectureBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLectureFinished);
 
 class ATutorialPlayerController;
+class ACyberbowlCharacter;
 class ATutorialGameMode;
 
 UCLASS(Abstract)
@@ -26,8 +28,8 @@ public:
 
 	virtual void Exit();
 
-	UFUNCTION()
-	virtual void AdvanceLecture();
+	UFUNCTION(BlueprintCallable)
+	void AdvanceLecture();
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnLectureFinished OnLectureFinished;
@@ -35,13 +37,23 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly)
-	TArray<TSubclassOf<UUserWidget>> widgetsList;
+	virtual void SetupTasks();
+
+	void AdvanceIfCurrentTask(const FString& performedTask);
+
+	TQueue<FString> lectureTasks;
+	FString currentTask;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<UTutorialWidgetBase>> widgetsList;
 
 	UPROPERTY()
-	UUserWidget* currentWidget;
+	UTutorialWidgetBase* currentWidget;
 
 	ATutorialPlayerController* tutorialPlayerController;
 
+	ACyberbowlCharacter* tutorialCharacter;
+
 	ATutorialGameMode* tutorialGameMode;
+
 };

@@ -19,6 +19,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 	bKeepMomentum = true;
 	float forwardAxisInput = InputComponent->GetAxisValue("MoveForward");
 	float rightAxisInput = InputComponent->GetAxisValue("MoveRight");
+	
 	FVector axisInput = FVector(forwardAxisInput, rightAxisInput, 0.f);
 	FRotator viewRotation = MovementComponent->GetPawnOwner()->GetControlRotation();
 
@@ -35,6 +36,8 @@ void UDashState::Activate(ECBMovementMode previousMode)
 
 		//FIX: This is needed, otherwise character will not dash upwards when standing still on ground
 		MovementComponent->DoJump(false);
+
+		OnUpDash.Broadcast();
 	}
 	else if (MovementComponent->DashMomentumStopRange.Contains(FMath::Abs(viewRotation.Yaw - axisInputRotation.Yaw)))
 	{

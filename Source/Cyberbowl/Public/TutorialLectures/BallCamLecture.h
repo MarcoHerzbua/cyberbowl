@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "TutorialLectures/TutorialLectureBase.h"
-#include "IntroLecture.generated.h"
+#include "BallCamLecture.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class CYBERBOWL_API AIntroLecture : public ATutorialLectureBase
+class CYBERBOWL_API ABallCamLecture : public ATutorialLectureBase
 {
 	GENERATED_BODY()
 	
@@ -18,10 +21,12 @@ public:
 	
 protected:
 	void BeginPlay() override;
-
 	void SetupTasks() override;
 
 	// Lecture tasks
-	FString taskPressedContinue = "taskPressedContinue";
-	void OnPressedContinue();
+	FString taskBallCamToggled = "taskBallCamToggled";
+
+	UFUNCTION()
+	void OnBallCamToggled();
+
 };

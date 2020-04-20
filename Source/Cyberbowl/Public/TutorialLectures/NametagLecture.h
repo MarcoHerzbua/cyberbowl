@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "TutorialLectures/TutorialLectureBase.h"
-#include "IntroLecture.generated.h"
+#include "PlayerController/FPlayerInfo.h"
+#include "NametagLecture.generated.h"
 
 UCLASS()
-class CYBERBOWL_API AIntroLecture : public ATutorialLectureBase
+class CYBERBOWL_API ANametagLecture : public ATutorialLectureBase
 {
 	GENERATED_BODY()
 	
@@ -18,10 +19,16 @@ public:
 	
 protected:
 	void BeginPlay() override;
-
 	void SetupTasks() override;
 
 	// Lecture tasks
 	FString taskPressedContinue = "taskPressedContinue";
 	void OnPressedContinue();
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<ACyberbowlCharacter>> dummyCharacterClasses;
+
+	TArray<ECBCharacterType> characterTypes{ ECBCharacterType::CBCHRACTERTYPE_AIR, ECBCharacterType::CBCHRACTERTYPE_EARTH };
+
+	TArray<ACyberbowlCharacter*> dummyCharacters;
 };

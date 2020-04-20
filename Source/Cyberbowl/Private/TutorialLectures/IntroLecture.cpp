@@ -2,6 +2,7 @@
 
 
 #include "TutorialLectures/IntroLecture.h"
+#include "PlayerController/TutorialPlayerController.h"
 
 void AIntroLecture::Tick(float DeltaTime)
 {
@@ -11,14 +12,28 @@ void AIntroLecture::Tick(float DeltaTime)
 void AIntroLecture::Enter()
 {
 	Super::Enter();
+
+	tutorialPlayerController->SetInputMode(FInputModeUIOnly());
 }
 
 void AIntroLecture::Exit()
 {
 	Super::Exit();
+
+	tutorialPlayerController->SetInputMode(FInputModeGameAndUI());
 }
 
 void AIntroLecture::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AIntroLecture::SetupTasks()
+{
+	lectureTasks.Enqueue(taskPressedContinue);
+}
+
+void AIntroLecture::OnPressedContinue()
+{
+	AdvanceIfCurrentTask(taskPressedContinue);
 }

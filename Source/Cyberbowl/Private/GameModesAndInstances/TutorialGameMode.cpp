@@ -18,15 +18,16 @@ void ATutorialGameMode::Tick(float DeltaSeconds)
 
 void ATutorialGameMode::AdvanceTutorial()
 {
+	if (currentLecture)
+	{
+		currentLecture->Exit();
+		currentLecture->Destroy();
+	}
+	
 	if (lecturesList.Num() <= 0)
 	{
 		OnTutorialFinished.Broadcast();
 		return;
-	}
-
-	if (currentLecture)
-	{
-		currentLecture->Exit();
 	}
 	
 	currentLecture = Cast<ATutorialLectureBase>(GetWorld()->SpawnActor(lecturesList[0]));

@@ -6,10 +6,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Character/Abilities/AbilityBase.h"
+#include "PlayerController/FPlayerInfo.h"
 #include "CyberbowlCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallCamToggled);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJump);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunEnd, float, timeOnWall, bool, launchedAway);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable
@@ -58,6 +64,21 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnBallCamToggled OnToggledBallCam;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnJump OnJump;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnDoubleJump OnDoubleJump;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnDash OnDash;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnVerticalDash OnVerticalDash;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnWallrunEnd OnWallrunEnd;
 	
 protected:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
@@ -87,7 +108,14 @@ protected:
 
 	void AbilityCanceled();
 
+	UFUNCTION()
 	void CallOnBallCamToggled();
+
+	UFUNCTION()
+	void CallOnVerticalDash();
+
+	UFUNCTION()
+	void CallOnWallRunEnd(float timeOnWall, bool launchedAway);
 	
 protected:
 	// APawn interface
@@ -108,7 +136,14 @@ public:
 	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
 	void UnFreeze_Implementation() override;
 
+	void BeginPlay() override;
 	//UFUNCTION(BlueprintCallable, Category = "CyberbowlCharacter")
 	//void ToggleAbilities(bool enable);
+
+
+	// Please don't use this method without supervision, thank you
+	// If you do, I'll find you
+	void TutorialNameTagSetup(int team, ECBCharacterType characterType);
+	
 };
 
