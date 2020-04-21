@@ -1,49 +1,51 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TutorialLectures/FireAbilityLecture.h"
+#include "TutorialLectures/IceAbilityLecture.h"
 #include "Actors/PlayBall.h"
-#include "Character/Abilities/Firewall.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "PlayerController/TutorialPlayerController.h"
 #include "Stadium/Goal_Collider.h"
+#include "PlayerController/TutorialPlayerController.h"
 #include "Character/CyberbowlCharacter.h"
+#include "Components/WidgetComponent.h"
 
-void AFireAbilityLecture::Tick(float DeltaTime)
+void AIceAbilityLecture::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void AFireAbilityLecture::Enter()
+void AIceAbilityLecture::Enter()
 {
 	Super::Enter();
 
 	tutorialPlayerController->SetInputMode(FInputModeUIOnly());
-
+	
 	tutorialCharacter->SetActorLocation(FVector(playerStartLocation->GetActorLocation().X, playerStartLocation->GetActorLocation().Y, tutorialCharacter->GetActorLocation().Z));
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
-
+	
+	ChangeToIceCharacter();
+	
 	const FRotator lookAtGoal = UKismetMathLibrary::FindLookAtRotation(tutorialCharacter->GetActorLocation(), goal->GetActorLocation());
 	tutorialPlayerController->SetControlRotation(lookAtGoal);
 }
 
-void AFireAbilityLecture::Exit()
+void AIceAbilityLecture::Exit()
 {
 	Super::Exit();
 
 	ball->StopBall();
 }
 
-void AFireAbilityLecture::BeginPlay()
+void AIceAbilityLecture::BeginPlay()
 {
 	Super::BeginPlay();
 
 	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
-	ball->OnActorHit.AddDynamic(this, &AFireAbilityLecture::OnBallBlocked);
+	ball->OnBallFrozen.AddDynamic(this, &AIceAbilityLecture::OnBallFrozen);
 
 	TArray<AActor*> actors;
-	
+
 	UGameplayStatics::GetAllActorsWithTag(this, "FireLecturePlayerStart", actors);
 	playerStartLocation = actors[0];
 	actors.Empty();
@@ -54,39 +56,54 @@ void AFireAbilityLecture::BeginPlay()
 
 	UGameplayStatics::GetAllActorsWithTag(this, "FireLectureGoal", actors);
 	goal = Cast<AGoal_Collider>(actors[0]);
-	goal->OnGoalScored.AddDynamic(this, &AFireAbilityLecture::OnGoalScored);
+	goal->OnGoalScored.AddDynamic(this, &AIceAbilityLecture::OnGoalScored);
 	actors.Empty();
 }
 
-void AFireAbilityLecture::SetupTasks()
+void AIceAbilityLecture::SetupTasks()
 {
 	lectureTasks.Enqueue(taskReadInstructions);
-	lectureTasks.Enqueue(taskBlockBall);
+	lectureTasks.Enqueue(taskFreezeBall);
 }
 
-void AFireAbilityLecture::OnReadInstructions()
+void AIceAbilityLecture::OnReadInstructions()
 {
 	AdvanceIfCurrentTask(taskReadInstructions);
 }
 
-void AFireAbilityLecture::OnBallBlocked(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+void AIceAbilityLecture::OnBallFrozen()
 {
-	if (Cast<AFirewall>(OtherActor))
-	{
-		AdvanceIfCurrentTask(taskBlockBall);
-	}
+	AdvanceIfCurrentTask(taskFreezeBall);
 }
 
-void AFireAbilityLecture::OnGoalScored(int teamIndex)
+void AIceAbilityLecture::OnGoalScored(int teamIndex)
 {
 	LaunchBall();
 }
 
-void AFireAbilityLecture::LaunchBall() const
+void AIceAbilityLecture::LaunchBall() const
 {
 	ball->StopBall();
 	ball->PlayBall();
-	
+
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
 	ball->PushBall(2000.f, FVector(0, 1, 0));
+}
+
+void AIceAbilityLecture::ChangeToIceCharacter()
+{
+	auto iceCharacter = Cast<ACyberbowlCharacter>(GetWorld()->SpawnActor<AActor>(iceCharacterClass, tutorialCharacter->GetTransform()));
+
+	GetWorld()->DestroyActor(tutorialCharacter);
+	
+	tutorialCharacter = iceCharacter;
+	tutorialPlayerController->Possess(tutorialCharacter);
+
+	TArray<UActorComponent*> widgetComponents;
+	Cast<ACyberbowlCharacter>(tutorialCharacter)->GetComponents(UWidgetComponent::StaticClass(), widgetComponents);
+
+	for (auto widget : widgetComponents)
+	{
+		widget->DestroyComponent();
+	}
 }

@@ -10,6 +10,7 @@
 #include "PlayBall.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallFrozen);
 
 UCLASS()
 class CYBERBOWL_API APlayBall : public AActor, public IFreezeable
@@ -30,7 +31,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
 	FOnBallBooped OnBallBooped;
-		
+
+	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	FOnBallFrozen OnBallFrozen;
 	
 protected:
 	// Called when the game starts or when spawned

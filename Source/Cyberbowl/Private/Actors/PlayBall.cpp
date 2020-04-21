@@ -69,6 +69,7 @@ void APlayBall::ResetBallPosition()
 void APlayBall::Freeze_Implementation(AActor* instigtr)
 {
 	BallStaticMesh->SetSimulatePhysics(false);
+	OnBallFrozen.Broadcast();
 }
 
 void APlayBall::UnFreeze_Implementation()
