@@ -75,6 +75,8 @@ private:
 	UFUNCTION()
 	void CallMenuNavigationUp();
 
+	void UpdateNametagPositions();
+
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallGameOverMenuNavigated OnCallGameOverMenuNavigated;
@@ -99,10 +101,19 @@ public:
 
 	UFUNCTION()
 	void CallMenuEnter();
+
+	void AddNametagWidgetForPlayer(UWidgetComponent* nametagWidget);
 	
 protected:
 	ACyberbowlCharacter* character;
 	FVector spawnTransform;
 	FRotator spawnRotation;
+	
+	TArray<UWidgetComponent*> otherPlayerNametags;
 
+	// Constants for the nametag widget height adjustment
+	const float MinZWidgetPos = 120.f;
+	const float MaxZWidgetPos = 400.f;
+	const float MinPlayerDistance = 1000.f;
+	const float MaxPlayerDistance = 15000.f;
 };

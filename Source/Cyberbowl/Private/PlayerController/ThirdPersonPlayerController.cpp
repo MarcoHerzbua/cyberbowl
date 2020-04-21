@@ -1,6 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerController/ThirdPersonPlayerController.h"
+
+#include <string>
+
 #include "GameModesAndInstances/CyberbowlGameInstance.h"
 #include "Character/BallCamComponent.h"
 #include "Engine/World.h"
@@ -10,6 +13,7 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Components/Button.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Widgets/WNameTag.h"
 
 void AThirdPersonPlayerController::BeginPlay()
@@ -23,6 +27,8 @@ void AThirdPersonPlayerController::BeginPlay()
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	UpdateNametagPositions();
 }
 
 void AThirdPersonPlayerController::SetupInputComponent()
@@ -146,6 +152,7 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 		}
 
 		widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
+		playerController->AddNametagWidgetForPlayer(widgetComponent);
 		nameTagWidget->SetOwningPlayer(playerController);
 		nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
 		nameTagWidget->IsAssigned = true;
@@ -212,6 +219,17 @@ void AThirdPersonPlayerController::CallMenuNavigationUp()
 	}
 }
 
+void AThirdPersonPlayerController::UpdateNametagPositions()
+{
+	for (auto nametag : otherPlayerNametags)
+	{
+		const auto distanceToOtherPlayer = UKismetMathLibrary::Vector_Distance(character->GetActorLocation(), nametag->GetComponentLocation());
+		const float heightAdjustment = (distanceToOtherPlayer - MinPlayerDistance) * (MaxZWidgetPos - MinZWidgetPos) / (MaxPlayerDistance - MinPlayerDistance) + MinZWidgetPos;
+		
+		nametag->SetRelativeLocation(FVector(0, 0, heightAdjustment));
+	}
+}
+
 void AThirdPersonPlayerController::CallMenuEnter()
 {
 	// Only Player0 can press buttons apparently, so we have to manually handle it for the others
@@ -219,4 +237,9 @@ void AThirdPersonPlayerController::CallMenuEnter()
 	{
 		OnMenuEnter.Broadcast();
 	}
+}
+
+void AThirdPersonPlayerController::AddNametagWidgetForPlayer(UWidgetComponent* nametagWidget)
+{
+	otherPlayerNametags.AddUnique(nametagWidget);
 }
