@@ -19,8 +19,6 @@ void AAirAbilityLecture::Enter()
 {
 	Super::Enter();
 
-	tutorialPlayerController->SetInputMode(FInputModeUIOnly());
-
 	tutorialCharacter->SetActorLocation(FVector(playerStartLocation->GetActorLocation().X, playerStartLocation->GetActorLocation().Y, tutorialCharacter->GetActorLocation().Z));
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
 

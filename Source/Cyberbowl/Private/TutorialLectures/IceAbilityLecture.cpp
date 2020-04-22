@@ -18,8 +18,6 @@ void AIceAbilityLecture::Tick(float DeltaTime)
 void AIceAbilityLecture::Enter()
 {
 	Super::Enter();
-
-	tutorialPlayerController->SetInputMode(FInputModeUIOnly());
 	
 	tutorialCharacter->SetActorLocation(FVector(playerStartLocation->GetActorLocation().X, playerStartLocation->GetActorLocation().Y, tutorialCharacter->GetActorLocation().Z));
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
@@ -33,8 +31,6 @@ void AIceAbilityLecture::Enter()
 void AIceAbilityLecture::Exit()
 {
 	Super::Exit();
-
-	ball->StopBall();
 }
 
 void AIceAbilityLecture::BeginPlay()

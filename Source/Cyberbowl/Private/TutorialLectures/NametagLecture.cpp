@@ -46,15 +46,11 @@ void ANametagLecture::Enter()
 
 	const FRotator lookAtDummy = UKismetMathLibrary::FindLookAtRotation(tutorialCharacter->GetActorLocation(), dummyCharacters[0]->GetActorLocation());
 	tutorialPlayerController->SetControlRotation(lookAtDummy);
-	
-	tutorialPlayerController->SetInputMode(FInputModeUIOnly());
 }
 
 void ANametagLecture::Exit()
 {
 	Super::Exit();
-
-	tutorialPlayerController->SetInputMode(FInputModeGameAndUI());
 
 	for (auto character : dummyCharacters)
 	{
