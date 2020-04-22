@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "TutorialLectures/TutorialLectureBase.h"
-#include "IceAbilityLecture.generated.h"
+#include "AirAbilityLecture.generated.h"
 
-class APlayBall;
 class AGoal_Collider;
+class APlayBall;
 
 UCLASS()
-class CYBERBOWL_API AIceAbilityLecture : public ATutorialLectureBase
+class CYBERBOWL_API AAirAbilityLecture : public ATutorialLectureBase
 {
 	GENERATED_BODY()
 	
@@ -25,13 +25,13 @@ protected:
 
 	// Lecture tasks
 	FString taskReadInstructions = "taskReadInstructions";
-	FString taskFreezeBall = "taskFreezeBall";
+	FString taskGrabAndThrow = "taskGrabAndThrow";
 
 	UFUNCTION(BlueprintCallable)
 	void OnReadInstructions();
 
 	UFUNCTION()
-	void OnBallFrozen();
+	void OnBallSucced();
 
 	UFUNCTION()
 	void OnGoalScored(int teamIndex);
@@ -48,5 +48,5 @@ protected:
 	AGoal_Collider* goal;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<ACyberbowlCharacter> iceCharacterClass;
+	TSubclassOf<ACyberbowlCharacter> airCharacterClass;
 };

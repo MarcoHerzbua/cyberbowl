@@ -46,4 +46,7 @@ protected:
 	AActor* playerStartLocation;
 
 	AGoal_Collider* goal;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ACyberbowlCharacter> fireCharacterClass;
 };

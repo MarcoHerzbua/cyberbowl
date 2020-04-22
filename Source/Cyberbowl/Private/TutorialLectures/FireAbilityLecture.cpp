@@ -24,6 +24,8 @@ void AFireAbilityLecture::Enter()
 	tutorialCharacter->SetActorLocation(FVector(playerStartLocation->GetActorLocation().X, playerStartLocation->GetActorLocation().Y, tutorialCharacter->GetActorLocation().Z));
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
 
+	tutorialCharacter = tutorialPlayerController->SwitchCharacterClass(fireCharacterClass);
+	
 	const FRotator lookAtGoal = UKismetMathLibrary::FindLookAtRotation(tutorialCharacter->GetActorLocation(), goal->GetActorLocation());
 	tutorialPlayerController->SetControlRotation(lookAtGoal);
 }

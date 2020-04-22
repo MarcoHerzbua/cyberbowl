@@ -6,6 +6,8 @@
 #include "AbilityBase.h"
 #include "AirAbility.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGrabModeExitByPush);
+
 class APlayBall;
 class UCharacterMovementComponent;
 class ACyberbowlCharacter;
@@ -18,26 +20,29 @@ class CYBERBOWL_API UAirAbility : public UAbilityBase
 {
 	GENERATED_BODY()
 
-	
-
-	virtual void Fire() override;
-
 public:
 	virtual void BeginPlay() override;
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnGrabModeExitByPush OnGrabModeExitByPush;
 	
 protected:
-
+	virtual void Fire() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void ConvertMetersToUnrealUnits();
+
+	UFUNCTION()
+	void ExitGrabModeByPush();
 
 	UFUNCTION()
 	void ExitGrabMode();
 
 	UFUNCTION()
 	void DestroyTornado();
-	
+
 	UPROPERTY(BlueprintReadWrite)
 	float grabRadiusMeters;
 
