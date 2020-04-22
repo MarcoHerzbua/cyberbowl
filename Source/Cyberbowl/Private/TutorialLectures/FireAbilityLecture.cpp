@@ -73,7 +73,7 @@ void AFireAbilityLecture::OnBallBlocked(AActor* SelfActor, AActor* OtherActor, F
 {
 	if (Cast<AFirewall>(OtherActor))
 	{
-		AdvanceIfCurrentTask(taskBlockBall);
+		AdvanceIfCurrentTask(taskBlockBall, 1.f);
 	}
 }
 

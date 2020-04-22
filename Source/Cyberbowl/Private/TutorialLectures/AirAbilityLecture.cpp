@@ -72,7 +72,7 @@ void AAirAbilityLecture::OnReadInstructions()
 
 void AAirAbilityLecture::OnBallSucced()
 {
-	AdvanceIfCurrentTask(taskGrabAndThrow);
+	AdvanceIfCurrentTask(taskGrabAndThrow, 1.f);
 }
 
 void AAirAbilityLecture::OnGoalScored(int teamIndex)

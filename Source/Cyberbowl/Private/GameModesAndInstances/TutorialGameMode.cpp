@@ -31,7 +31,6 @@ void ATutorialGameMode::AdvanceTutorial()
 	}
 	
 	currentLecture = Cast<ATutorialLectureBase>(GetWorld()->SpawnActor(lecturesList[0]));
-	currentLecture->SetFolderPath("TutorialLectures");
 
 	currentLecture->OnLectureFinished.AddDynamic(this, &ATutorialGameMode::AdvanceTutorial);
 	currentLecture->Enter();

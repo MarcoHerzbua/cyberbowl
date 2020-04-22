@@ -69,7 +69,7 @@ void AIceAbilityLecture::OnReadInstructions()
 
 void AIceAbilityLecture::OnBallFrozen()
 {
-	AdvanceIfCurrentTask(taskFreezeBall);
+	AdvanceIfCurrentTask(taskFreezeBall, 1.f);
 }
 
 void AIceAbilityLecture::OnGoalScored(int teamIndex)
