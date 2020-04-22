@@ -9,7 +9,10 @@
 #include "GameModesAndInstances/InGameGameMode.h"
 #include "PlayBall.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu ; Just how I like it :3
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallFrozen); 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallUnfrozen); 
+
 
 UCLASS()
 class CYBERBOWL_API APlayBall : public AActor, public IFreezeable
@@ -31,14 +34,20 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
 	FOnBallBooped OnBallBooped;
 		
-	
+	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	FOnBallFrozen OnBallFrozen;
+		
+	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	FOnBallUnfrozen OnBallUnfrozen;
+		
+	UPROPERTY(BlueprintReadOnly, Category = "BoopComponent")
+	bool IsBallFrozen;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
 	FVector StartPosition;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

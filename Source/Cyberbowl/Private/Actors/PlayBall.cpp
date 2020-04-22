@@ -39,8 +39,10 @@ void APlayBall::Tick(float DeltaTime)
 
 void APlayBall::PushBall(float force, FVector direction)
 {
-	//ball should be pushable when e.g. frozen
-	BallStaticMesh->SetSimulatePhysics(true);
+	if(IsBallFrozen)
+	{
+		UnFreeze_Implementation();
+	}
 
 	//Is this only moving the mesh? -> Marco: the mesh is a scene component and the root of the actor, so everything in this actor is moved
 	BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
@@ -68,11 +70,25 @@ void APlayBall::ResetBallPosition()
 
 void APlayBall::Freeze_Implementation(AActor* instigtr)
 {
+	if(IsBallFrozen)
+	{
+		return;
+	}
+	
+	IsBallFrozen = true;
 	BallStaticMesh->SetSimulatePhysics(false);
+	OnBallFrozen.Broadcast();
 }
 
 void APlayBall::UnFreeze_Implementation()
 {
+	if (!IsBallFrozen)
+	{
+		return;
+	}
+
+	IsBallFrozen = false;
 	BallStaticMesh->SetSimulatePhysics(true);
+	OnBallUnfrozen.Broadcast();
 }
 

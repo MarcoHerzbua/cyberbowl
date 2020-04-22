@@ -22,4 +22,5 @@ protected:
 
 	UFUNCTION()
 	void CallOnAdvanceTutorial();
+	void BeginPlay() override;
 };
