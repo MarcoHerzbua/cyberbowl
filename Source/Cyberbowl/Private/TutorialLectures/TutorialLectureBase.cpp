@@ -5,6 +5,7 @@
 #include "PlayerController/TutorialPlayerController.h"
 #include "Character/CyberbowlCharacter.h"
 #include "GameModesAndInstances/TutorialGameMode.h"
+#include "TimerManager.h"
 
 ATutorialLectureBase::ATutorialLectureBase()
 {
@@ -30,11 +31,18 @@ void ATutorialLectureBase::SetupTasks()
 {
 }
 
-void ATutorialLectureBase::AdvanceIfCurrentTask(const FString& performedTask)
+void ATutorialLectureBase::AdvanceIfCurrentTask(const FString& performedTask, float delayInSeconds)
 {
 	if (currentTask == performedTask)
 	{
-		AdvanceLecture();
+		if (delayInSeconds == 0.f)
+		{
+			AdvanceLecture();
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimer(advanceTaskDelayHandle, this, &ATutorialLectureBase::AdvanceLecture, delayInSeconds, false);
+		}
 	}
 }
 

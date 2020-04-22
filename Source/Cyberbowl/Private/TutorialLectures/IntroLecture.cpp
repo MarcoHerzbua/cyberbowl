@@ -12,15 +12,11 @@ void AIntroLecture::Tick(float DeltaTime)
 void AIntroLecture::Enter()
 {
 	Super::Enter();
-
-	tutorialPlayerController->SetInputMode(FInputModeUIOnly());
 }
 
 void AIntroLecture::Exit()
 {
 	Super::Exit();
-
-	tutorialPlayerController->SetInputMode(FInputModeGameAndUI());
 }
 
 void AIntroLecture::BeginPlay()

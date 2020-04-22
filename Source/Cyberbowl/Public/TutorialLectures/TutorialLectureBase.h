@@ -39,7 +39,10 @@ protected:
 
 	virtual void SetupTasks();
 
-	void AdvanceIfCurrentTask(const FString& performedTask);
+	void AdvanceIfCurrentTask(const FString& performedTask, float delayInSeconds = 0.f);
+
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle advanceTaskDelayHandle;
 
 	TQueue<FString> lectureTasks;
 	FString currentTask;
