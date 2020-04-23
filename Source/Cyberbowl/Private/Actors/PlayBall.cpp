@@ -32,8 +32,7 @@ void APlayBall::BeginPlay()
 void APlayBall::ResolveCollision(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
 {
 	FName otherCollisionProfile = Hit.Component->GetCollisionProfileName();
-	FVector ballVelocity = this->GetVelocity();
-	float ballVelMagnitude = ballVelocity.Size();
+	float ballVelMagnitude = CachedVelocity.Size();
 
 	//TODO: this ignores impact with ground; (23.4.) stadium is work in progress and arena collider is single mesh with profile "StadiumWall"
 	//when stadium is done we need to add the proper profiles to all the meshes to the visual arena
@@ -50,8 +49,12 @@ void APlayBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector ballVelocity = GetVelocity();
-	BallStaticMesh->SetAllPhysicsLinearVelocity( ballVelocity.GetClampedToMaxSize(MaxSpeed)) ;
+	CachedVelocity = GetVelocity();
+	if(CachedVelocity.Size() > MaxSpeed)
+	{
+		BallStaticMesh->SetAllPhysicsLinearVelocity(CachedVelocity.GetClampedToMaxSize(MaxSpeed)) ;
+		CachedVelocity = GetVelocity();
+	}
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%s"), *GetVelocity().ToString()));
 }
 

@@ -54,6 +54,7 @@ protected:
 	void ResolveCollision(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
 	FVector StartPosition;
+	FVector CachedVelocity;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
