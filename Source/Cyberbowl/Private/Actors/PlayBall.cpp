@@ -25,6 +25,24 @@ void APlayBall::BeginPlay()
 	}
 	BallStaticMesh->SetWorldScale3D(FVector(ScaleModifier));
 	StartPosition = GetActorLocation();
+
+	OnActorHit.AddDynamic(this, &APlayBall::ResolveCollision);
+}
+
+void APlayBall::ResolveCollision(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+{
+	FName otherCollisionProfile = Hit.Component->GetCollisionProfileName();
+	FVector ballVelocity = this->GetVelocity();
+	float ballVelMagnitude = ballVelocity.Size();
+
+	//TODO: this ignores impact with ground; (23.4.) stadium is work in progress and arena collider is single mesh with profile "StadiumWall"
+	//when stadium is done we need to add the proper profiles to all the meshes to the visual arena
+	//(we might need to implement another raycast that ignores the arena collider)
+	//and the hit result of the raycast should be used to determine the correct collision profile
+	if(otherCollisionProfile == FName("StadiumWall") && Hit.ImpactNormal.Z != 1.f)
+	{
+		OnBallHit.Broadcast(otherCollisionProfile, ballVelMagnitude / MaxSpeed);
+	}
 }
 
 // Called every frame

@@ -12,6 +12,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu ; Just how I like it :3
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallFrozen); 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallUnfrozen); 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBallHit, FName, collisionProfile, float, velocity); 
 
 
 UCLASS()
@@ -40,13 +41,18 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
 	FOnBallUnfrozen OnBallUnfrozen;
 		
+	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	FOnBallHit OnBallHit;
+		
 	UPROPERTY(BlueprintReadOnly, Category = "BoopComponent")
 	bool IsBallFrozen;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-private:
+	UFUNCTION()
+	void ResolveCollision(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
+
 	FVector StartPosition;
 public:	
 	// Called every frame
