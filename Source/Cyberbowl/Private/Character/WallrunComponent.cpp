@@ -55,6 +55,7 @@ void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AAc
 		MovementComponent->AddImpulse(SweepResult.Normal * 1000.f);
 
 		MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Wallrun);
+		OnWallrunStart.Broadcast();
 	}
 }
 
