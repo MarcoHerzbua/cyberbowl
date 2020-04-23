@@ -119,6 +119,9 @@ void UWallrunState::LaunchCharacter()
 	LaunchVector = launchVec;
 	MovementComponent->animinstance->setIsDashing(true);
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &UWallrunState::EndWallrun, MovementComponent->WallrunLaunchDuration);
+
+	OnWallrunFinish.Broadcast(timeOnWall, true);
+	timeOnWall = 0.f;
 	
 	//MovementComponent->GetCharacterOwner()->LaunchCharacter(launchVec, true, true);
 
@@ -158,8 +161,5 @@ void UWallrunState::EndWallrun()
 	LaunchVector = WallrunDirection = FVector::ZeroVector;
 	MovementComponent->animinstance->setIsDashing(false);
 	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
-
-	OnWallrunFinish.Broadcast(timeOnWall, true);
-	timeOnWall = 0.f;
 }
 

@@ -2,7 +2,11 @@
 
 
 #include "TutorialLectures/WallrunLecture.h"
+
+#include <string>
+
 #include "Character/CyberbowlCharacter.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void AWallrunLecture::Tick(float DeltaTime)
 {
@@ -33,8 +37,9 @@ void AWallrunLecture::SetupTasks()
 
 void AWallrunLecture::OnWallrunEnd(float timeOnWall, bool launchedAway)
 {
+	UKismetSystemLibrary::PrintString(this, std::to_string(timeOnWall).c_str());
 	if (launchedAway && timeOnWall >= 2.f)
 	{
-		AdvanceIfCurrentTask(taskWallrunLaunch);
+		AdvanceIfCurrentTask(taskWallrunLaunch, 0.5f);
 	}
 }
