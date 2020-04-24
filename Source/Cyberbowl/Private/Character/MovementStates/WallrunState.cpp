@@ -39,8 +39,8 @@ void UWallrunState::Deactivate()
 
 	MovementComponent->GravityScale = DefaultGravityScale;
 
-	MovementComponent->animinstance->setIsWallRidingClockWise(false);
-	MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
+	MovementComponent->animinstance->SetIsWallRidingClockWise(false);
+	MovementComponent->animinstance->SetIsWallRidingCounterClockWise(false);
 	
 }
 
@@ -70,14 +70,14 @@ void UWallrunState::OnTick(float DeltaTime)
 
 		if (hitPosition == EWallRunDirection::WALLRUN_CLOCKWISE)
 		{
-			MovementComponent->animinstance->setIsWallRidingClockWise(true);
-			MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
+			MovementComponent->animinstance->SetIsWallRidingClockWise(true);
+			MovementComponent->animinstance->SetIsWallRidingCounterClockWise(false);
 		}
 
 		else
 		{
-			MovementComponent->animinstance->setIsWallRidingCounterClockWise(true);
-			MovementComponent->animinstance->setIsWallRidingClockWise(false);
+			MovementComponent->animinstance->SetIsWallRidingCounterClockWise(true);
+			MovementComponent->animinstance->SetIsWallRidingClockWise(false);
 		}
 		currInitializeAnimationFrames++;
 	}
@@ -117,7 +117,7 @@ void UWallrunState::LaunchCharacter()
 
 	bIsLaunching = true;
 	LaunchVector = launchVec;
-	MovementComponent->animinstance->setIsDashing(true);
+	MovementComponent->animinstance->SetIsDashing(true);
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &UWallrunState::EndWallrun, MovementComponent->WallrunLaunchDuration);
 
 	OnWallrunFinish.Broadcast(timeOnWall, true);
@@ -159,7 +159,7 @@ void UWallrunState::EndWallrun()
 {
 	bIsLaunching = false;
 	LaunchVector = WallrunDirection = FVector::ZeroVector;
-	MovementComponent->animinstance->setIsDashing(false);
+	MovementComponent->animinstance->SetIsDashing(false);
 	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 

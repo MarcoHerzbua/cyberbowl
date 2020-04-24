@@ -55,7 +55,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 	MovementComponent->BrakingFrictionFactor = 0.f;
 	MovementComponent->StopMovementImmediately();
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(DashTimerHandle, this, &UDashState::StopDash, finalDashDuration);
-	MovementComponent->animinstance->setIsDashing(true);
+	MovementComponent->animinstance->SetIsDashing(true);
 }
 
 void UDashState::Deactivate()
@@ -67,7 +67,7 @@ void UDashState::Deactivate()
 	MovementComponent->GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
 	DashDirection = FVector::ZeroVector;
 	PreviousMovementMode = ECBMovementMode::CBMOVE_Running;
-	MovementComponent->animinstance->setIsDashing(false);
+	MovementComponent->animinstance->SetIsDashing(false);
 }
 
 void UDashState::OnTick(float DeltaTime)

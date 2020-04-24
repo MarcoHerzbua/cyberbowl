@@ -86,7 +86,8 @@ void UBoopComponent::StartBoop()
 
 		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		bBoopActive = true;
-		MovementComponent->animinstance->setIsBooping(true);
+		MovementComponent->animinstance->SetIsBooping(true);
+		MovementComponent->animinstance->SetBoopPlayRate(3.0f);
 	}
 
 }
@@ -121,7 +122,8 @@ void UBoopComponent::DeactivateBoopHitbox()
 		//TODO: fire event
 		BoopHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		bBoopActive = false;
-		MovementComponent->animinstance->setIsBooping(false);
+
+		MovementComponent->animinstance->SetIsBooping(false);
 	}
 }
 
@@ -149,6 +151,7 @@ void UBoopComponent::OnBoopCooldown()
 {
 	//TODO: fire event
 	bBoopOnCooldown = false;
+	
 }
 
 // Called every frame
