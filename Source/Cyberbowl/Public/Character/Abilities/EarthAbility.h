@@ -25,11 +25,14 @@ protected:
 	
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MinTargetDistance = 500.f;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//float MinTargetDistance = 500.f;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//float MaxTargetDistance = 3000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MaxTargetDistance = 3000.f;
+	float TargetDistance = 5000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TargetIndicatorRadius = 400.f;
@@ -43,24 +46,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PillarLifeSpan = 4.f;
 
-	UPROPERTY(BlueprintReadOnly)
-	FVector LeapTarget;
+	//UPROPERTY(BlueprintReadOnly)
+	//FVector LeapTarget;
+
+	//UPROPERTY(BlueprintReadOnly)
+	//FVector LeapStart;
 
 	UPROPERTY(BlueprintReadOnly)
-	FVector LeapStart;
+	FVector PillarSpawnPoint;
 
 	UPROPERTY()
 	bool bValidTarget;
-
-	AEarthpillar* pillar;
 
 	class AThirdPersonPlayerController* characterController;
 
 	void SpawnPillar();
 
 	class ACyberbowlCharacter* character;
-
-	float pillarHeigth;
 
 public:
 	UPROPERTY(BlueprintReadWrite)

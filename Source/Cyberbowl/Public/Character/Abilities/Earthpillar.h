@@ -47,12 +47,12 @@ public:
 	UFUNCTION()
 	virtual void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void SetCurrPlayerTeam(int playerTeam);
+	//void SetCurrPlayerTeam(int playerTeam);
 
-	void SetMaxLoweringPos(float pos);
+	//void SetMaxLoweringPos(float pos);
 
 	UFUNCTION(BlueprintCallable)
-	void InitializePillar(FVector launchTarget, float launchDuration, float launchHeight);
+	void InitializePillar(int playerTeam, float maxLoweringPos, float lifeSpan);
 	
 	UFUNCTION(BlueprintCallable)
 	void LaunchActor(AActor* actor);
@@ -74,20 +74,24 @@ protected:
 	UPROPERTY()
 	FTimerHandle LaunchTimerHandle;
 
-	UPROPERTY(BlueprintReadOnly)
-	AActor* LaunchedActor;
+	//UPROPERTY(BlueprintReadOnly)
+	//AActor* LaunchedActor;
 
-	UPROPERTY(BlueprintReadOnly)
-	FVector LaunchTarget;
+	//UPROPERTY(BlueprintReadOnly)
+	//FVector LaunchTarget;
 
-	UPROPERTY(BlueprintReadOnly)
-	FVector LaunchStart;
+	//UPROPERTY(BlueprintReadOnly)
+	//FVector LaunchStart;
 
-	UPROPERTY(BlueprintReadOnly)
-	float LaunchDuration;
+	//UPROPERTY(BlueprintReadOnly)
+	//float LaunchDuration;
 
+	//UPROPERTY(BlueprintReadOnly)
+	//float LaunchHeight;
+	
 	UPROPERTY(BlueprintReadOnly)
-	float LaunchHeight;
+	float LaunchCooldown;
+
 	
 	void TickLaunch();
 
