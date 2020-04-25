@@ -16,8 +16,6 @@ AFirewall::AFirewall()
 	box = CreateDefaultSubobject<UBoxComponent>(FName("FirewallBox"));
 	box->SetupAttachment(root);
 	box->SetBoxExtent(firewallColliderSize);
-
-	
 }
 
 // Called when the game starts or when spawned

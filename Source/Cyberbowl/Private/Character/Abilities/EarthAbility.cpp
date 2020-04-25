@@ -2,6 +2,8 @@
 
 
 #include "Character/Abilities/EarthAbility.h"
+
+#include "Character/Abilities/AbilityUtils.h"
 #include "Character/CyberbowlCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -52,48 +54,14 @@ void UEarthAbility::Targeting()
 	camViewRotator.Pitch = 0.f;
 	FVector end = actorLoc + camViewRotator.Vector() * TargetDistance;
 
-	FHitResult hitResult;
-	world->LineTraceSingleByProfile(hitResult, actorLoc, end, "AbilityTrace");
-
-	bValidTarget = true;
-	FVector floorTraceStart;
-	if(hitResult.bBlockingHit)
-	{
-		if(hitResult.GetComponent()->GetCollisionProfileName() == "StadiumWall")
-		{
-			//get a point a certain distant away from the wall
-			floorTraceStart = hitResult.ImpactPoint + hitResult.ImpactNormal * TargetIndicatorRadius;
-		}
-		else
-		{
-			bValidTarget = false;
-			UE_LOG(LogActor, Error, TEXT("EarthAbility: Error when tracing for pillar location."));
-			//return;
-		}
-	}
-	else
-	{
-		floorTraceStart = end;
-	}
-
-	FHitResult floorTrace;
-	world->LineTraceSingleByProfile(floorTrace, floorTraceStart, floorTraceStart + FVector::DownVector * 10000.f, "AbilityTrace");
-
-	if(floorTrace.bBlockingHit)
-	{
-		PillarSpawnPoint = floorTrace.ImpactPoint;
-	}
-	else
-	{
-		bValidTarget = false;
-		UE_LOG(LogActor, Error, TEXT("EarthAbility: Error when tracing for pillar location."));
-		//return;
-	}
+	bValidTarget = UAbilityUtils::FindTargetPoint(world, PillarSpawnPoint, actorLoc, end, TargetIndicatorRadius);
+	
 	if(bValidTarget)
 	{
 		DrawDebugCylinder(world, PillarSpawnPoint, PillarSpawnPoint + FVector::UpVector * 100.f, TargetIndicatorRadius, 12, FColor::Red, false, 0.01f, 0, 5);
 	}
 
+#pragma region Dynamic Targeting (old)
 	//bValidTarget = true;
 	//if (hitResult.bBlockingHit)
 	//{
@@ -146,7 +114,7 @@ void UEarthAbility::Targeting()
 	//		}
 	//	}
 	//}
-
+#pragma endregion 
 }
 
 void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -170,7 +138,7 @@ void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UEarthAbility::SpawnPillar()
 {
-	auto pillar = GetWorld()->SpawnActor<AEarthpillar>(earthClass, PillarSpawnPoint, FRotator());
+	auto pillar = GetWorld()->SpawnActor<AEarthpillar>(EarthPillarClass, PillarSpawnPoint, FRotator());
 
 	pillar->InitializePillar(characterController->currPlayerTeam, PillarSpawnPoint.Z, PillarLifeSpan);
 	//pillar->SetActorLocation(pillar->GetActorLocation() - FVector(0, pillar->GetPillarLocationZ(), 0));

@@ -46,6 +46,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PillarLifeSpan = 4.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AEarthpillar> EarthPillarClass;
 	//UPROPERTY(BlueprintReadOnly)
 	//FVector LeapTarget;
 
@@ -63,10 +65,6 @@ protected:
 	void SpawnPillar();
 
 	class ACyberbowlCharacter* character;
-
-public:
-	UPROPERTY(BlueprintReadWrite)
-	TSubclassOf<AEarthpillar> earthClass;
 };
 
 

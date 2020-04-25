@@ -7,6 +7,7 @@
 #include "Engine/World.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Camera/CameraComponent.h"
+#include "Character/Abilities/AbilityUtils.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Character/Abilities/CooldownComponent.h"
 #include "DrawDebugHelpers.h"
@@ -19,7 +20,6 @@ void UFireAbility::BeginPlay()
 	bValidTargetBoxSize = false;
 	boxScale = FVector(0.f);
 	fireWallLifeTime = 8.f;
-	
 }
 
 
@@ -32,9 +32,9 @@ void UFireAbility::Fire()
 		return;
 	}
 
-	AFirewall* firewall = GetWorld()->SpawnActor<AFirewall>(fireClass);
+	AFirewall* firewall = GetWorld()->SpawnActor<AFirewall>(FireWallClass);
 	
-	FVector boxPosition = fireWallPosition +FVector(0.f, 0.f, firewall->GetBoxExtent().Z);
+	FVector boxPosition = fireWallPosition + FVector(0.f, 0.f, firewall->GetBoxExtent().Z);
 	firewall->SetActorLocation(boxPosition);
 
 	auto rotation = character->GetCameraBoom()->GetTargetRotation();
@@ -48,7 +48,6 @@ void UFireAbility::Fire()
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
 	bValidTarget = false;
 	bValidTargetBoxSize = false;
-	
 }
 
 void UFireAbility::Targeting()
@@ -57,64 +56,23 @@ void UFireAbility::Targeting()
 
 	ACyberbowlCharacter* character = Cast<ACyberbowlCharacter>(GetOwner());
 	FVector actorLoc = character->GetActorLocation();
-	auto rotation = character->GetCameraBoom()->GetTargetRotation();
-	FRotator indicatorRotation = FRotator(0.f, rotation.Yaw + 90, 0.f);
-	FVector end = actorLoc + rotation.Vector() * targetingLength;
-
+	auto actorRot = character->GetCameraBoom()->GetTargetRotation();
+	//Set Pitch to zero cause we are only interested in the Yaw (Roll is always 0)
+	actorRot.Pitch = 0.f;
+	FRotator indicatorRotation = FRotator(0.f, actorRot.Yaw + 90, 0.f);
+	FVector end = actorLoc + actorRot.Vector() * TargetDistance;
 
 	if (!bValidTargetBoxSize)
 	{
-		AFirewall* dummyActor = GetWorld()->SpawnActor<AFirewall>(fireClass);
+		AFirewall* dummyActor = GetWorld()->SpawnActor<AFirewall>(FireWallClass);
 		boxScale = dummyActor->GetBoxExtent();
 		GetWorld()->DestroyActor(dummyActor);
+		bValidTargetBoxSize = true;
 	}
 
-	bValidTargetBoxSize = true;
-	
+	bValidTarget = UAbilityUtils::FindTargetPoint(world, fireWallPosition, actorLoc, end, 100.f);
 
-	
-	FHitResult hitResult;
-	world->LineTraceSingleByProfile(hitResult, actorLoc, end, "AbilityTrace");
-	DrawDebugBox(world, end, FVector(5.f), FColor::Red, false, 5, 0, 3);
-
-
-	if (hitResult.bBlockingHit)
-	{
-		fireWallPosition = hitResult.ImpactPoint;
-		bValidTarget = true;
-
-		if (hitResult.GetComponent()->GetCollisionProfileName() == "StadiumWall")
-		{
-
-			//get a point a certain distant away from the wall
-			FVector hitPointWithOffset = hitResult.ImpactPoint + hitResult.ImpactNormal * targetIndicatorRadius;
-
-			FHitResult floorTrace;
-			world->LineTraceSingleByProfile(floorTrace, hitPointWithOffset, hitPointWithOffset + FVector::DownVector * 10000.f, "AbilityTrace");
-
-			if (floorTrace.bBlockingHit)
-			{
-				bValidTarget = true;
-
-				fireWallPosition = floorTrace.ImpactPoint;
-			}
-
-		}
-	}
-	else
-	{
-		FHitResult floorTrace;
-		world->LineTraceSingleByProfile(floorTrace, end, end + FVector::DownVector * 10000.f, "AbilityTrace");
-
-		if (floorTrace.bBlockingHit)
-		{
-			float distanceToActor = (floorTrace.ImpactPoint - actorLoc).Size();
-			fireWallPosition = floorTrace.ImpactPoint;
-			bValidTarget = true;
-		}
-	}
-
-	DrawDebugBox(world, fireWallPosition, FVector(boxScale.X, boxScale.Y, 10), indicatorRotation.Quaternion(), FColor::Blue, false, 0.1f, 0, 5.f);
+	DrawDebugBox(world, fireWallPosition, FVector(boxScale.X, boxScale.Y, 10), indicatorRotation.Quaternion(), FColor::Blue, false, 0.01f, 0, 10.f);
 	
 }
 
