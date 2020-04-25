@@ -32,9 +32,7 @@ void UEarthAbility::Fire()
 		return;
 	}
 
-	//LeapStart = GetOwner()->GetActorLocation();
 	SpawnPillar();
-	//pillar->LaunchActor(GetOwner());
 	
 	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
@@ -91,6 +89,10 @@ void UEarthAbility::Targeting()
 		UE_LOG(LogActor, Error, TEXT("EarthAbility: Error when tracing for pillar location."));
 		//return;
 	}
+	if(bValidTarget)
+	{
+		DrawDebugCylinder(world, PillarSpawnPoint, PillarSpawnPoint + FVector::UpVector * 100.f, TargetIndicatorRadius, 12, FColor::Red, false, 0.01f, 0, 5);
+	}
 
 	//bValidTarget = true;
 	//if (hitResult.bBlockingHit)
@@ -145,10 +147,6 @@ void UEarthAbility::Targeting()
 	//	}
 	//}
 
-	if(bValidTarget)
-	{
-		DrawDebugCylinder(world, PillarSpawnPoint, PillarSpawnPoint + FVector::UpVector * 100.f, TargetIndicatorRadius, 12, FColor::Red, false, 0.01f, 0, 5);
-	}
 }
 
 void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

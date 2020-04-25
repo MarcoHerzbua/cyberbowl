@@ -174,6 +174,18 @@ void ACyberbowlCharacter::UnFreeze_Implementation()
 	CustomTimeDilation = DefaultTimeDilation;
 }
 
+void ACyberbowlCharacter::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical)
+{
+	auto moveCmp = GetCharacterMovement();
+	moveCmp->StopMovementImmediately();
+	moveCmp->DoJump(true);
+	moveCmp->Velocity = direction * forceHorizontal;
+	moveCmp->Velocity.Z = forceVertical;
+
+	auto CBMoveCmp = Cast<UCBCharacterMovementComponent>(moveCmp);
+	CBMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+}
+
 void ACyberbowlCharacter::BeginPlay()
 {
 	Super::BeginPlay();

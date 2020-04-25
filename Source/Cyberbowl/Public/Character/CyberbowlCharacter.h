@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Actors/IFreezeable.h"
+#include "Actors/ILaunchable.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Character/Abilities/AbilityBase.h"
@@ -18,7 +19,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunEnd, float, timeOnWall, bool, launchedAway);
 
 UCLASS(config=Game)
-class ACyberbowlCharacter : public ACharacter, public IFreezeable
+class ACyberbowlCharacter : public ACharacter, public IFreezeable, public ILaunchable
 {
 	GENERATED_BODY()
 
@@ -136,6 +137,8 @@ public:
 	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
 	void UnFreeze_Implementation() override;
 
+	void Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical) override;
+	
 	void BeginPlay() override;
 	//UFUNCTION(BlueprintCallable, Category = "CyberbowlCharacter")
 	//void ToggleAbilities(bool enable);

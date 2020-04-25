@@ -113,3 +113,10 @@ void APlayBall::UnFreeze_Implementation()
 	OnBallUnfrozen.Broadcast();
 }
 
+void APlayBall::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical)
+{
+	FVector newVel = direction * forceHorizontal;
+	newVel.Z = forceVertical;
+	BallStaticMesh->AddImpulse(newVel, NAME_None, true);
+}
+

@@ -30,14 +30,23 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* root;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float maxRise = 200;
+	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
+	float MaxRise = 200.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float riseTime = 10.f;
+	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
+	float RiseTime = 10.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float loweringTime = 10.f;
+	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
+	float LoweringTime = 10.f;
+	
+	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
+	float LaunchForceVertical = 8000.f;
+	
+	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
+	float LaunchForceHorizontal = 12000.f;
+	
+	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
+	float LaunchCooldown = 0.2f;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -50,13 +59,11 @@ public:
 	//void SetCurrPlayerTeam(int playerTeam);
 
 	//void SetMaxLoweringPos(float pos);
+	
 
 	UFUNCTION(BlueprintCallable)
 	void InitializePillar(int playerTeam, float maxLoweringPos, float lifeSpan);
 	
-	UFUNCTION(BlueprintCallable)
-	void LaunchActor(AActor* actor);
-
 	float GetPillarLocationZ();
 	
 protected:
@@ -67,7 +74,6 @@ protected:
 
 	bool bIsRising;
 	bool bIsLowering;
-	bool bAdjustRotation;
 	int currPlayerTeam;
 	float maxLowering;
 
@@ -88,9 +94,6 @@ protected:
 
 	//UPROPERTY(BlueprintReadOnly)
 	//float LaunchHeight;
-	
-	UPROPERTY(BlueprintReadOnly)
-	float LaunchCooldown;
 
 	
 	void TickLaunch();

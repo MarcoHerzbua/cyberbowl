@@ -41,13 +41,13 @@ void AEarthpillar::Tick(float DeltaTime)
 
 	float val = GetActorLocation().Z;
 
-	if ((GetActorLocation().Z) >= maxRise)
+	if ((GetActorLocation().Z) >= MaxRise)
 	{
 		bIsRising = false;
 		triggerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	
-	if (bIsRising && GetActorLocation().Z <= maxRise)
+	if (bIsRising && GetActorLocation().Z <= MaxRise)
 	{
 		Rising(DeltaTime);
 	}
@@ -65,33 +65,22 @@ void AEarthpillar::Tick(float DeltaTime)
 
 void AEarthpillar::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ACyberbowlCharacter* overlappingActor = Cast<ACyberbowlCharacter>(OtherActor);
-	if(overlappingActor)
+	if(OtherActor->GetClass()->ImplementsInterface(ULaunchable::StaticClass()) && !GetWorld()->GetTimerManager().IsTimerActive(LaunchTimerHandle))
 	{
-		AThirdPersonPlayerController* controller = Cast<AThirdPersonPlayerController>(overlappingActor->GetController());
-		if (controller->currPlayerTeam == currPlayerTeam)
-		{
-			LaunchActor(OtherActor);
-			bAdjustRotation = false;
-			//UE_LOG(LogTemp, Warning, TEXT("I'am on the pillar and a Character :D"));
-		}
-	}
-	else
-	{
+		GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &AEarthpillar::EndLaunch, LaunchCooldown/* - LaunchCooldown / 10.f*/);
+		ILaunchable::Execute_Launch(OtherActor, OtherActor->GetVelocity().GetSafeNormal(), LaunchForceHorizontal, LaunchForceVertical);
 		bIsRising = true;
-		//LaunchActor(OtherActor);
-		//UE_LOG(LogTemp, Warning, TEXT("I'am on the pillar and a Ball :D"));
 	}
 }
 
 void AEarthpillar::Rising(float DeltaTime)
 {
-	SetActorLocation(GetActorLocation() + GetActorUpVector() * FVector(riseTime * DeltaTime));
+	SetActorLocation(GetActorLocation() + GetActorUpVector() * FVector(RiseTime * DeltaTime));
 }
 
 void AEarthpillar::Lowering(float DeltaTime)
 {
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(loweringTime * DeltaTime));
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(LoweringTime * DeltaTime));
 }
 
 void AEarthpillar::TickLaunch()
@@ -130,14 +119,6 @@ void AEarthpillar::EndLaunch()
 	//LaunchedActor = nullptr;
 }
 
-//void AEarthpillar::SetCurrPlayerTeam(int playerTeam)
-//{
-//}
-//
-//void AEarthpillar::SetMaxLoweringPos(float pos)
-//{
-//}
-
 void AEarthpillar::InitializePillar(int playerTeam, float maxLoweringPos, float lifeSpan)
 {
 	currPlayerTeam = playerTeam;
@@ -146,30 +127,6 @@ void AEarthpillar::InitializePillar(int playerTeam, float maxLoweringPos, float 
 	//LaunchTarget = launchTarget;
 	//LaunchCooldown = launchDuration;
 	//LaunchHeight = launchHeight;
-}
-
-void AEarthpillar::LaunchActor(AActor* actor)
-{
-	if (!GetWorld()->GetTimerManager().IsTimerActive(LaunchTimerHandle))
-	{
-		FVector velocityDir = actor->GetVelocity().GetSafeNormal();
-
-		if(auto ch = Cast<ACharacter>(actor))
-		{
-			auto moveCmp = ch->GetCharacterMovement();
-			moveCmp->StopMovementImmediately();
-			moveCmp->DoJump(true);
-			moveCmp->Velocity = velocityDir * 15000.f;
-			moveCmp->Velocity.Z = 7500.f;
-		}
-		
-		bIsRising = true;
-		GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &AEarthpillar::EndLaunch, LaunchCooldown/* - LaunchCooldown / 10.f*/);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("EarthPillar: Another Actor is currently launching"));
-	}
 }
 
 float AEarthpillar::GetPillarLocationZ()
