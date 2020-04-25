@@ -24,13 +24,13 @@ public:
 	UFireAbility() = default;
 
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	float fireWallLifeTime;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	float TargetDistance;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<AFirewall> FireWallClass;
 
 private:

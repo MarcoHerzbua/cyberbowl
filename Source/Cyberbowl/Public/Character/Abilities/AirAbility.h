@@ -43,18 +43,21 @@ protected:
 	UFUNCTION()
 	void DestroyTornado();
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	float grabRadiusMeters;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	float succSpeed;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	float grabDurationSeconds;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	float tornadoDuration;
 	
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* tornadoEffect;
+
 	UPROPERTY()
 	APlayBall* ball;
 
@@ -79,11 +82,6 @@ protected:
 	UPROPERTY()
 	ACyberbowlCharacter* character;
 
-	UPROPERTY(BlueprintReadWrite)
-	UNiagaraSystem* tornadoEffect;
-
 	UPROPERTY(BlueprintReadOnly)
 	UNiagaraComponent* tornadoComponent;
-
-	
 };

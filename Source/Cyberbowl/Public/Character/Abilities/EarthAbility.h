@@ -38,12 +38,6 @@ protected:
 	float TargetIndicatorRadius = 400.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LeapDuration = 2.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LeapHeight = 2000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PillarLifeSpan = 4.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
