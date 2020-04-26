@@ -23,7 +23,6 @@ UBoopComponent::UBoopComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	//BoopHitbox = CreateDefaultSubobject<UBoxComponent>(FName("BoopHitbox"));
 }
 
 
@@ -34,11 +33,6 @@ void UBoopComponent::BeginPlay()
 
 	MovementComponent = GetOwner()->FindComponentByClass<UCBCharacterMovementComponent>();
 
-	//BoopHitbox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	//BoopHitbox->SetWorldLocationAndRotation(Owner->GetActorLocation() + FVector(Range / 2.f,0,0), Owner->GetActorRotation());
-	////BoopHitbox->SetupAttachment(this->Owner->GetRootComponent());
-	//BoopHitbox->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-	//BoopHitbox->SetBoxExtent(FVector(Range, BoxWidth, BoxHeight));
 	BoopSpringarm = Cast<USpringArmComponent>(GetOwner()->GetComponentsByTag(USpringArmComponent::StaticClass(), "BoopSpringarm").Last());
 	BoopEffectSpawnLocation = Cast<USceneComponent>(GetOwner()->GetComponentsByTag(USceneComponent::StaticClass(), "BoopEffectSpawnLocation").Last());
 	BoopHitbox = Cast<UBoxComponent>(GetOwner()->GetComponentsByTag(UBoxComponent::StaticClass(), "BoopHitbox").Last());
@@ -81,7 +75,7 @@ void UBoopComponent::StartBoop()
 	{
 		owner->GetWorld()->GetTimerManager().SetTimer(BoopDurationHandle, this, &UBoopComponent::EndBoop, BoopDuration);
 
-		//The animation is 1 second long with exactly 30 frames... this is hardcoded for now for convenience
+		//TODO: The animation is 1 second long with exactly 30 frames... this is hardcoded for now for convenience
 		auto animPlayRate = 1.f / 30.f * (30.f / BoopDuration);
 		
 		bBoopActive = true;
@@ -107,7 +101,6 @@ void UBoopComponent::EndBoop()
 	
 	if (BoopNiagaraComponent)
 	{
-		//BoopNiagaraComponent->Deactivate();
 		BoopNiagaraComponent->DestroyComponent();
 		BoopNiagaraComponent = nullptr;
 	}
@@ -149,7 +142,7 @@ void UBoopComponent::SpawnBoopEffect()
 {
 	if(bBoopActive)
 	{
-		//effects needs to be rotated 90 degrees since it is not oriented the right way
+		//effect needs to be rotated 90 degrees since it is not oriented the right way
 		FRotator spawnRot = FRotator(-90, 0, 0) + MovementComponent->GetPawnOwner()->GetControlRotation();
 		
 		BoopNiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(BoopEffect, GetOwner()->GetRootComponent(), NAME_None, BoopEffectSpawnLocation->GetComponentLocation(), spawnRot, EAttachLocation::KeepWorldPosition, false);
