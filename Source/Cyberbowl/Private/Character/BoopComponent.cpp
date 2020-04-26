@@ -200,16 +200,6 @@ void UBoopComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		PlayerController = pc;
 	}
 
-	//does not work in BeginPlay(), same as above
-	if (!InputComponent)
-	{
-		InputComponent = GetOwner()->InputComponent;
-		if (InputComponent)
-		{
-			InputComponent->BindAction("Boop", IE_Pressed, this, &UBoopComponent::StartBoop);
-		}
-	}
-
 	AdjustBoopTransforms(DeltaTime);
 }
 

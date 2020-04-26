@@ -38,7 +38,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
 	FOnBoopStarted OnBoopStarted;
-	
+
+	UFUNCTION(BlueprintCallable, Category = "BoopComponent")
+	void StartBoop();
+
 protected:
 	UInputComponent* InputComponent;
 	APlayerController* PlayerController;
@@ -64,8 +67,6 @@ protected:
 	
 	virtual void BeginPlay() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	void StartBoop();
 
 	void EndBoop();
 	

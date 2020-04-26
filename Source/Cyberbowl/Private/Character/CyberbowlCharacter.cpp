@@ -61,7 +61,6 @@ ACyberbowlCharacter::ACyberbowlCharacter(const FObjectInitializer& ObjectInitial
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 	//
@@ -89,6 +88,8 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("MenuEnter", IE_Pressed, this, &ACyberbowlCharacter::CallMenuEnter);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ACyberbowlCharacter::Dash);
+	PlayerInputComponent->BindAction("Boop", IE_Pressed, this, &ACyberbowlCharacter::Boop);
+
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACyberbowlCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACyberbowlCharacter::MoveRight);
@@ -189,7 +190,12 @@ void ACyberbowlCharacter::Launch_Implementation(FVector direction, float forceHo
 void ACyberbowlCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	BoopComponent = FindComponentByClass<UBoopComponent>();
+	if(!BoopComponent)
+	{
+		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: BoopComponent not found"));
+	}
 	auto movementComp = Cast<UCBCharacterMovementComponent>(GetComponentByClass(UCBCharacterMovementComponent::StaticClass()));
 	movementComp->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
 	movementComp->OnWallRunFinished.AddDynamic(this, &ACyberbowlCharacter::CallOnWallRunEnd);
@@ -240,6 +246,12 @@ void ACyberbowlCharacter::Dash()
 
 		OnDash.Broadcast();
 	}
+}
+
+void ACyberbowlCharacter::Boop()
+{
+	BoopComponent->StartBoop();
+	OnBoop.Broadcast();
 }
 
 void ACyberbowlCharacter::AbilityPressed()

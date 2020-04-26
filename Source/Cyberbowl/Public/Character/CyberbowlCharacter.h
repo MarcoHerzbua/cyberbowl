@@ -16,6 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJump);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoop);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunEnd, float, timeOnWall, bool, launchedAway);
 
 UCLASS(config=Game)
@@ -30,10 +31,14 @@ class ACyberbowlCharacter : public ACharacter, public IFreezeable, public ILaunc
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
 public:
 	ACyberbowlCharacter();
 	ACyberbowlCharacter(const class FObjectInitializer& ObjectInitializer);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
+	class UBoopComponent* BoopComponent;
+	
 	UFUNCTION()
 	void CallMenuEnter();
 
@@ -63,6 +68,7 @@ public:
 	UPROPERTY()
 	float DefaultTimeDilation;
 
+#pragma region EventDispatchers
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnBallCamToggled OnToggledBallCam;
 
@@ -80,11 +86,18 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnWallrunEnd OnWallrunEnd;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnBoop OnBoop;
+#pragma endregion
 	
 protected:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallErrorFeedback forceFeedback;
 
+
+#pragma region Movement/Camera/Abilities
+	
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
@@ -102,8 +115,12 @@ protected:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
-
+	
+	void Jump() override;
+	
 	void Dash();
+
+	void Boop();
 
 	void AbilityPressed();
 
@@ -117,13 +134,12 @@ protected:
 
 	UFUNCTION()
 	void CallOnWallRunEnd(float timeOnWall, bool launchedAway);
-	
-protected:
+
+#pragma endregion 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
-	void Jump() override;
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -131,13 +147,15 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
+#pragma region Interfaces
+	
 	void Freeze_Implementation(AActor* instigtr) override;
 
-	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
 	void UnFreeze_Implementation() override;
 
 	void Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical) override;
+
+#pragma endregion 
 	
 	void BeginPlay() override;
 	//UFUNCTION(BlueprintCallable, Category = "CyberbowlCharacter")
