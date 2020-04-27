@@ -38,7 +38,7 @@ void AWallrunLecture::SetupTasks()
 void AWallrunLecture::OnWallrunEnd(float timeOnWall, bool launchedAway)
 {
 	UKismetSystemLibrary::PrintString(this, std::to_string(timeOnWall).c_str());
-	if (launchedAway && timeOnWall >= 2.f)
+	if (launchedAway && timeOnWall >= 1.f)
 	{
 		AdvanceIfCurrentTask(taskWallrunLaunch, 0.5f);
 	}
