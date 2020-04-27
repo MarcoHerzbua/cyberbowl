@@ -34,7 +34,7 @@ void AAirAbilityLecture::Exit()
 {
 	Super::Exit();
 
-	ball->StopBall();
+	//ball->StopBall();
 }
 
 void AAirAbilityLecture::BeginPlay()
