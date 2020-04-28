@@ -111,15 +111,8 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 
 void ACyberbowlCharacter::Jump()
 {
-	auto CBCharMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
-	if(!CBCharMoveCmp)
-	{
-		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CBCharacterMovementCmp not found"));
-		return;
-	}
-
-	if (CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_DoubleJump
-		|| CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+	if (CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_DoubleJump
+		|| CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
 	{
 		return;
 	}
@@ -127,14 +120,14 @@ void ACyberbowlCharacter::Jump()
 	Super::Jump();
 	OnJump.Broadcast();
 
-	if(CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
+	if(CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
 	{
-		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
+		CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
 		OnDoubleJump.Broadcast();
 		return;
 	}
 	
-	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+	CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 
 void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
@@ -152,12 +145,10 @@ void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
 		}
 	}
 
-	auto cbMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
-
 	//Stop Movement & disable Input
-	cbMoveCmp->StopMovementImmediately();
-	DefaultGravityScale = cbMoveCmp->GravityScale;
-	cbMoveCmp->GravityScale = 0.f;
+	CBCharacterMoveComponent->StopMovementImmediately();
+	DefaultGravityScale = CBCharacterMoveComponent->GravityScale;
+	CBCharacterMoveComponent->GravityScale = 0.f;
 	DisableInput(Cast<APlayerController>(Controller));
 	//ToggleAbilities(false);
 	
@@ -168,8 +159,7 @@ void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
 
 void ACyberbowlCharacter::UnFreeze_Implementation()
 {
-	auto cbMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
-	cbMoveCmp->GravityScale = DefaultGravityScale;
+	CBCharacterMoveComponent->GravityScale = DefaultGravityScale;
 	EnableInput(Cast<APlayerController>(Controller));
 	//ToggleAbilities(true);
 	CustomTimeDilation = DefaultTimeDilation;
@@ -177,14 +167,12 @@ void ACyberbowlCharacter::UnFreeze_Implementation()
 
 void ACyberbowlCharacter::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical)
 {
-	auto moveCmp = GetCharacterMovement();
-	moveCmp->StopMovementImmediately();
-	moveCmp->DoJump(true);
-	moveCmp->Velocity = direction * forceHorizontal;
-	moveCmp->Velocity.Z = forceVertical;
+	CBCharacterMoveComponent->StopMovementImmediately();
+	CBCharacterMoveComponent->DoJump(true);
+	CBCharacterMoveComponent->Velocity = direction * forceHorizontal;
+	CBCharacterMoveComponent->Velocity.Z = forceVertical;
 
-	auto CBMoveCmp = Cast<UCBCharacterMovementComponent>(moveCmp);
-	CBMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+	CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 
 void ACyberbowlCharacter::BeginPlay()
@@ -192,13 +180,15 @@ void ACyberbowlCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	BoopComponent = FindComponentByClass<UBoopComponent>();
-	if(!BoopComponent)
+	CBCharacterMoveComponent = FindComponentByClass<UCBCharacterMovementComponent>();
+	if(!BoopComponent || !CBCharacterMoveComponent)
 	{
-		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: BoopComponent not found"));
+		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: Vital Components not set in character blueprint! (BoopComponent, CBCharacterMovementComponent)"));
 	}
-	auto movementComp = Cast<UCBCharacterMovementComponent>(GetComponentByClass(UCBCharacterMovementComponent::StaticClass()));
-	movementComp->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
-	movementComp->OnWallRunFinished.AddDynamic(this, &ACyberbowlCharacter::CallOnWallRunEnd);
+	{
+		CBCharacterMoveComponent->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
+		CBCharacterMoveComponent->OnWallRunFinished.AddDynamic(this, &ACyberbowlCharacter::CallOnWallRunEnd);
+	}
 }
 
 //DOES NOT deactivate the abilities
@@ -221,13 +211,6 @@ void ACyberbowlCharacter::BeginPlay()
 
 void ACyberbowlCharacter::Dash()
 {
-	auto CBCharMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
-	if (!CBCharMoveCmp)
-	{
-		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CBCharacterMovementCmp not found"));
-		return;
-	}
-
 	auto cooldownComponent = FindComponentByClass<UCooldownComponent>();
 	if (!cooldownComponent)
 	{
@@ -241,7 +224,7 @@ void ACyberbowlCharacter::Dash()
 	
 	if(cooldownComponent->IsDashReady() && !bIsTargetingAbility)
 	{
-		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
+		CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
 		cooldownComponent->StartCooldown("Dash");
 
 		OnDash.Broadcast();
@@ -250,9 +233,7 @@ void ACyberbowlCharacter::Dash()
 
 void ACyberbowlCharacter::Boop()
 {
-	auto CBMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
-
-	if(CBMoveCmp->GetCBMovementMode() != ECBMovementMode::CBMOVE_Dash)
+	if(CBCharacterMoveComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Dash)
 	{
 		BoopComponent->StartBoop();
 		OnBoop.Broadcast();

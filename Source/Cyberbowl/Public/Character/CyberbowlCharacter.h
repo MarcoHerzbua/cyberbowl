@@ -36,6 +36,10 @@ public:
 	ACyberbowlCharacter();
 	ACyberbowlCharacter(const class FObjectInitializer& ObjectInitializer);
 
+	//Custom Cyberbowl Character MovementComponent
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
+	class UCBCharacterMovementComponent* CBCharacterMoveComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
 	class UBoopComponent* BoopComponent;
 	
