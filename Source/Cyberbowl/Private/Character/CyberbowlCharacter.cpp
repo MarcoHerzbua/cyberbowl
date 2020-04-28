@@ -250,8 +250,13 @@ void ACyberbowlCharacter::Dash()
 
 void ACyberbowlCharacter::Boop()
 {
-	BoopComponent->StartBoop();
-	OnBoop.Broadcast();
+	auto CBMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
+
+	if(CBMoveCmp->GetCBMovementMode() != ECBMovementMode::CBMOVE_Dash)
+	{
+		BoopComponent->StartBoop();
+		OnBoop.Broadcast();
+	}
 }
 
 void ACyberbowlCharacter::AbilityPressed()

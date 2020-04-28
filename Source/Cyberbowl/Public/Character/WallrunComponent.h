@@ -38,6 +38,10 @@ protected:
 	UFUNCTION()
 	void EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	//This function calls EndWallrun without any collision parameters
+	UFUNCTION()
+	void ForceEndWallrun();
+
 	UPROPERTY(BlueprintAssignable, Category = "WallrunComponent")
 	FOnWallrunStart OnWallrunStart;
 public:	
