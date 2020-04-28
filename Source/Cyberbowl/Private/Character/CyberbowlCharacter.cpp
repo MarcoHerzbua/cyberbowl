@@ -236,7 +236,6 @@ void ACyberbowlCharacter::Boop()
 	if(CBCharacterMoveComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Dash)
 	{
 		BoopComponent->StartBoop();
-		OnBoop.Broadcast();
 	}
 }
 

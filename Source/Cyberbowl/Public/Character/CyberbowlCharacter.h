@@ -91,8 +91,6 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnWallrunEnd OnWallrunEnd;
 
-	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnBoop OnBoop;
 #pragma endregion
 	
 protected:
