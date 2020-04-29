@@ -66,6 +66,7 @@ void UCBCharacterMovementComponent::BeginPlay()
     if (animinstance)
     {
         animinstance->SetDashPlayRate(DashDuration);
+        animinstance->SetDoubleJumpPlayRate(DoubleJumpDuration);
     }
 }
 

@@ -41,6 +41,12 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		bool bisInAir;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		bool bIsDoubleJumping;
+
+		UPROPERTY(editAnywhere, BlueprintReadWrite)
+		float doubleJumpPlayRate = 1.0f;
+
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		bool bisIsWallRidingCounterClockWise;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
@@ -67,6 +73,8 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		void SetDashPlayRate(float playRate);
 		void SetIsBooping(bool bBooping);
 		void SetBoopPlayRate(float playRate);
+		void SetIsDoubleJumping(bool bDoubleJump);
+		void SetDoubleJumpPlayRate(float playRate);
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		class APawn* pawn;

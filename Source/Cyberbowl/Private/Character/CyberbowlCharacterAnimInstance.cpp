@@ -115,3 +115,16 @@ void UCyberbowlCharacterAnimInstance::SetBoopPlayRate(float playRate)
 {
 	boopPlayRate = playRate;
 }
+
+void UCyberbowlCharacterAnimInstance::SetIsDoubleJumping(bool bDoubleJump)
+{
+	bIsDoubleJumping = bDoubleJump;
+}
+
+void UCyberbowlCharacterAnimInstance::SetDoubleJumpPlayRate(float playRate)
+{
+	float playratePerFramesPerSecond = 0.56f / 17.f;
+	float playduration = 17.f / playRate;
+	doubleJumpPlayRate = playduration * playratePerFramesPerSecond;
+
+}
