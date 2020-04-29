@@ -34,17 +34,28 @@ void UCBCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick Ti
     MovementStates[CBMovementMode]->OnTick(DeltaTime);
 }
 
+void UCBCharacterMovementComponent::CallOnWallRunFinished(float timeOnWall, bool launchedAway)
+{
+    OnWallRunFinished.Broadcast(timeOnWall, launchedAway);
+}
+
 void UCBCharacterMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
     CBMovementMode = ECBMovementMode::CBMOVE_Running;
-	
+
     MovementStates.Add(ECBMovementMode::CBMOVE_Running, NewObject<UBaseMovementState>());
-    MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, NewObject<UWallrunState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_Jump, NewObject<UJumpState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_DoubleJump, NewObject<UDoubleJumpState>());
-    MovementStates.Add(ECBMovementMode::CBMOVE_Dash, NewObject<UDashState>());
+
+    auto dashState = NewObject<UDashState>();
+    dashState->OnUpDash.AddDynamic(this, &UCBCharacterMovementComponent::CallOnVerticalDash);
+    MovementStates.Add(ECBMovementMode::CBMOVE_Dash, dashState);
+
+    auto wallrunState = NewObject<UWallrunState>();
+    wallrunState->OnWallrunFinish.AddDynamic(this, &UCBCharacterMovementComponent::CallOnWallRunFinished);
+    MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, wallrunState);
 
 	for(auto state : MovementStates)
 	{
@@ -54,7 +65,7 @@ void UCBCharacterMovementComponent::BeginPlay()
     animinstance = Cast<UCyberbowlCharacterAnimInstance>(GetOwner()->FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance());
     if (animinstance)
     {
-        animinstance->setDashPlayRate(DashDuration);
+        animinstance->SetDashPlayRate(DashDuration);
     }
 }
 
@@ -175,4 +186,9 @@ void UCBCharacterMovementComponent::PhysWallrun(float deltaTime, int32 Iteration
         Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
     }
 
+}
+
+void UCBCharacterMovementComponent::CallOnVerticalDash()
+{
+    OnVertDash.Broadcast();
 }

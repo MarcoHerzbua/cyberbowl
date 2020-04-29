@@ -2,6 +2,7 @@
 
 
 #include "TutorialLectures/OutroLecture.h"
+#include "PlayerController/TutorialPlayerController.h"
 
 void AOutroLecture::Tick(float DeltaTime)
 {
@@ -21,4 +22,14 @@ void AOutroLecture::Exit()
 void AOutroLecture::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AOutroLecture::SetupTasks()
+{
+	lectureTasks.Enqueue(taskPressedContinue);
+}
+
+void AOutroLecture::OnPressedContinue()
+{
+	AdvanceIfCurrentTask(taskPressedContinue);
 }

@@ -33,7 +33,7 @@ void UAirAbility::BeginPlay()
 	ballLocationSpringArm = Cast<USpringArmComponent>(character->GetComponentsByTag(USpringArmComponent::StaticClass(), "BallLocationArm").Last());
 	ballPulledAttachComponent = Cast<USceneComponent>(character->GetComponentsByTag(USceneComponent::StaticClass(), "TornadoBallLocation").Last());
 
-	ball->OnBallBooped.AddDynamic(this, &UAirAbility::ExitGrabMode);
+	ball->OnBallBooped.AddDynamic(this, &UAirAbility::ExitGrabModeByPush);
 }
 
 void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -104,6 +104,17 @@ void UAirAbility::ConvertMetersToUnrealUnits()
 {
 	// Conversion from meters to cm, as unreal functions generally output centimeters, but meters is easier for game design tweaks
 	grabRadiusMeters *= 100.f;
+}
+
+void UAirAbility::ExitGrabModeByPush()
+{
+	if (!bIsInGrabMode)
+	{
+		return;
+	}
+	
+	ExitGrabMode();
+	OnGrabModeExitByPush.Broadcast();
 }
 
 void UAirAbility::ExitGrabMode()

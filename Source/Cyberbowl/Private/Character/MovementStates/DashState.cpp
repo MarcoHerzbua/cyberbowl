@@ -19,6 +19,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 	bKeepMomentum = true;
 	float forwardAxisInput = InputComponent->GetAxisValue("MoveForward");
 	float rightAxisInput = InputComponent->GetAxisValue("MoveRight");
+	
 	FVector axisInput = FVector(forwardAxisInput, rightAxisInput, 0.f);
 	FRotator viewRotation = MovementComponent->GetPawnOwner()->GetControlRotation();
 
@@ -35,6 +36,8 @@ void UDashState::Activate(ECBMovementMode previousMode)
 
 		//FIX: This is needed, otherwise character will not dash upwards when standing still on ground
 		MovementComponent->DoJump(false);
+
+		OnUpDash.Broadcast();
 	}
 	else if (MovementComponent->DashMomentumStopRange.Contains(FMath::Abs(viewRotation.Yaw - axisInputRotation.Yaw)))
 	{
@@ -52,7 +55,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 	MovementComponent->BrakingFrictionFactor = 0.f;
 	MovementComponent->StopMovementImmediately();
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(DashTimerHandle, this, &UDashState::StopDash, finalDashDuration);
-	MovementComponent->animinstance->setIsDashing(true);
+	MovementComponent->animinstance->SetIsDashing(true);
 }
 
 void UDashState::Deactivate()
@@ -64,7 +67,7 @@ void UDashState::Deactivate()
 	MovementComponent->GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
 	DashDirection = FVector::ZeroVector;
 	PreviousMovementMode = ECBMovementMode::CBMOVE_Running;
-	MovementComponent->animinstance->setIsDashing(false);
+	MovementComponent->animinstance->SetIsDashing(false);
 }
 
 void UDashState::OnTick(float DeltaTime)

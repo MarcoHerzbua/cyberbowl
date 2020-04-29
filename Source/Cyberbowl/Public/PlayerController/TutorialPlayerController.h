@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include "Character/CBCharacterMovementComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "TutorialPlayerController.generated.h"
+
+class ACyberbowlCharacter;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAdvanceTutorial);
 
@@ -16,10 +19,25 @@ class CYBERBOWL_API ATutorialPlayerController : public APlayerController
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnAdvanceTutorial OnAdvanceTutorial;
+
+	ACyberbowlCharacter* SwitchCharacterClass(TSubclassOf<ACyberbowlCharacter> newCharacterClass);
+
+	UPROPERTY(BlueprintReadOnly)
+	ECBCharacterType currPlayerType;
 	
 protected:
 	void SetupInputComponent() override;
 
 	UFUNCTION()
 	void CallOnAdvanceTutorial();
+	void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ACyberbowlCharacter> defaultCharacterClass;
+	
+	UPROPERTY(Editanywhere)
+	TSubclassOf<UUserWidget> baseHudClass;
+
+	UPROPERTY()
+	UUserWidget* currentHud;
 };

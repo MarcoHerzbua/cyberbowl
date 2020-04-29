@@ -24,18 +24,14 @@ public:
 	UFireAbility() = default;
 
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
 	float fireWallLifeTime;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float targetingLength;
+	UPROPERTY(EditAnywhere)
+	float TargetDistance;
 
-	UPROPERTY(BlueprintReadWrite)
-	TSubclassOf<AFirewall> fireClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float targetIndicatorRadius = 400.f;
-
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AFirewall> FireWallClass;
 
 private:
 
@@ -47,7 +43,6 @@ private:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-private:
 	UCameraComponent* camera;
 	FVector fireWallPosition;
 	bool bValidTarget;

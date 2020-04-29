@@ -4,6 +4,7 @@
 #include "Character/Abilities/IceAbility.h"
 
 #include "Actors/IFreezeable.h"
+#include "Actors/PlayBall.h"
 #include "Character/Abilities/CooldownComponent.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Pawn.h"
@@ -16,6 +17,7 @@
 
 void UIceAbility::Fire()
 {
+	OnAbilityCasted.Broadcast();
 	float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
 	float coneRadius = ConeLength * FMath::Tan(ConeAngle) / 2.f;
 	APawn* ownerAsPawn = Cast<APawn>(GetOwner());

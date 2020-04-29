@@ -39,8 +39,8 @@ void UWallrunState::Deactivate()
 
 	MovementComponent->GravityScale = DefaultGravityScale;
 
-	MovementComponent->animinstance->setIsWallRidingClockWise(false);
-	MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
+	MovementComponent->animinstance->SetIsWallRidingClockWise(false);
+	MovementComponent->animinstance->SetIsWallRidingCounterClockWise(false);
 	
 }
 
@@ -58,7 +58,8 @@ void UWallrunState::OnTick(float DeltaTime)
 	}
 	else
 	{
-		MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);		
+		MovementComponent->Velocity = WallrunDirection * (MovementComponent->MaxAcceleration * MovementComponent->WallrunSpeedModifier);
+		timeOnWall += DeltaTime;
 	}
 	
 	//More then one Tick is needed to finalize the WallRunDirection, therefore the frist 5 Ticks are used to correct the Animation.
@@ -69,14 +70,14 @@ void UWallrunState::OnTick(float DeltaTime)
 
 		if (hitPosition == EWallRunDirection::WALLRUN_CLOCKWISE)
 		{
-			MovementComponent->animinstance->setIsWallRidingClockWise(true);
-			MovementComponent->animinstance->setIsWallRidingCounterClockWise(false);
+			MovementComponent->animinstance->SetIsWallRidingClockWise(true);
+			MovementComponent->animinstance->SetIsWallRidingCounterClockWise(false);
 		}
 
 		else
 		{
-			MovementComponent->animinstance->setIsWallRidingCounterClockWise(true);
-			MovementComponent->animinstance->setIsWallRidingClockWise(false);
+			MovementComponent->animinstance->SetIsWallRidingCounterClockWise(true);
+			MovementComponent->animinstance->SetIsWallRidingClockWise(false);
 		}
 		currInitializeAnimationFrames++;
 	}
@@ -116,8 +117,12 @@ void UWallrunState::LaunchCharacter()
 
 	bIsLaunching = true;
 	LaunchVector = launchVec;
-	MovementComponent->animinstance->setIsDashing(true);
+	MovementComponent->animinstance->SetIsDashing(true);
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &UWallrunState::EndWallrun, MovementComponent->WallrunLaunchDuration);
+
+	OnWallrunFinish.Broadcast(timeOnWall, true);
+	timeOnWall = 0.f;
+	
 	//MovementComponent->GetCharacterOwner()->LaunchCharacter(launchVec, true, true);
 
 	//MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
@@ -139,13 +144,11 @@ EWallRunDirection UWallrunState::HitDirection(FHitResult& hitResult)
 	if (hit1.bBlockingHit)
 	{
 		hitResult = hit1;
-		UE_LOG(LogTemp, Warning, TEXT("WALLRUN_COUNTERCLOCKWISE"));
 		return EWallRunDirection::WALLRUN_COUNTERCLOCKWISE;//WallrunDirection.RotateAngleAxis(-90, FVector(0, 0, 1));
 	}
 	else
 	{
 		hitResult = hit2;
-		UE_LOG(LogTemp, Warning, TEXT("WALLRUN_CLOCKWISE"));
 		return EWallRunDirection::WALLRUN_CLOCKWISE;//WallrunDirection.RotateAngleAxis(90, FVector(0, 0, 1));
 	}
 }
@@ -154,7 +157,7 @@ void UWallrunState::EndWallrun()
 {
 	bIsLaunching = false;
 	LaunchVector = WallrunDirection = FVector::ZeroVector;
-	MovementComponent->animinstance->setIsDashing(false);
+	MovementComponent->animinstance->SetIsDashing(false);
 	MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 

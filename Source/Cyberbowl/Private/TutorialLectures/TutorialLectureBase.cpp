@@ -3,7 +3,9 @@
 #include "TutorialLectures/TutorialLectureBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerController/TutorialPlayerController.h"
+#include "Character/CyberbowlCharacter.h"
 #include "GameModesAndInstances/TutorialGameMode.h"
+#include "TimerManager.h"
 
 ATutorialLectureBase::ATutorialLectureBase()
 {
@@ -14,10 +16,34 @@ void ATutorialLectureBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetupTasks();
+
 	tutorialPlayerController = Cast<ATutorialPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
+	tutorialCharacter = Cast<ACyberbowlCharacter>(tutorialPlayerController->GetPawn());
 	tutorialGameMode = Cast<ATutorialGameMode>(UGameplayStatics::GetGameMode(this));
 
+	// Debug purposes
+	// ToDo: Remove
 	tutorialPlayerController->OnAdvanceTutorial.AddDynamic(this, &ATutorialLectureBase::AdvanceLecture);
+}
+
+void ATutorialLectureBase::SetupTasks()
+{
+}
+
+void ATutorialLectureBase::AdvanceIfCurrentTask(const FString& performedTask, float delayInSeconds)
+{
+	if (currentTask == performedTask)
+	{
+		if (delayInSeconds == 0.f)
+		{
+			AdvanceLecture();
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimer(advanceTaskDelayHandle, this, &ATutorialLectureBase::AdvanceLecture, delayInSeconds, false);
+		}
+	}
 }
 
 void ATutorialLectureBase::Enter()
@@ -33,18 +59,21 @@ void ATutorialLectureBase::Exit()
 
 void ATutorialLectureBase::AdvanceLecture()
 {
-	if (widgetsList. Num() <= 0)
+	if (lectureTasks.IsEmpty())
 	{
 		OnLectureFinished.Broadcast();
 		return;
 	}
 
+	lectureTasks.Dequeue(currentTask);
+	
 	if (currentWidget)
 	{
 		currentWidget->RemoveFromParent();
 	}
 	
-	currentWidget = CreateWidget(tutorialPlayerController, widgetsList[0]);
+	currentWidget = Cast<UTutorialWidgetBase>(CreateWidget(tutorialPlayerController, widgetsList[0]));
+	currentWidget->SetTutorialLecture(this);
 	currentWidget->AddToViewport();
 
 	widgetsList.RemoveAt(0);
