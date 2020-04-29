@@ -36,6 +36,10 @@ public:
 	ACyberbowlCharacter();
 	ACyberbowlCharacter(const class FObjectInitializer& ObjectInitializer);
 
+	//Custom Cyberbowl Character MovementComponent
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
+	class UCBCharacterMovementComponent* CBCharacterMoveComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
 	class UBoopComponent* BoopComponent;
 	
@@ -87,8 +91,6 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnWallrunEnd OnWallrunEnd;
 
-	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnBoop OnBoop;
 #pragma endregion
 	
 protected:

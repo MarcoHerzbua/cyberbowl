@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerInput.h"
 #include "Character/CBCharacterMovementComponent.h"
 #include "Character/MovementStates/WallrunState.h"
+#include "Character/BoopComponent.h"
 
 
 // Sets default values for this component's properties
@@ -30,15 +31,16 @@ void UWallrunComponent::BeginPlay()
 		WallrunCollider = Cast<USphereComponent>(sphereCmps[0]);
 	}
 
-	if(!WallrunCollider)
+	auto boopComponent = GetOwner()->FindComponentByClass<UBoopComponent>();
+	if(!WallrunCollider || !boopComponent)
 	{
-		UE_LOG(LogInit, Error, TEXT("No WallrunCollider set in Character Blueprint"));
+		UE_LOG(LogInit, Error, TEXT("WallrunComponent: Vital Components not set in Character Blueprint! (WallrunCollider, boopcomponent)"));
 	}
 	else
 	{
 		WallrunCollider->OnComponentBeginOverlap.AddDynamic(this, &UWallrunComponent::CheckForWallrun);
 		WallrunCollider->OnComponentEndOverlap.AddDynamic(this, &UWallrunComponent::EndWallrun);
-		//WallrunCollider->OnComponentHit.AddDynamic(this, &UWallrunComponent::CheckForWallrun);
+		boopComponent->OnBoopStarted.AddDynamic(this, &UWallrunComponent::ForceEndWallrun);
 	}
 
 	MovementComponent = GetOwner()->FindComponentByClass<UCBCharacterMovementComponent>();
@@ -75,6 +77,11 @@ void UWallrunComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* 
 			MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 		}
 	}
+}
+
+void UWallrunComponent::ForceEndWallrun()
+{
+	EndWallrun(nullptr, nullptr, nullptr, 0);
 }
 
 

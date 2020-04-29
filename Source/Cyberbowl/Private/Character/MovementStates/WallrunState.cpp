@@ -144,13 +144,11 @@ EWallRunDirection UWallrunState::HitDirection(FHitResult& hitResult)
 	if (hit1.bBlockingHit)
 	{
 		hitResult = hit1;
-		UE_LOG(LogTemp, Warning, TEXT("WALLRUN_COUNTERCLOCKWISE"));
 		return EWallRunDirection::WALLRUN_COUNTERCLOCKWISE;//WallrunDirection.RotateAngleAxis(-90, FVector(0, 0, 1));
 	}
 	else
 	{
 		hitResult = hit2;
-		UE_LOG(LogTemp, Warning, TEXT("WALLRUN_CLOCKWISE"));
 		return EWallRunDirection::WALLRUN_CLOCKWISE;//WallrunDirection.RotateAngleAxis(90, FVector(0, 0, 1));
 	}
 }
