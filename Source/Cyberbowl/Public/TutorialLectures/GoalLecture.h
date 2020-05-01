@@ -6,9 +6,8 @@
 #include "TutorialLectures/TutorialLectureBase.h"
 #include "GoalLecture.generated.h"
 
-/**
- * 
- */
+class APlayBall;
+
 UCLASS()
 class CYBERBOWL_API AGoalLecture : public ATutorialLectureBase
 {
@@ -28,4 +27,13 @@ protected:
 
 	UFUNCTION()
 	void OnGoalScored(int teamIndex);
+
+	UPROPERTY(BlueprintReadOnly)
+	int taskScoredGoalAttempts = 0;
+	
+	void ResetBall() const;
+
+	APlayBall* ball;
+
+	AActor* ballLaunchStartLocation;
 };

@@ -23,16 +23,11 @@ void AFireAbilityLecture::Enter()
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
 
 	tutorialCharacter = tutorialPlayerController->SwitchCharacterClass(fireCharacterClass);
-	
-	const FRotator lookAtGoal = UKismetMathLibrary::FindLookAtRotation(tutorialCharacter->GetActorLocation(), goal->GetActorLocation());
-	tutorialPlayerController->SetControlRotation(lookAtGoal);
 }
 
 void AFireAbilityLecture::Exit()
 {
 	Super::Exit();
-
-	ball->StopBall();
 }
 
 void AFireAbilityLecture::BeginPlay()
@@ -52,16 +47,20 @@ void AFireAbilityLecture::BeginPlay()
 	ballLaunchStartLocation = actors[0];
 	actors.Empty();
 
-	UGameplayStatics::GetAllActorsWithTag(this, "FireLectureGoal", actors);
-	goal = Cast<AGoal_Collider>(actors[0]);
-	goal->OnGoalScored.AddDynamic(this, &AFireAbilityLecture::OnGoalScored);
+	UGameplayStatics::GetAllActorsOfClass(this, AGoal_Collider::StaticClass(), actors);
+	for (auto goalActor : actors)
+	{
+		auto goal = Cast<AGoal_Collider>(goalActor);
+		goal->OnGoalScored.AddDynamic(this, &AFireAbilityLecture::OnGoalScored);
+	}
+	
 	actors.Empty();
 }
 
 void AFireAbilityLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskReadInstructions);
-	lectureTasks.Enqueue(taskBlockBall);
+	EnqueueTask(taskReadInstructions, 1);
+	EnqueueTask(taskBlockBall, 3);
 }
 
 void AFireAbilityLecture::OnReadInstructions()
@@ -74,6 +73,9 @@ void AFireAbilityLecture::OnBallBlocked(AActor* SelfActor, AActor* OtherActor, F
 	if (Cast<AFirewall>(OtherActor))
 	{
 		AdvanceIfCurrentTask(taskBlockBall, 1.f);
+		taskBlockBallAttempts++;
+		bSwitchLaunchDirection = !bSwitchLaunchDirection;
+		LaunchBall();
 	}
 }
 
@@ -86,7 +88,17 @@ void AFireAbilityLecture::LaunchBall() const
 {
 	ball->StopBall();
 	ball->PlayBall();
-	
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
-	ball->PushBall(2000.f, FVector(0, 1, 0));
+	
+	FVector launchDirection;
+	if (bSwitchLaunchDirection)
+	{
+		launchDirection = { 0, 1, 0 };
+	}
+	else
+	{
+		launchDirection = { 0, -1, 0 };
+	}
+	
+	ball->PushBall(4000.f, launchDirection);
 }

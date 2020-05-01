@@ -27,6 +27,9 @@ protected:
 	FString taskReadInstructions = "taskReadInstructions";
 	FString taskGrabAndThrow = "taskGrabAndThrow";
 
+	UPROPERTY(BlueprintReadOnly)
+	int taskGrabAndThrowAttempts = 0;
+	
 	UFUNCTION(BlueprintCallable)
 	void OnReadInstructions();
 
@@ -45,8 +48,11 @@ protected:
 
 	AActor* playerStartLocation;
 
-	AGoal_Collider* goal;
-
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ACyberbowlCharacter> airCharacterClass;
+
+	bool bSwitchLaunchDirection;
+
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle restartBallDelayHandle;
 };

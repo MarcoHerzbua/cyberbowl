@@ -8,7 +8,7 @@
 #include "Stadium/Goal_Collider.h"
 #include "PlayerController/TutorialPlayerController.h"
 #include "Character/CyberbowlCharacter.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "TimerManager.h"
 
 void AAirAbilityLecture::Tick(float DeltaTime)
 {
@@ -25,16 +25,11 @@ void AAirAbilityLecture::Enter()
 	tutorialCharacter = tutorialPlayerController->SwitchCharacterClass(airCharacterClass);
 	auto airAbility = Cast<UAirAbility>(tutorialCharacter->GetComponentByClass(UAirAbility::StaticClass()));
 	airAbility->OnGrabModeExitByPush.AddDynamic(this, &AAirAbilityLecture::OnBallSucced);
-
-	const FRotator lookAtGoal = UKismetMathLibrary::FindLookAtRotation(tutorialCharacter->GetActorLocation(), goal->GetActorLocation());
-	tutorialPlayerController->SetControlRotation(lookAtGoal);
 }
 
 void AAirAbilityLecture::Exit()
 {
 	Super::Exit();
-
-	//ball->StopBall();
 }
 
 void AAirAbilityLecture::BeginPlay()
@@ -53,16 +48,19 @@ void AAirAbilityLecture::BeginPlay()
 	ballLaunchStartLocation = actors[0];
 	actors.Empty();
 
-	UGameplayStatics::GetAllActorsWithTag(this, "FireLectureGoal", actors);
-	goal = Cast<AGoal_Collider>(actors[0]);
-	goal->OnGoalScored.AddDynamic(this, &AAirAbilityLecture::OnGoalScored);
+	UGameplayStatics::GetAllActorsOfClass(this, AGoal_Collider::StaticClass(), actors);
+	for (auto goalActor : actors)
+	{
+		auto goal = Cast<AGoal_Collider>(goalActor);
+		goal->OnGoalScored.AddDynamic(this, &AAirAbilityLecture::OnGoalScored);
+	}
 	actors.Empty();
 }
 
 void AAirAbilityLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskReadInstructions);
-	lectureTasks.Enqueue(taskGrabAndThrow);
+	EnqueueTask(taskReadInstructions);
+	EnqueueTask(taskGrabAndThrow, 3);
 }
 
 void AAirAbilityLecture::OnReadInstructions()
@@ -73,6 +71,9 @@ void AAirAbilityLecture::OnReadInstructions()
 void AAirAbilityLecture::OnBallSucced()
 {
 	AdvanceIfCurrentTask(taskGrabAndThrow, 1.f);
+	taskGrabAndThrowAttempts++;
+	bSwitchLaunchDirection = !bSwitchLaunchDirection;
+	GetWorld()->GetTimerManager().SetTimer(restartBallDelayHandle, this, &AAirAbilityLecture::LaunchBall, 1.f, false);
 }
 
 void AAirAbilityLecture::OnGoalScored(int teamIndex)
@@ -84,7 +85,17 @@ void AAirAbilityLecture::LaunchBall() const
 {
 	ball->StopBall();
 	ball->PlayBall();
-
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
-	ball->PushBall(2000.f, FVector(0, 1, 0));
+
+	FVector launchDirection;
+	if (bSwitchLaunchDirection)
+	{
+		launchDirection = { 0, 1, 0 };
+	}
+	else
+	{
+		launchDirection = { 0, -1, 0 };
+	}
+
+	ball->PushBall(4000.f, launchDirection);
 }

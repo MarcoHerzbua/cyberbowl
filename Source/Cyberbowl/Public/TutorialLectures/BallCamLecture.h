@@ -26,6 +26,9 @@ protected:
 	// Lecture tasks
 	FString taskBallCamToggled = "taskBallCamToggled";
 
+	UPROPERTY(BlueprintReadOnly)
+	int taskBallCamToggledAttempts = 0;
+	
 	UFUNCTION()
 	void OnBallCamToggled();
 
