@@ -70,6 +70,7 @@ void AEarthpillar::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &AEarthpillar::EndLaunch, LaunchCooldown/* - LaunchCooldown / 10.f*/);
 		ILaunchable::Execute_Launch(OtherActor, OtherActor->GetVelocity().GetSafeNormal(), LaunchForceHorizontal, LaunchForceVertical);
 		bIsRising = true;
+		OnActorLaunched.Broadcast(OtherActor);
 	}
 }
 

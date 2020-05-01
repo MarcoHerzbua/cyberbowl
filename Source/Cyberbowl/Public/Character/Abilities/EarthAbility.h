@@ -7,13 +7,16 @@
 #include "Character/Abilities/Earthpillar.h"
 #include "EarthAbility.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAActorLaunched, AActor*, launchedActor);
+
 UCLASS(ClassGroup = (Abilities), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API UEarthAbility : public UAbilityBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnAActorLaunched OnAActorLaunched;
 	
 protected:
 
@@ -59,6 +62,9 @@ protected:
 	void SpawnPillar();
 
 	class ACyberbowlCharacter* character;
+
+	UFUNCTION()
+	void CallOnActorLaunched(AActor* launchedActor);
 };
 
 

@@ -26,6 +26,12 @@ protected:
 	// Lecture tasks
 	FString taskJump = "taskJump";
 	FString taskDoubleJump = "taskDoubleJump";
+
+	UPROPERTY(BlueprintReadOnly)
+	int taskJumpAttempts = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	int taskDoubleJumpAttempts = 0;
 	
 	UFUNCTION()
 	void OnJump();

@@ -30,6 +30,15 @@ protected:
 	FString taskJumpDash = "taskJumpDash";
 	FString taskVerticalDash = "taskVerticalDash";
 
+	UPROPERTY(BlueprintReadOnly)
+	int taskRegularDashAttempts = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	int taskJumpDashAttempts = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	int taskVerticalDashAttempts = 0;
+	
 	UFUNCTION()
 	void OnRegularDash();
 
