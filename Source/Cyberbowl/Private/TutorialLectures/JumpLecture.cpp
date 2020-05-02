@@ -3,7 +3,6 @@
 
 #include "TutorialLectures/JumpLecture.h"
 #include "Character/CyberbowlCharacter.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 void AJumpLecture::Tick(float DeltaTime)
 {
@@ -30,16 +29,18 @@ void AJumpLecture::BeginPlay()
 
 void AJumpLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskJump);
-	lectureTasks.Enqueue(taskDoubleJump);
+	EnqueueTask(taskJump, 3);
+	EnqueueTask(taskDoubleJump, 3);
 }
 
 void AJumpLecture::OnJump()
 {
-	AdvanceIfCurrentTask(taskJump);
+	AdvanceIfCurrentTask(taskJump, 0.5f);
+	taskJumpAttempts++;
 }
 
 void AJumpLecture::OnDoubleJump()
 {
 	AdvanceIfCurrentTask(taskDoubleJump);
+	taskDoubleJumpAttempts++;
 }

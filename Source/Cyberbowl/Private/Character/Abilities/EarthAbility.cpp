@@ -16,6 +16,7 @@
 #include "Engine/Engine.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "PlayerController/TutorialPlayerController.h"
 #include "TimerManager.h"
 
 void UEarthAbility::BeginPlay()
@@ -140,6 +141,19 @@ void UEarthAbility::SpawnPillar()
 {
 	auto pillar = GetWorld()->SpawnActor<AEarthpillar>(EarthPillarClass, PillarSpawnPoint, FRotator());
 
-	pillar->InitializePillar(characterController->currPlayerTeam, PillarSpawnPoint.Z, PillarLifeSpan);
+	if (!characterController)
+	{
+		pillar->InitializePillar(1, PillarSpawnPoint.Z, PillarLifeSpan);
+	}
+	else
+	{
+		pillar->InitializePillar(characterController->currPlayerTeam, PillarSpawnPoint.Z, PillarLifeSpan);
+	}
+	pillar->OnActorLaunched.AddDynamic(this, &UEarthAbility::CallOnActorLaunched);
 	//pillar->SetActorLocation(pillar->GetActorLocation() - FVector(0, pillar->GetPillarLocationZ(), 0));
+}
+
+void UEarthAbility::CallOnActorLaunched(AActor* launchedActor)
+{
+	OnAActorLaunched.Broadcast(launchedActor);
 }

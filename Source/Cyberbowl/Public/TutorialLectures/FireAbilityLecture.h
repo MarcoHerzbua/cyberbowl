@@ -27,6 +27,9 @@ protected:
 	FString taskReadInstructions = "taskReadInstructions";
 	FString taskBlockBall = "taskBlockBall";
 
+	UPROPERTY(BlueprintReadOnly)
+	int taskBlockBallAttempts = 0;
+	
 	UFUNCTION(BlueprintCallable)
 	void OnReadInstructions();
 	
@@ -45,8 +48,8 @@ protected:
 
 	AActor* playerStartLocation;
 
-	AGoal_Collider* goal;
-
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ACyberbowlCharacter> fireCharacterClass;
+
+	bool bSwitchLaunchDirection;
 };

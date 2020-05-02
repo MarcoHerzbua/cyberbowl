@@ -4,11 +4,10 @@
 #include "TutorialLectures/IceAbilityLecture.h"
 #include "Actors/PlayBall.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Stadium/Goal_Collider.h"
 #include "PlayerController/TutorialPlayerController.h"
 #include "Character/CyberbowlCharacter.h"
-#include "Components/WidgetComponent.h"
+#include "TimerManager.h"
 
 void AIceAbilityLecture::Tick(float DeltaTime)
 {
@@ -23,14 +22,13 @@ void AIceAbilityLecture::Enter()
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
 	
 	tutorialCharacter = tutorialPlayerController->SwitchCharacterClass(iceCharacterClass);
-	
-	const FRotator lookAtGoal = UKismetMathLibrary::FindLookAtRotation(tutorialCharacter->GetActorLocation(), goal->GetActorLocation());
-	tutorialPlayerController->SetControlRotation(lookAtGoal);
 }
 
 void AIceAbilityLecture::Exit()
 {
 	Super::Exit();
+
+	ball->PlayBall();
 }
 
 void AIceAbilityLecture::BeginPlay()
@@ -50,16 +48,20 @@ void AIceAbilityLecture::BeginPlay()
 	ballLaunchStartLocation = actors[0];
 	actors.Empty();
 
-	UGameplayStatics::GetAllActorsWithTag(this, "FireLectureGoal", actors);
-	goal = Cast<AGoal_Collider>(actors[0]);
-	goal->OnGoalScored.AddDynamic(this, &AIceAbilityLecture::OnGoalScored);
+	UGameplayStatics::GetAllActorsOfClass(this, AGoal_Collider::StaticClass(), actors);
+	for (auto goalActor : actors)
+	{
+		auto goal = Cast<AGoal_Collider>(goalActor);
+		goal->OnGoalScored.AddDynamic(this, &AIceAbilityLecture::OnGoalScored);
+	}
+
 	actors.Empty();
 }
 
 void AIceAbilityLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskReadInstructions);
-	lectureTasks.Enqueue(taskFreezeBall);
+	EnqueueTask(taskReadInstructions);
+	EnqueueTask(taskFreezeBall, 3);
 }
 
 void AIceAbilityLecture::OnReadInstructions()
@@ -70,6 +72,9 @@ void AIceAbilityLecture::OnReadInstructions()
 void AIceAbilityLecture::OnBallFrozen()
 {
 	AdvanceIfCurrentTask(taskFreezeBall, 1.f);
+	taskFreezeBallAttempts++;
+	bSwitchLaunchDirection = !bSwitchLaunchDirection;
+	GetWorld()->GetTimerManager().SetTimer(restartBallDelayHandle, this, &AIceAbilityLecture::LaunchBall, 1.f, false);
 }
 
 void AIceAbilityLecture::OnGoalScored(int teamIndex)
@@ -81,7 +86,17 @@ void AIceAbilityLecture::LaunchBall() const
 {
 	ball->StopBall();
 	ball->PlayBall();
-
 	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
-	ball->PushBall(2000.f, FVector(0, 1, 0));
+
+	FVector launchDirection;
+	if (bSwitchLaunchDirection)
+	{
+		launchDirection = { 0, 1, 0 };
+	}
+	else
+	{
+		launchDirection = { 0, -1, 0 };
+	}
+
+	ball->PushBall(4000.f, launchDirection);
 }

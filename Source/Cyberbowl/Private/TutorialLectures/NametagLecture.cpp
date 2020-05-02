@@ -67,7 +67,7 @@ void ANametagLecture::BeginPlay()
 
 void ANametagLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskPressedContinue);
+	EnqueueTask(taskPressedContinue);
 }
 
 void ANametagLecture::OnPressedContinue()

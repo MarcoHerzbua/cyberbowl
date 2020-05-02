@@ -39,13 +39,12 @@ protected:
 
 	virtual void SetupTasks();
 
-	void AdvanceIfCurrentTask(const FString& performedTask, float delayInSeconds = 0.f);
+	void AdvanceIfCurrentTask(const FString& performedTask, float delayInSeconds = 1.f);
+
+	void EnqueueTask(FString task, int attempts = 1);
 
 	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle advanceTaskDelayHandle;
-
-	TQueue<FString> lectureTasks;
-	FString currentTask;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TSubclassOf<UTutorialWidgetBase>> widgetsList;
@@ -59,4 +58,7 @@ protected:
 
 	ATutorialGameMode* tutorialGameMode;
 
+private:
+	TQueue<FString> lectureTasks;
+	FString currentTask;
 };

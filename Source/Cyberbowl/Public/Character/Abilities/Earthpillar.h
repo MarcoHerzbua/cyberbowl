@@ -9,6 +9,8 @@
 #include "Engine/TriggerBase.h"
 #include "Earthpillar.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorLaunched, AActor*, launchedActor);
+
 UCLASS()
 class CYBERBOWL_API AEarthpillar : public AActor
 {
@@ -65,6 +67,9 @@ public:
 	void InitializePillar(int playerTeam, float maxLoweringPos, float lifeSpan);
 	
 	float GetPillarLocationZ();
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnActorLaunched OnActorLaunched;
 	
 protected:
 	FRotator rotation;

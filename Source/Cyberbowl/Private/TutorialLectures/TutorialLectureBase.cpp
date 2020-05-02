@@ -46,6 +46,14 @@ void ATutorialLectureBase::AdvanceIfCurrentTask(const FString& performedTask, fl
 	}
 }
 
+void ATutorialLectureBase::EnqueueTask(FString task, int attempts)
+{
+	for (int i = 0; i < attempts; i++)
+	{
+		lectureTasks.Enqueue(task);
+	}
+}
+
 void ATutorialLectureBase::Enter()
 {
 	AdvanceLecture();

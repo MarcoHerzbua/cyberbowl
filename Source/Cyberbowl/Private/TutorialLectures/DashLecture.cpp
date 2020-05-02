@@ -34,22 +34,28 @@ void ADashLecture::BeginPlay()
 
 void ADashLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskRegularDash);
-	lectureTasks.Enqueue(taskJumpDash);
-	lectureTasks.Enqueue(taskVerticalDash);
+	EnqueueTask(taskRegularDash, 3);
+	EnqueueTask(taskJumpDash, 3);
+	EnqueueTask(taskVerticalDash, 3);
 }
 
 void ADashLecture::OnRegularDash()
 {
-	AdvanceIfCurrentTask(taskRegularDash);
+	if (!animInstance->bisInAir)
+	{
+		AdvanceIfCurrentTask(taskRegularDash);
+		taskRegularDashAttempts++;
+	}
 
 	if (animInstance->bisInAir)
 	{
 		AdvanceIfCurrentTask(taskJumpDash);
+		taskJumpDashAttempts++;
 	}
 }
 
 void ADashLecture::OnVerticalDash()
 {
 	AdvanceIfCurrentTask(taskVerticalDash);
+	taskVerticalDashAttempts++;
 }
