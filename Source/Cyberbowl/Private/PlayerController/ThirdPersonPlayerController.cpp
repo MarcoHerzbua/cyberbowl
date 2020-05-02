@@ -64,6 +64,7 @@ void AThirdPersonPlayerController::SpawnActors()
 	TArray<AActor*> playerStarts;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), playerStarts);
 	APlayerStart* playerSpawn = nullptr;
+	savedPlayerStarts = playerStarts;
 	
 	for (AActor* currPlayerStart : playerStarts)
 	{
@@ -78,8 +79,8 @@ void AThirdPersonPlayerController::SpawnActors()
 	}
 
 	character = nullptr;
-	spawnTransform = playerSpawn->GetTransform().GetLocation();
-	spawnRotation = playerSpawn->GetActorRotation();
+	FVector spawnTransform = playerSpawn->GetTransform().GetLocation();
+	FRotator spawnRotation = playerSpawn->GetActorRotation();
 	
 	switch (currPlayerType)
 	{
@@ -180,6 +181,24 @@ void AThirdPersonPlayerController::OnPauseGamePlay()
 
 void AThirdPersonPlayerController::OnRegroup()
 {
+	Algo::Reverse(savedPlayerStarts);
+	TArray<AActor*> playerStarts = savedPlayerStarts;
+
+	APlayerStart* playerSpawn = nullptr;
+	for (AActor* currPlayerStart : playerStarts)
+	{
+		playerSpawn = Cast<APlayerStart>(currPlayerStart);
+		int playerTeam = FCString::Atoi(*playerSpawn->PlayerStartTag.ToString());
+		if (playerTeam == currPlayerTeam)
+		{
+			int idx = playerStarts.Find(currPlayerStart);
+			playerStarts.RemoveAt(idx);
+			break;
+		}
+	}
+
+	FVector spawnTransform = playerSpawn->GetTransform().GetLocation();
+	FRotator spawnRotation = playerSpawn->GetActorRotation();
 	character->SetActorLocation(spawnTransform);
 	character->SetActorRotation(spawnRotation);
 	UBallCamComponent* ballCam = Cast<UBallCamComponent>(character->FindComponentByClass<UBallCamComponent>());
