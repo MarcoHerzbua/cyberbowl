@@ -41,13 +41,13 @@ void ADashLecture::SetupTasks()
 
 void ADashLecture::OnRegularDash()
 {
-	if (!animInstance->bisInAir)
+	if (!animInstance->GetIsInAir())
 	{
 		AdvanceIfCurrentTask(taskRegularDash);
 		taskRegularDashAttempts++;
 	}
 
-	if (animInstance->bisInAir)
+	if (animInstance->GetIsInAir())
 	{
 		AdvanceIfCurrentTask(taskJumpDash);
 		taskJumpDashAttempts++;

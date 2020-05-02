@@ -77,7 +77,7 @@ protected:
 	FTimerHandle TornadoEffectDurationHandle;
 
 	UPROPERTY()
-	UCharacterMovementComponent* movementComp;
+	class UCBCharacterMovementComponent* movementComp;
 
 	UPROPERTY()
 	ACyberbowlCharacter* character;
