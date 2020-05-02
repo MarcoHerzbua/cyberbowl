@@ -28,13 +28,13 @@ AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectIniti
 	static ConstructorHelpers::FClassFinder<UUserWidget> countdownWidgetClassFinder(TEXT("/Game/UI/Countdown"));
 	countdownWidgetClass = countdownWidgetClassFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyNotJoinedWidgetClassFinder(TEXT("/Game/UI/W_LobbyNotJoined"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyNotJoinedWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_LobbyNotJoined"));
 	lobbyNotJoinedWidgetClass = lobbyNotJoinedWidgetClassFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyWidgetClassFinder(TEXT("/Game/UI/W_Lobby"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_Lobby"));
 	lobbyWidgetClass = lobbyWidgetClassFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<UWMainMenu> mainMenuWidgetClassFinder(TEXT("/Game/UI/W_MainMenu"));
+	static ConstructorHelpers::FClassFinder<UWMainMenu> mainMenuWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_MainMenu"));
 	mainMenuWidgetClass = mainMenuWidgetClassFinder.Class;
 }
 
