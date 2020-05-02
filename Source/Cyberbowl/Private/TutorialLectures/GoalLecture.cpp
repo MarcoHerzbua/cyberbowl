@@ -3,6 +3,8 @@
 
 #include "TutorialLectures/GoalLecture.h"
 
+
+#include "Actors/PlayBall.h"
 #include "Kismet/GameplayStatics.h"
 #include "Stadium/Goal_Collider.h"
 
@@ -24,6 +26,12 @@ void AGoalLecture::Exit()
 void AGoalLecture::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
+
+	TArray<AActor*> actors;
+	UGameplayStatics::GetAllActorsWithTag(this, "FireLectureBallStart", actors);
+	ballLaunchStartLocation = actors[0];
 	
 	TArray<AActor*> goalColliders;
 	UGameplayStatics::GetAllActorsOfClass(this, AGoal_Collider::StaticClass(), goalColliders);
@@ -36,10 +44,19 @@ void AGoalLecture::BeginPlay()
 
 void AGoalLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskScoredGoal);
+	EnqueueTask(taskScoredGoal, 3);
 }
 
 void AGoalLecture::OnGoalScored(int teamIndex)
 {
-	AdvanceIfCurrentTask(taskScoredGoal);
+	AdvanceIfCurrentTask(taskScoredGoal, 0);
+	taskScoredGoalAttempts++;
+	ResetBall();
+}
+
+void AGoalLecture::ResetBall() const
+{	
+	ball->SetActorLocation(ballLaunchStartLocation->GetActorLocation());
+	ball->StopBall();
+	ball->PlayBall();
 }

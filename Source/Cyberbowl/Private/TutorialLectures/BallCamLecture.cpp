@@ -28,10 +28,11 @@ void ABallCamLecture::BeginPlay()
 
 void ABallCamLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskBallCamToggled);
+	EnqueueTask(taskBallCamToggled, 3);
 }
 
 void ABallCamLecture::OnBallCamToggled()
 {
 	AdvanceIfCurrentTask(taskBallCamToggled);
+	taskBallCamToggledAttempts++;
 }

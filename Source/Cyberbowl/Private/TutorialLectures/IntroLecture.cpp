@@ -26,7 +26,7 @@ void AIntroLecture::BeginPlay()
 
 void AIntroLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskPressedContinue);
+	EnqueueTask(taskPressedContinue);
 }
 
 void AIntroLecture::OnPressedContinue()

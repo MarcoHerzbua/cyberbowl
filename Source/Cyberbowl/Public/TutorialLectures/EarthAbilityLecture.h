@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "TutorialLectures/TutorialLectureBase.h"
-#include "IceAbilityLecture.generated.h"
+#include "EarthAbilityLecture.generated.h"
 
 class APlayBall;
 class AGoal_Collider;
 
 UCLASS()
-class CYBERBOWL_API AIceAbilityLecture : public ATutorialLectureBase
+class CYBERBOWL_API AEarthAbilityLecture : public ATutorialLectureBase
 {
 	GENERATED_BODY()
 	
@@ -25,34 +25,23 @@ protected:
 
 	// Lecture tasks
 	FString taskReadInstructions = "taskReadInstructions";
-	FString taskFreezeBall = "taskFreezeBall";
+	FString taskLaunchSelf = "taskLaunchSelf";
+	FString taskLaunchBall = "taskLaunchBall";
 
 	UPROPERTY(BlueprintReadOnly)
-	int taskFreezeBallAttempts = 0;
+	int taskLaunchBallAttempts = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	int taskLaunchSelfAttempts = 0;
 
 	UFUNCTION(BlueprintCallable)
 	void OnReadInstructions();
 
 	UFUNCTION()
-	void OnBallFrozen();
-
-	UFUNCTION()
-	void OnGoalScored(int teamIndex);
-
-	UFUNCTION(BlueprintCallable)
-	void LaunchBall() const;
+	void OnBallHit(AActor* launchedActor);
 
 	APlayBall* ball;
 
-	AActor* ballLaunchStartLocation;
-
-	AActor* playerStartLocation;
-
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<ACyberbowlCharacter> iceCharacterClass;
-
-	bool bSwitchLaunchDirection;
-
-	UPROPERTY(BlueprintReadOnly)
-	FTimerHandle restartBallDelayHandle;
+	TSubclassOf<ACyberbowlCharacter> earthCharacterClass;
 };

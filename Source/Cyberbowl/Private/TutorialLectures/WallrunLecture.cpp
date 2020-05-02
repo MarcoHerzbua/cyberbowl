@@ -32,7 +32,7 @@ void AWallrunLecture::BeginPlay()
 
 void AWallrunLecture::SetupTasks()
 {
-	lectureTasks.Enqueue(taskWallrunLaunch);
+	EnqueueTask(taskWallrunLaunch, 3);
 }
 
 void AWallrunLecture::OnWallrunEnd(float timeOnWall, bool launchedAway)
@@ -41,5 +41,6 @@ void AWallrunLecture::OnWallrunEnd(float timeOnWall, bool launchedAway)
 	if (launchedAway && timeOnWall >= 1.f)
 	{
 		AdvanceIfCurrentTask(taskWallrunLaunch, 0.5f);
+		taskWallrunLaunchAttempts++;
 	}
 }
