@@ -77,6 +77,9 @@ void UWallrunComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* 
 			MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 		}
 	}
+
+	//TODO: Wallrun Eventdispatchers need to be rearranged/cleared up because its no bueno
+	OnWallrunEnd.Broadcast();
 }
 
 void UWallrunComponent::ForceEndWallrun()
