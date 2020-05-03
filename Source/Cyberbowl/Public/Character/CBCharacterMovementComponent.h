@@ -18,9 +18,9 @@ enum class ECBMovementMode : uint8
 	CBMOVE_Dash UMETA(DisplayName="Dash")
 };
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVertDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallRunFinished, float, timeOnWall, bool, launchedAway);
+
 UCLASS()
 class CYBERBOWL_API UCBCharacterMovementComponent : public UCharacterMovementComponent
 {
@@ -35,6 +35,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunLaunchForce = 700.f;
 	
+	//modifies the force by which the character gets launched UPWARDS from the wall when jumping during wallrun
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
+	float WallrunUpwardsLaunchForce = 3000.f;
+	
+	//modifies how long the character is launched (how long the Launch Forces are applied to the char, similar to Dash)
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
+	float WallrunLaunchDuration = 0.1f;
+	
 	//modifies the angle in which the character get launched away from the wall when jumping during wallrun
 	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunLaunchAngle = 45.f;
@@ -44,6 +52,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Dash Params")
 	float DashForce = 10000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Double Jump Params")
+	float DoubleJumpDuration = 0.2f;
 
 	/*
 	 * 	This is the Range (in degrees) in which the character does not keep momentum after dashing, takes the View of the camera as starting point 
@@ -64,13 +75,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	ECBMovementMode GetCBMovementMode() { return CBMovementMode; }
 
+	UFUNCTION(BlueprintCallable)
+	UBaseMovementState* GetCBMovementState() { return MovementStates.Contains(GetCBMovementMode()) ? MovementStates[GetCBMovementMode()] : nullptr; }
+
 	FVector GetCharacterTransform() { return GetOwner()->GetActorLocation(); };
 
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	class UCyberbowlCharacterAnimInstance* animinstance;
-	
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnVertDash OnVertDash;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnWallRunFinished OnWallRunFinished;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	ECBMovementMode CBMovementMode;
@@ -97,11 +117,15 @@ protected:
 	void PhysCustom(float deltaTime, int32 Iterations) override;
 
 	void PhysWallrun(float deltaTime, int32 Iterations);
+
+	UFUNCTION()
+	void CallOnVerticalDash();
+
+	UFUNCTION()
+	void CallOnWallRunFinished(float timeOnWall, bool launchedAway);
 /*
  *
  *
  * 
  */
 };
-
-

@@ -22,6 +22,8 @@ void AMainMenuPlayerController::SetupInputComponent()
 	InputComponent->BindAction("MenuBack", IE_Pressed, this, &AMainMenuPlayerController::PopFromMenuStack);
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
+	InputComponent->BindAction("MenuNavigationRight", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
+	InputComponent->BindAction("MenuNavigationLeft", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
 }
 
 void AMainMenuPlayerController::BeginPlay()
@@ -110,7 +112,7 @@ void AMainMenuPlayerController::PushToMenuStack(UUserWidget* newWidget)
 
 void AMainMenuPlayerController::PopFromMenuStack()
 {
-	if (widgetStack.Num() == 0)
+	if (widgetStack.Num() <= 1)
 	{
 		return;
 	}

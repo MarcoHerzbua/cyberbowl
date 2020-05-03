@@ -15,11 +15,16 @@ void UCyberbowlCharacterAnimInstance::NativeInitializeAnimation()
 			main = Cast<ACyberbowlCharacter>(pawn);
 		}
 	}
+	bisInAir = false;
+	bIsDashing = false;
 	bisIsWallRidingCounterClockWise = false;
 	bisIsWallRidingClockWise = false;
 	awayFromWallTime = 0;
 	movementTime = 0.6f;
 	MaxCharacterSpeed = 0;
+	bIsBooping = false;
+	bIsDoubleJumping = false;
+	bIsGrabbing = false;
 }
 
 void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
@@ -69,7 +74,7 @@ void UCyberbowlCharacterAnimInstance::UpdateAnimationProperties()
 	}
 }
 
-void UCyberbowlCharacterAnimInstance::setIsWallRidingCounterClockWise(bool bIsCounterClockWise)
+void UCyberbowlCharacterAnimInstance::SetIsWallRidingCounterClockWise(bool bIsCounterClockWise)
 {
 	bisIsWallRidingCounterClockWise = bIsCounterClockWise;
 	if (bIsCounterClockWise == true)
@@ -78,7 +83,7 @@ void UCyberbowlCharacterAnimInstance::setIsWallRidingCounterClockWise(bool bIsCo
 	}
 }
 
-void UCyberbowlCharacterAnimInstance::setIsWallRidingClockWise(bool bisInWallRidingClockWise)
+void UCyberbowlCharacterAnimInstance::SetIsWallRidingClockWise(bool bisInWallRidingClockWise)
 {
 	bisIsWallRidingClockWise = bisInWallRidingClockWise;
 	if (bisInWallRidingClockWise == true)
@@ -87,3 +92,53 @@ void UCyberbowlCharacterAnimInstance::setIsWallRidingClockWise(bool bisInWallRid
 	}
 }
 
+void UCyberbowlCharacterAnimInstance::SetIsDashing(bool bIsDash)
+{
+	bIsDashing = bIsDash;
+}
+
+void UCyberbowlCharacterAnimInstance::SetDashPlayRate(float playRate)
+{
+	float playratePerFramesPerSecond = 1.f / 30.f;
+	float playduration = 30.f / playRate;
+	dashPlayRate = playduration*playratePerFramesPerSecond;
+
+}
+
+void UCyberbowlCharacterAnimInstance::SetIsBooping(bool bBooping)
+{
+	bIsBooping = bBooping;
+}
+
+void UCyberbowlCharacterAnimInstance::SetBoopPlayRate(float playRate)
+{
+	boopPlayRate = playRate;
+}
+
+void UCyberbowlCharacterAnimInstance::SetIsDoubleJumping(bool bDoubleJump)
+{
+	bIsDoubleJumping = bDoubleJump;
+}
+
+void UCyberbowlCharacterAnimInstance::SetDoubleJumpPlayRate(float playRate)
+{
+	float playratePerFramesPerSecond = 0.25f / 15.f;
+	float playduration = 15.f / playRate;
+	doubleJumpPlayRate = playduration * playratePerFramesPerSecond;
+
+}
+
+void UCyberbowlCharacterAnimInstance::SetIsGrabbing(bool bGrabbing)
+{
+	bIsGrabbing = bGrabbing;
+}
+
+bool UCyberbowlCharacterAnimInstance::GetIsGrabbing()
+{
+	return bIsGrabbing;
+}
+
+bool UCyberbowlCharacterAnimInstance::GetIsInAir()
+{
+	return bisInAir;
+}

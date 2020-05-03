@@ -4,12 +4,23 @@
 #include "Character/Abilities/AirAbility.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Character/Abilities/AbilityBase.h"
+#include "Character/BallCamComponent.h"
+#include "Character/BoopComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Character/CBCharacterMovementComponent.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
+#include "Components/Button.h"
+#include "PlayerController/ThirdPersonPlayerController.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/WidgetComponent.h"
+#include "PlayerController/TutorialPlayerController.h"
+#include "Widgets/WNameTag.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACyberbowlCharacter
@@ -50,10 +61,19 @@ ACyberbowlCharacter::ACyberbowlCharacter(const FObjectInitializer& ObjectInitial
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 	//
+}
+
+void ACyberbowlCharacter::CallMenuEnter()
+{
+	auto thirdPersonController = Cast<AThirdPersonPlayerController>(Controller);
+
+	if (thirdPersonController)
+	{
+		thirdPersonController->CallMenuEnter();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -65,8 +85,11 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("MenuEnter", IE_Pressed, this, &ACyberbowlCharacter::CallMenuEnter);
 
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ACyberbowlCharacter::Dash);
+	PlayerInputComponent->BindAction("Boop", IE_Pressed, this, &ACyberbowlCharacter::Boop);
+
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACyberbowlCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACyberbowlCharacter::MoveRight);
@@ -79,62 +102,140 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ACyberbowlCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ACyberbowlCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ACyberbowlCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ACyberbowlCharacter::OnResetVR);
-
-	//handle ability input
+	// Handle ability input
 	PlayerInputComponent->BindAction("Ult", IE_Pressed, this, &ACyberbowlCharacter::AbilityPressed);
+	PlayerInputComponent->BindAction("CancelUlt", IE_Pressed, this, &ACyberbowlCharacter::AbilityCanceled);
+
+	PlayerInputComponent->BindAction("ToggleBallCam", IE_Pressed, this, &ACyberbowlCharacter::CallOnBallCamToggled);
 }
 
 void ACyberbowlCharacter::Jump()
 {
-	auto CBCharMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
-	if(!CBCharMoveCmp)
-	{
-		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CBCharacterMovementCmp not found"));
-		return;
-	}
-
-	if (CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_DoubleJump
-		|| CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+	if (CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_DoubleJump
+		|| CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
 	{
 		return;
 	}
 	
 	Super::Jump();
+	OnJump.Broadcast();
 
-	if(CBCharMoveCmp->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
+	if(CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
 	{
-		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
+		CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
+		OnDoubleJump.Broadcast();
 		return;
 	}
 	
-	CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+	CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
+
+void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
+{
+	//Check for friendly fire
+	if(auto instigatorAsChar = Cast<ACyberbowlCharacter>(instigtr))
+	{
+		if (auto instigatorController = Cast<AThirdPersonPlayerController>(instigatorAsChar->Controller))
+		{
+			auto targetController = Cast<AThirdPersonPlayerController>(this->Controller);
+			if(instigatorController->currPlayerTeam == targetController->currPlayerTeam)
+			{
+				return;
+			}
+		}
+	}
+
+	//Stop Movement & disable Input
+	CBCharacterMoveComponent->StopMovementImmediately();
+	DefaultGravityScale = CBCharacterMoveComponent->GravityScale;
+	CBCharacterMoveComponent->GravityScale = 0.f;
+	DisableInput(Cast<APlayerController>(Controller));
+	//ToggleAbilities(false);
+	
+	//Pause all animations
+	DefaultTimeDilation = CustomTimeDilation;
+	CustomTimeDilation = 0.f;
+}
+
+void ACyberbowlCharacter::UnFreeze_Implementation()
+{
+	CBCharacterMoveComponent->GravityScale = DefaultGravityScale;
+	EnableInput(Cast<APlayerController>(Controller));
+	//ToggleAbilities(true);
+	CustomTimeDilation = DefaultTimeDilation;
+}
+
+void ACyberbowlCharacter::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical)
+{
+	CBCharacterMoveComponent->StopMovementImmediately();
+	CBCharacterMoveComponent->DoJump(true);
+	CBCharacterMoveComponent->Velocity = direction * forceHorizontal;
+	CBCharacterMoveComponent->Velocity.Z = forceVertical;
+
+	CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+}
+
+void ACyberbowlCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	BoopComponent = FindComponentByClass<UBoopComponent>();
+	CBCharacterMoveComponent = FindComponentByClass<UCBCharacterMovementComponent>();
+	if(!BoopComponent || !CBCharacterMoveComponent)
+	{
+		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: Vital Components not set in character blueprint! (BoopComponent, CBCharacterMovementComponent)"));
+	}
+	{
+		CBCharacterMoveComponent->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
+		CBCharacterMoveComponent->OnWallRunFinished.AddDynamic(this, &ACyberbowlCharacter::CallOnWallRunEnd);
+	}
+}
+
+//DOES NOT deactivate the abilities
+//void ACyberbowlCharacter::ToggleAbilities(bool enable)
+//{
+//	TSet<UActorComponent*> cmps = GetComponents();
+//
+//	for(auto cmp : cmps)
+//	{
+//		if(auto boopCmp = Cast<UBoopComponent>(cmp))
+//		{
+//			boopCmp->SetActive(enable, true);
+//		}
+//		else if (auto abilityCmp = Cast<UAbilityBase>(cmp))
+//		{
+//			abilityCmp->SetActive(enable, true);
+//		}
+//	}
+//}
 
 void ACyberbowlCharacter::Dash()
 {
-	auto CBCharMoveCmp = Cast<UCBCharacterMovementComponent>(GetCharacterMovement());
-	if (!CBCharMoveCmp)
-	{
-		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CBCharacterMovementCmp not found"));
-		return;
-	}
-
 	auto cooldownComponent = FindComponentByClass<UCooldownComponent>();
 	if (!cooldownComponent)
 	{
 		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: CoolDownComponent not found"));
 		return;	
 	}
-	
-	if(cooldownComponent->IsDashReady())
+	if(!cooldownComponent->IsDashReady())
 	{
-		CBCharMoveCmp->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);	
+		forceFeedback.Broadcast();
+	}
+	
+	if(cooldownComponent->IsDashReady() && !bIsTargetingAbility)
+	{
+		CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
+		cooldownComponent->StartCooldown("Dash");
+
+		OnDash.Broadcast();
+	}
+}
+
+void ACyberbowlCharacter::Boop()
+{
+	if(CBCharacterMoveComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Dash)
+	{
+		BoopComponent->StartBoop();
 	}
 }
 
@@ -161,12 +262,13 @@ void ACyberbowlCharacter::AbilityPressed()
 		if (abilityState == EAbilityState::ABILITY_DEFAULT)
 		{
 			abilityComponent->SetAbilityState(EAbilityState::ABILITY_TARGETING);
-			
+			bIsTargetingAbility = true;
 		}
 
 		else if (abilityState == EAbilityState::ABILITY_TARGETING)
 		{
 			abilityComponent->SetAbilityState(EAbilityState::ABILITY_FIRE);
+			bIsTargetingAbility = false;
 		}
 
 		else
@@ -181,19 +283,43 @@ void ACyberbowlCharacter::AbilityPressed()
 	}
 }
 
-void ACyberbowlCharacter::OnResetVR()
+void ACyberbowlCharacter::AbilityCanceled()
 {
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+	if(!bIsTargetingAbility)
+	{
+		return;
+	}
+	
+	TArray<UAbilityBase*, FDefaultAllocator> abilityComponents;
+	GetComponents<UAbilityBase, FDefaultAllocator>(abilityComponents);
+	UAbilityBase* abilityComponent = nullptr;
+	for (auto ability : abilityComponents)
+	{
+		if (ability->GetReadableName() != "AbilityBase")
+		{
+			abilityComponent = ability;
+		}
+	}
+
+	bIsTargetingAbility = false;
+	abilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 }
 
-void ACyberbowlCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+void ACyberbowlCharacter::CallOnBallCamToggled()
 {
-		Jump();
+	Cast<UBallCamComponent>(GetComponentByClass(UBallCamComponent::StaticClass()))->ToggleBallCam();
+
+	OnToggledBallCam.Broadcast();
 }
 
-void ACyberbowlCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
+void ACyberbowlCharacter::CallOnVerticalDash()
 {
-		StopJumping();
+	OnVerticalDash.Broadcast();
+}
+
+void ACyberbowlCharacter::CallOnWallRunEnd(float timeOnWall, bool launchedAway)
+{
+	OnWallrunEnd.Broadcast(timeOnWall, launchedAway);
 }
 
 
@@ -236,4 +362,40 @@ void ACyberbowlCharacter::MoveRight(float Value)
 	//	// add movement in that direction
 	//	AddMovementInput(Direction, Value);
 	//}
+}
+
+void ACyberbowlCharacter::TutorialNameTagSetup(int team, ECBCharacterType characterType)
+{
+	TArray<UWidgetComponent*, FDefaultAllocator> widgetComponents;
+	GetComponents<UWidgetComponent, FDefaultAllocator>(widgetComponents);
+
+	
+
+	UWidgetComponent* widgetComponent = widgetComponents.Pop();
+	widgetComponent->Activate();
+	UWNameTag* nameTagWidget = Cast<UWNameTag>(widgetComponent->GetUserWidgetObject());
+	UButton* nameplate = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
+	nameTagWidget->CharacterName = ToCharacterName(characterType);
+
+	if (team == 1)
+	{
+		nameplate->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
+	}
+	else
+	{
+		nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
+	}
+
+	const auto playerController = Cast<ATutorialPlayerController>(UGameplayStatics::GetPlayerControllerFromID(this, 0));
+	
+	widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
+	nameTagWidget->SetOwningPlayer(playerController);
+	nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
+	nameTagWidget->IsAssigned = true;
+
+	for (auto widgetComp : widgetComponents)
+	{
+		if (!Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned)
+		widgetComp->DestroyComponent();
+	}
 }

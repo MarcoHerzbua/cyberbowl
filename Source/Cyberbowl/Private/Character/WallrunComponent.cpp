@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerInput.h"
 #include "Character/CBCharacterMovementComponent.h"
+#include "Character/MovementStates/WallrunState.h"
+#include "Character/BoopComponent.h"
 
 
 // Sets default values for this component's properties
@@ -29,38 +31,33 @@ void UWallrunComponent::BeginPlay()
 		WallrunCollider = Cast<USphereComponent>(sphereCmps[0]);
 	}
 
-	if(!WallrunCollider)
+	auto boopComponent = GetOwner()->FindComponentByClass<UBoopComponent>();
+	if(!WallrunCollider || !boopComponent)
 	{
-		UE_LOG(LogInit, Error, TEXT("No WallrunCollider set in Character Blueprint"));
+		UE_LOG(LogInit, Error, TEXT("WallrunComponent: Vital Components not set in Character Blueprint! (WallrunCollider, boopcomponent)"));
 	}
 	else
 	{
 		WallrunCollider->OnComponentBeginOverlap.AddDynamic(this, &UWallrunComponent::CheckForWallrun);
 		WallrunCollider->OnComponentEndOverlap.AddDynamic(this, &UWallrunComponent::EndWallrun);
-		//WallrunCollider->OnComponentHit.AddDynamic(this, &UWallrunComponent::CheckForWallrun);
+		boopComponent->OnBoopStarted.AddDynamic(this, &UWallrunComponent::ForceEndWallrun);
 	}
 
 	MovementComponent = GetOwner()->FindComponentByClass<UCBCharacterMovementComponent>();
-
-	
 }
 
 void UWallrunComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//TODO: Should not be handled by tags, but Stadium should have its own Blueprint and walls should have a collision preset (or something similiar) 
-	//if(!OtherComp->ComponentTags.Contains("Stadium"))
-	//{
- // 		return;
-	//}
-
-	if (MovementComponent->MovementMode == EMovementMode::MOVE_Falling)
+	if (MovementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Running)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("WallrunCmp valid Wallrun")));
+		//CountWallTouches++;
 
 		//push character against the wall 
 		MovementComponent->AddImpulse(SweepResult.Normal * 1000.f);
 
 		MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Wallrun);
+		OnWallrunStart.Broadcast();
 	}
 }
 
@@ -70,8 +67,21 @@ void UWallrunComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* 
 	//This check is necessary to avoid bugs when character just walks up to a wall 
 	if(MovementComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
 	{
-		MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+		//CountWallTouches--;
+		//if(CountWallTouche == 0)
+
+		auto movementState = Cast<UWallrunState>(MovementComponent->GetCBMovementState());
+
+		if(!movementState->IsLaunching())
+		{
+			MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+		}
 	}
+}
+
+void UWallrunComponent::ForceEndWallrun()
+{
+	EndWallrun(nullptr, nullptr, nullptr, 0);
 }
 
 
@@ -100,19 +110,24 @@ void UWallrunComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		JumpKeyMapping = PlayerController->PlayerInput->GetKeysForAction("Jump");
 	}
 
-	if(PlayerController)
-	{
-		JumpInputPressedDuration = 0.f;
-		for(auto keyMapping : JumpKeyMapping)
-		{
-			float oldDuration = JumpInputPressedDuration;
-			JumpInputPressedDuration = PlayerController->GetInputKeyTimeDown(keyMapping.Key);
+	//if(MovementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Wallrun)
+	//{
+	//	CountWallTouches = 0;
+	//}
 
-			if(oldDuration > JumpInputPressedDuration)
-			{
-				JumpInputPressedDuration = oldDuration;
-			}
-		}
-	}
+	//if(PlayerController)
+	//{
+	//	JumpInputPressedDuration = 0.f;
+	//	for(auto keyMapping : JumpKeyMapping)
+	//	{
+	//		float oldDuration = JumpInputPressedDuration;
+	//		JumpInputPressedDuration = PlayerController->GetInputKeyTimeDown(keyMapping.Key);
+
+	//		if(oldDuration > JumpInputPressedDuration)
+	//		{
+	//			JumpInputPressedDuration = oldDuration;
+	//		}
+	//	}
+	//}
 }
 

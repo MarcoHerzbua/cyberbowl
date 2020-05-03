@@ -9,6 +9,7 @@
 #include "GameFramework/PlayerInput.h"
 #include "WallrunComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWallrunStart);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CYBERBOWL_API UWallrunComponent : public UActorComponent
@@ -16,20 +17,19 @@ class CYBERBOWL_API UWallrunComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	float TimeToActivateWallrun = 0.2f;
-	
-	USphereComponent* WallrunCollider;
+	UWallrunComponent();
+
+protected:
 	class UCBCharacterMovementComponent* MovementComponent;
 	APlayerController* PlayerController;
 	TArray<FInputActionKeyMapping> JumpKeyMapping;
 	
-	UWallrunComponent();
-
-protected:
 	UPROPERTY(BlueprintReadOnly)
-	float JumpInputPressedDuration = 0.f;
+	USphereComponent* WallrunCollider;
 	
+	//UPROPERTY(BlueprintReadOnly)
+	//int CountWallTouches = 0;
+		
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
@@ -37,6 +37,13 @@ protected:
 	void CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	//This function calls EndWallrun without any collision parameters
+	UFUNCTION()
+	void ForceEndWallrun();
+
+	UPROPERTY(BlueprintAssignable, Category = "WallrunComponent")
+	FOnWallrunStart OnWallrunStart;
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

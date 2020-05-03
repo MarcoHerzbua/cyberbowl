@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "AbilityBase.h"
+
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "Character/CyberbowlCharacter.h"
+#include "Character/Abilities/Firewall.h"
 #include "FireAbility.generated.h"
 
 /**
@@ -19,6 +23,16 @@ public:
 
 	UFireAbility() = default;
 
+
+	UPROPERTY(EditAnywhere)
+	float fireWallLifeTime;
+
+	UPROPERTY(EditAnywhere)
+	float TargetDistance;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AFirewall> FireWallClass;
+
 private:
 
 	virtual void BeginPlay() override;
@@ -29,6 +43,9 @@ private:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-private:
-	ACyberbowlCharacter* character;
+	UCameraComponent* camera;
+	FVector fireWallPosition;
+	bool bValidTarget;
+	bool bValidTargetBoxSize;
+	FVector boxScale;
 };

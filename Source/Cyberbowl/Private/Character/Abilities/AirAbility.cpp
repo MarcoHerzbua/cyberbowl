@@ -20,20 +20,21 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "Character/Abilities/CooldownComponent.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 
 void UAirAbility::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	character = Cast<ACyberbowlCharacter>(GetOwner());
-	movementComp = Cast<UCharacterMovementComponent>(character->GetMovementComponent());
+	movementComp = Cast<UCBCharacterMovementComponent>(character->GetMovementComponent());
 	
 
-	ball = Cast<APlayBall>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball);
+	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
 	ballLocationSpringArm = Cast<USpringArmComponent>(character->GetComponentsByTag(USpringArmComponent::StaticClass(), "BallLocationArm").Last());
 	ballPulledAttachComponent = Cast<USceneComponent>(character->GetComponentsByTag(USceneComponent::StaticClass(), "TornadoBallLocation").Last());
 
-	ball->OnBallBooped.AddDynamic(this, &UAirAbility::ExitGrabMode);
+	ball->OnBallBooped.AddDynamic(this, &UAirAbility::ExitGrabModeByPush);
 }
 
 void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -60,6 +61,11 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 		const FRotator cameraLookAt = FRotator(character->GetCameraBoom()->GetTargetRotation().Pitch * (-1), ballLocationSpringArm->GetComponentRotation().Yaw, 0);
 		ballLocationSpringArm->SetWorldRotation(cameraLookAt);
+
+		if(!movementComp->animinstance->GetIsGrabbing())
+		{
+			movementComp->animinstance->SetIsGrabbing(true);
+		}
 	}
 }
 
@@ -106,6 +112,18 @@ void UAirAbility::ConvertMetersToUnrealUnits()
 	grabRadiusMeters *= 100.f;
 }
 
+void UAirAbility::ExitGrabModeByPush()
+{
+	if (!bIsInGrabMode)
+	{
+		return;
+	}
+	
+	ExitGrabMode();
+	OnGrabModeExitByPush.Broadcast();
+
+}
+
 void UAirAbility::ExitGrabMode()
 {
 	if (!bIsInGrabMode)
@@ -120,6 +138,11 @@ void UAirAbility::ExitGrabMode()
 	character->bTurretMode = false;
 	character->GetCameraBoom()->bUsePawnControlRotation = true;
 	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	if (movementComp->animinstance->GetIsGrabbing())
+	{
+		movementComp->animinstance->SetIsGrabbing(false);
+	}
 }
 
 void UAirAbility::DestroyTornado()

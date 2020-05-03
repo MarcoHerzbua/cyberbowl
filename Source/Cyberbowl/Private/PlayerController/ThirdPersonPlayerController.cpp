@@ -1,22 +1,25 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "PlayerController/ThirdPersonPlayerController.h"
+
+#include <string>
+
 #include "GameModesAndInstances/CyberbowlGameInstance.h"
+#include "Character/BallCamComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameModesAndInstances/InGameGameMode.h"
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
-#include "Character/Abilities/AbilityBase.h"
-#include "Character/Abilities/FireAbility.h"
 #include "Components/Button.h"
-#include <string>
+#include "Kismet/KismetMathLibrary.h"
+#include "Widgets/WNameTag.h"
 
 void AThirdPersonPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	SetAsLocalPlayerController();
 	SpawnActors();
 }
@@ -25,7 +28,7 @@ void AThirdPersonPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	UpdateNameTagWidgetRotations();
+	UpdateNametagPositions();
 }
 
 void AThirdPersonPlayerController::SetupInputComponent()
@@ -34,7 +37,9 @@ void AThirdPersonPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallGameOverMenuNavigated);
-	InputComponent->BindAction("ToggleBallCam", IE_Pressed, this, &AThirdPersonPlayerController::CallToggledBallCam);
+	InputComponent->BindAction("PauseGame", IE_Pressed, this, &AThirdPersonPlayerController::CallPlayerPausedGame);
+	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationDown);
+	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AThirdPersonPlayerController::CallMenuNavigationUp);
 }
 
 void AThirdPersonPlayerController::SpawnActors()
@@ -59,6 +64,7 @@ void AThirdPersonPlayerController::SpawnActors()
 	TArray<AActor*> playerStarts;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), playerStarts);
 	APlayerStart* playerSpawn = nullptr;
+	savedPlayerStarts = playerStarts;
 	
 	for (AActor* currPlayerStart : playerStarts)
 	{
@@ -73,8 +79,8 @@ void AThirdPersonPlayerController::SpawnActors()
 	}
 
 	character = nullptr;
-	spawnTransform = playerSpawn->GetTransform().GetLocation();
-	spawnRotation = playerSpawn->GetActorRotation();
+	FVector spawnTransform = playerSpawn->GetTransform().GetLocation();
+	FRotator spawnRotation = playerSpawn->GetActorRotation();
 	
 	switch (currPlayerType)
 	{
@@ -116,12 +122,18 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 	TArray<UWidgetComponent*, FDefaultAllocator> widgetComponents;
 	character->GetComponents<UWidgetComponent, FDefaultAllocator>(widgetComponents);
 
+	// We need to re-activate the components, since they are being deactivated based on the player count last round
+	for (auto widgetComp : widgetComponents)
+	{
+		widgetComp->Activate();
+	}
+
 	TArray<AActor*> playerControllers;
 	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), playerControllers);
 
 	for (auto controller : playerControllers)
 	{
-		auto playerController = Cast<AThirdPersonPlayerController>(controller);
+		const auto playerController = Cast<AThirdPersonPlayerController>(controller);
 
 		if (playerController == this)
 			continue;
@@ -140,22 +152,19 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 			nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
 		}
 
-		//if (playerController != this)
-		//{
-			widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
-			nameTagWidget->SetOwningPlayer(playerController);
-			nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
-			nameTagWidget->IsAssigned = true;
-		//}
+		widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
+		playerController->AddNametagWidgetForPlayer(widgetComponent);
+		nameTagWidget->SetOwningPlayer(playerController);
+		nameTagWidget->SetOwningLocalPlayer(playerController->GetLocalPlayer());
+		nameTagWidget->IsAssigned = true;
 	}
 
 	for (auto widgetComp : widgetComponents)
-	{	
-		bool isAssigned = Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned;
+	{
+		const bool isAssigned = Cast<UWNameTag>(widgetComp->GetUserWidgetObject())->IsAssigned;
 		if (!isAssigned)
 		{
-			widgetComp->DestroyComponent();
-			UKismetSystemLibrary::PrintString(this, "deleted widget component");
+			widgetComp->Deactivate();
 		}
 	}
 }
@@ -172,8 +181,30 @@ void AThirdPersonPlayerController::OnPauseGamePlay()
 
 void AThirdPersonPlayerController::OnRegroup()
 {
+	Algo::Reverse(savedPlayerStarts);
+	TArray<AActor*> playerStarts = savedPlayerStarts;
+
+	APlayerStart* playerSpawn = nullptr;
+	for (AActor* currPlayerStart : playerStarts)
+	{
+		playerSpawn = Cast<APlayerStart>(currPlayerStart);
+		int playerTeam = FCString::Atoi(*playerSpawn->PlayerStartTag.ToString());
+		if (playerTeam == currPlayerTeam)
+		{
+			int idx = playerStarts.Find(currPlayerStart);
+			playerStarts.RemoveAt(idx);
+			break;
+		}
+	}
+
+	FVector spawnTransform = playerSpawn->GetTransform().GetLocation();
+	FRotator spawnRotation = playerSpawn->GetActorRotation();
 	character->SetActorLocation(spawnTransform);
 	character->SetActorRotation(spawnRotation);
+	UBallCamComponent* ballCam = Cast<UBallCamComponent>(character->FindComponentByClass<UBallCamComponent>());
+	ballCam->DoNotFollow();
+
+	character->GetController()->SetControlRotation(spawnRotation);
 }
 
 void AThirdPersonPlayerController::OnEndGame()
@@ -186,12 +217,48 @@ void AThirdPersonPlayerController::CallGameOverMenuNavigated()
 	OnCallGameOverMenuNavigated.Broadcast();
 }
 
-void AThirdPersonPlayerController::CallToggledBallCam()
+void AThirdPersonPlayerController::CallPlayerPausedGame()
 {
-	OnCallToggledBallCam.Broadcast();
+	OnPlayerPausedGame.Broadcast(UGameplayStatics::GetPlayerControllerID(this));
 }
 
-void AThirdPersonPlayerController::UpdateNameTagWidgetRotations()
+void AThirdPersonPlayerController::CallMenuNavigationDown()
 {
-	
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused())
+	{
+		OnMenuNavigatedDown.Broadcast();
+	}
+}
+
+void AThirdPersonPlayerController::CallMenuNavigationUp()
+{
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused())
+	{
+		OnMenuNavigatedUp.Broadcast();
+	}
+}
+
+void AThirdPersonPlayerController::UpdateNametagPositions()
+{
+	for (auto nametag : otherPlayerNametags)
+	{
+		const auto distanceToOtherPlayer = UKismetMathLibrary::Vector_Distance(character->GetActorLocation(), nametag->GetComponentLocation());
+		const float heightAdjustment = (distanceToOtherPlayer - MinPlayerDistance) * (MaxZWidgetPos - MinZWidgetPos) / (MaxPlayerDistance - MinPlayerDistance) + MinZWidgetPos;
+		
+		nametag->SetRelativeLocation(FVector(0, 0, heightAdjustment));
+	}
+}
+
+void AThirdPersonPlayerController::CallMenuEnter()
+{
+	// Only Player0 can press buttons apparently, so we have to manually handle it for the others
+	if (Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->GetIsPaused() && UGameplayStatics::GetPlayerControllerID(this) != 0)
+	{
+		OnMenuEnter.Broadcast();
+	}
+}
+
+void AThirdPersonPlayerController::AddNametagWidgetForPlayer(UWidgetComponent* nametagWidget)
+{
+	otherPlayerNametags.AddUnique(nametagWidget);
 }

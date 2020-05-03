@@ -2,15 +2,25 @@
 
 #pragma once
 
+#include "Actors/IFreezeable.h"
+#include "Actors/ILaunchable.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Character/Abilities/AbilityBase.h"
+#include "PlayerController/FPlayerInfo.h"
 #include "CyberbowlCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallCamToggled);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJump);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoop);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunEnd, float, timeOnWall, bool, launchedAway);
 
 UCLASS(config=Game)
-class ACyberbowlCharacter : public ACharacter
+class ACyberbowlCharacter : public ACharacter, public IFreezeable, public ILaunchable
 {
 	GENERATED_BODY()
 
@@ -21,9 +31,20 @@ class ACyberbowlCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
 public:
 	ACyberbowlCharacter();
 	ACyberbowlCharacter(const class FObjectInitializer& ObjectInitializer);
+
+	//Custom Cyberbowl Character MovementComponent
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
+	class UCBCharacterMovementComponent* CBCharacterMoveComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
+	class UBoopComponent* BoopComponent;
+	
+	UFUNCTION()
+	void CallMenuEnter();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -42,14 +63,43 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bTurretMode;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsTargetingAbility;
+
+	UPROPERTY()
+	float DefaultGravityScale;
+	
+	UPROPERTY()
+	float DefaultTimeDilation;
+
+#pragma region EventDispatchers
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnBallCamToggled OnToggledBallCam;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnJump OnJump;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnDoubleJump OnDoubleJump;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnDash OnDash;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnVerticalDash OnVerticalDash;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnWallrunEnd OnWallrunEnd;
+
+#pragma endregion
+	
+protected:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallErrorFeedback forceFeedback;
 
-protected:
 
-	/** Resets HMD orientation in VR. */
-	void OnResetVR();
-
+#pragma region Movement/Camera/Abilities
+	
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
@@ -67,30 +117,56 @@ protected:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
-
-	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
-
-	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
-
+	
+	void Jump() override;
+	
 	void Dash();
+
+	void Boop();
 
 	void AbilityPressed();
 
-	
-	
-protected:
+	void AbilityCanceled();
+
+	UFUNCTION()
+	void CallOnBallCamToggled();
+
+	UFUNCTION()
+	void CallOnVerticalDash();
+
+	UFUNCTION()
+	void CallOnWallRunEnd(float timeOnWall, bool launchedAway);
+
+#pragma endregion 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
-	void Jump() override;
 
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+#pragma region Interfaces
+	
+	void Freeze_Implementation(AActor* instigtr) override;
+
+	void UnFreeze_Implementation() override;
+
+	void Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical) override;
+
+#pragma endregion 
+	
+	void BeginPlay() override;
+	//UFUNCTION(BlueprintCallable, Category = "CyberbowlCharacter")
+	//void ToggleAbilities(bool enable);
+
+
+	// Please don't use this method without supervision, thank you
+	// If you do, I'll find you
+	void TutorialNameTagSetup(int team, ECBCharacterType characterType);
+	
 };
 

@@ -2,7 +2,7 @@
 
 
 #include "Character/BallCamComponent.h"
-
+#include "Actors/PlayBall.h"
 #include "Character/CyberbowlCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,7 +21,7 @@ void UBallCamComponent::BeginPlay()
 	Super::BeginPlay();
 
 	CameraBoom = Cast<ACyberbowlCharacter>(GetOwner())->GetCameraBoom();
-	PlayBall = Cast<UStaticMeshComponent>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball->GetComponentByClass(UStaticMeshComponent::StaticClass()));
+	PlayBall = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()))->BallStaticMesh;
 }
 
 void UBallCamComponent::FocusBall(float deltaTime)
@@ -84,7 +84,6 @@ void UBallCamComponent::ToggleBallCam()
 	}
 }
 
-// Called every frame
 void UBallCamComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

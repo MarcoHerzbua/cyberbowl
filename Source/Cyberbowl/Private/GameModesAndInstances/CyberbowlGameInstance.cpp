@@ -5,7 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "PlayerController/ThirdPersonPlayerController.h"
 
-void UCyberbowlGameInstance::CheckAllCharactersSpawned() const
+void UCyberbowlGameInstance::CheckAllCharactersSpawned()
 {
 	if (SpawnedCharacters == TotalPlayers)
 	{
@@ -16,5 +16,7 @@ void UCyberbowlGameInstance::CheckAllCharactersSpawned() const
 		{
 			Cast<AThirdPersonPlayerController>(controller)->SetupNameTagWidgets();
 		}
+
+		SpawnedCharacters = 0;
 	}
 }

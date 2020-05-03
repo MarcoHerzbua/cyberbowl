@@ -6,14 +6,10 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/Actor.h"
 #include "EngineUtils.h"
-#include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "InGameGameMode.generated.h"
 
-
-/**
- * 
- */
+class AThirdPersonPlayerController;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndGameEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGamePlayEvent);
@@ -32,7 +28,10 @@ public:
 	AActor* GoalColliderTeam0;
 	UPROPERTY(BlueprintReadWrite)
 	AActor* GoalColliderTeam1;
-	void Add_Points(AActor* Collider);
+
+	UFUNCTION()
+	void Add_Points(int teamIndex);
+	
 	UPROPERTY(BlueprintReadWrite)
 	int PointsTeam0;
 	UPROPERTY(BlueprintReadWrite)
@@ -70,8 +69,36 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Restart();
 
+	UFUNCTION()
+	bool GetIsPaused() const;
+
 private:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 	void GameEnd();
+
+	UFUNCTION()
+	void TogglePauseGame(int playerIndexInitiator);
+	
+	UFUNCTION()
+	void PauseGameForAll(int playerIndexInitiator);
+
+	UFUNCTION(BlueprintCallable)
+	void ResumeGameForAll();
+
+	UPROPERTY()
+	bool bGameIsPaused;
+
+	UPROPERTY()
+	TArray<AThirdPersonPlayerController*> playerControllers;
+
+	UPROPERTY()
+	TArray<UUserWidget*> pauseWidgets;
+
+	UPROPERTY(Editanywhere)
+	TSubclassOf<UUserWidget> WGamePausedAll;
+
+	UPROPERTY(Editanywhere)
+	TSubclassOf<UUserWidget> WGamePausedInitiator;
+
 };

@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/InputComponent.h"
 #include "CBCharacterMovementComponent.h"
+#include "NiagaraComponent.h"
 #include "BoopComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoopStarted);
@@ -31,15 +32,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
 	float BoopCooldown = 1.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
+	UNiagaraSystem* BoopEffect;
+
+
 	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
 	FOnBoopStarted OnBoopStarted;
-	
+
+	UFUNCTION(BlueprintCallable, Category = "BoopComponent")
+	void StartBoop();
+
 protected:
-	AActor* Owner;
 	UInputComponent* InputComponent;
 	APlayerController* PlayerController;
 	UCBCharacterMovementComponent* MovementComponent;
-	class APlayerCameraManager* CameraManager;
+	USceneComponent* BoopEffectSpawnLocation;
+	USpringArmComponent* BoopSpringarm;
+	//class APlayerCameraManager* CameraManager;
 	
 	class UBoxComponent* BoopHitbox;
 	FVector BoopHitboxInitialLocation;
@@ -52,19 +61,24 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bBoopActive = false;
+
 	UPROPERTY(BlueprintReadOnly)
-	bool bBoopOnCooldown = false;
+	UNiagaraComponent* BoopNiagaraComponent;
 	
 	virtual void BeginPlay() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	
-	void StartBoop();
 
+	void EndBoop();
+	
 	UFUNCTION()
 	void PushBall(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void DeactivateBoopHitbox();
-	void AdjustBoopHitboxTransform(float DeltaTime);
+
+	UFUNCTION(BlueprintCallable, Category = "BoopComponent")
+	void SpawnBoopEffect();
+	
+	void AdjustBoopTransforms(float DeltaTime);
 
 	void OnBoopCooldown();
 public:	

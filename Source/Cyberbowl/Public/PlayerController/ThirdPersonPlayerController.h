@@ -7,12 +7,14 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "FPlayerInfo.h"
-#include "Widgets/WNameTag.h"
 #include "Components/WidgetComponent.h"
 #include "ThirdPersonPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallToggledBallCam);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerPausedGame, int, playerIndexInitiator);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedDown);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedUp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuEnter);
 
 UCLASS()
 class CYBERBOWL_API AThirdPersonPlayerController : public APlayerController
@@ -65,17 +67,32 @@ private:
 	void CallGameOverMenuNavigated();
 
 	UFUNCTION()
-	void CallToggledBallCam();
+	void CallPlayerPausedGame();
 
 	UFUNCTION()
-	void UpdateNameTagWidgetRotations();
+	void CallMenuNavigationDown();
+
+	UFUNCTION()
+	void CallMenuNavigationUp();
+
+	void UpdateNametagPositions();
+	
 
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnCallGameOverMenuNavigated OnCallGameOverMenuNavigated;
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnCallGameOverMenuNavigated OnCallToggledBallCam;
+	FOnPlayerPausedGame OnPlayerPausedGame;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuNavigatedDown OnMenuNavigatedDown;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuNavigatedUp OnMenuNavigatedUp;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuEnter OnMenuEnter;
 
 	UPROPERTY(BlueprintReadOnly)
 	int currPlayerTeam;
@@ -83,10 +100,20 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	ECBCharacterType currPlayerType;
 
+	UFUNCTION()
+	void CallMenuEnter();
+
+	void AddNametagWidgetForPlayer(UWidgetComponent* nametagWidget);
 	
 protected:
 	ACyberbowlCharacter* character;
-	FVector spawnTransform;
-	FRotator spawnRotation;
+	TArray<AActor*> savedPlayerStarts;
+	
+	TArray<UWidgetComponent*> otherPlayerNametags;
 
+	// Constants for the nametag widget height adjustment
+	const float MinZWidgetPos = 120.f;
+	const float MaxZWidgetPos = 400.f;
+	const float MinPlayerDistance = 1000.f;
+	const float MaxPlayerDistance = 15000.f;
 };
