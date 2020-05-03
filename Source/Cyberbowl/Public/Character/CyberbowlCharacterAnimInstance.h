@@ -15,10 +15,12 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
-	public:
+public:
 
 		virtual void NativeInitializeAnimation() override;
 
+protected:
+	
 		UFUNCTION(blueprintCallable)
 		void UpdateAnimationProperties();
 
@@ -41,6 +43,12 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		bool bisInAir;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		bool bIsDoubleJumping;
+
+		UPROPERTY(editAnywhere, BlueprintReadWrite)
+		float doubleJumpPlayRate = 1.0f;
+
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		bool bisIsWallRidingCounterClockWise;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
@@ -48,6 +56,9 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		bool bIsDashing;
+
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		float dashPlayRate = 1.f;
 	
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		bool bIsBooping;
@@ -55,11 +66,16 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		UPROPERTY(editAnywhere, BlueprintReadWrite)
 		float boopPlayRate = 1.0f;
 
-		UPROPERTY(editDefaultsOnly, blueprintReadWrite, Category = "Animation")
-		class UAnimMontage* cyberbowlMonatage;
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		bool bIsGrabbing;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
-		float dashPlayRate = 1.f;
+			class APawn* pawn;
+
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
+			class ACyberbowlCharacter* main;
+
+public:
 
 		void SetIsWallRidingCounterClockWise(bool bIsCounterClockWise);
 		void SetIsWallRidingClockWise(bool bisInWallRidingClockWise);
@@ -67,13 +83,12 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		void SetDashPlayRate(float playRate);
 		void SetIsBooping(bool bBooping);
 		void SetBoopPlayRate(float playRate);
-
-		UPROPERTY(editAnywhere, BlueprintReadOnly)
-		class APawn* pawn;
-
-		UPROPERTY(editAnywhere, BlueprintReadOnly)
-		class ACyberbowlCharacter* main;
-
+		void SetIsDoubleJumping(bool bDoubleJump);
+		void SetDoubleJumpPlayRate(float playRate);
+		void SetIsGrabbing(bool bGrabbing);
+		bool GetIsGrabbing();
+		bool GetIsInAir();
+	
 private:
 	float MaxCharacterSpeed;
 	

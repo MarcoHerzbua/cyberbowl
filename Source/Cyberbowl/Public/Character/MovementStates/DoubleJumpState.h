@@ -21,4 +21,8 @@ public:
 	void OnTick(float DeltaTime) override;
 
 protected:
+	void EndDoubleJumpingAnimation();
+
+	UPROPERTY()
+	FTimerHandle EndDoubleJumpAnimation;
 };

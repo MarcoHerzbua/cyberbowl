@@ -20,13 +20,14 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "Character/Abilities/CooldownComponent.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 
 void UAirAbility::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	character = Cast<ACyberbowlCharacter>(GetOwner());
-	movementComp = Cast<UCharacterMovementComponent>(character->GetMovementComponent());
+	movementComp = Cast<UCBCharacterMovementComponent>(character->GetMovementComponent());
 	
 
 	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
@@ -60,6 +61,11 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 		const FRotator cameraLookAt = FRotator(character->GetCameraBoom()->GetTargetRotation().Pitch * (-1), ballLocationSpringArm->GetComponentRotation().Yaw, 0);
 		ballLocationSpringArm->SetWorldRotation(cameraLookAt);
+
+		if(!movementComp->animinstance->GetIsGrabbing())
+		{
+			movementComp->animinstance->SetIsGrabbing(true);
+		}
 	}
 }
 
@@ -115,6 +121,7 @@ void UAirAbility::ExitGrabModeByPush()
 	
 	ExitGrabMode();
 	OnGrabModeExitByPush.Broadcast();
+
 }
 
 void UAirAbility::ExitGrabMode()
@@ -131,6 +138,11 @@ void UAirAbility::ExitGrabMode()
 	character->bTurretMode = false;
 	character->GetCameraBoom()->bUsePawnControlRotation = true;
 	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	if (movementComp->animinstance->GetIsGrabbing())
+	{
+		movementComp->animinstance->SetIsGrabbing(false);
+	}
 }
 
 void UAirAbility::DestroyTornado()

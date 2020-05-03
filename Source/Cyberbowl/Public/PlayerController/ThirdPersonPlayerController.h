@@ -76,6 +76,7 @@ private:
 	void CallMenuNavigationUp();
 
 	void UpdateNametagPositions();
+	
 
 public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
@@ -106,8 +107,7 @@ public:
 	
 protected:
 	ACyberbowlCharacter* character;
-	FVector spawnTransform;
-	FRotator spawnRotation;
+	TArray<AActor*> savedPlayerStarts;
 	
 	TArray<UWidgetComponent*> otherPlayerNametags;
 
