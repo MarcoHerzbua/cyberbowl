@@ -100,6 +100,13 @@ void UAirAbility::Fire()
 
 		const auto cameraLookAtRotation = FRotator(0.f, character->GetCameraBoom()->GetTargetRotation().Yaw, 0.f);
 		character->SetActorRotation(cameraLookAtRotation);
+
+		OnGrabMode.Broadcast();
+	}
+
+	else
+	{
+		OnFailedGrab.Broadcast();
 	}
 
 	tornadoComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, tornadoEffect, character->GetActorLocation());
@@ -108,13 +115,20 @@ void UAirAbility::Fire()
 	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	playSoundTargeting = true;
 }
 
 void UAirAbility::Targeting()
 {
+	
 	FVector cylinderEnd = GetOwner()->GetActorLocation();
 	cylinderEnd.Z += 2000.f;
 	DrawDebugCylinder(GetWorld(), GetOwner()->GetActorLocation(), cylinderEnd, grabRadiusMeters, 32, FColor::Red, false, 0.01f, 0, 5.f);
+	if (playSoundTargeting)
+	{
+		OnTargeting.Broadcast();
+		playSoundTargeting = false;
+	}
 }
 
 void UAirAbility::ConvertMetersToUnrealUnits()

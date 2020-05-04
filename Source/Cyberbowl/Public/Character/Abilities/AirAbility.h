@@ -7,6 +7,9 @@
 #include "AirAbility.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGrabModeExitByPush);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTargeting);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGrabMode);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFailedGrab);
 
 class APlayBall;
 class UCharacterMovementComponent;
@@ -27,6 +30,15 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnGrabModeExitByPush OnGrabModeExitByPush;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnTargeting OnTargeting;
+	
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnGrabMode OnGrabMode;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnFailedGrab OnFailedGrab;
 	
 protected:
 	virtual void Fire() override;
@@ -86,4 +98,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	UNiagaraComponent* tornadoComponent;
+
+	bool playSoundTargeting = true;
 };
