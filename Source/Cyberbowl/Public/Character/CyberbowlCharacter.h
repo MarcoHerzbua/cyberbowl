@@ -43,6 +43,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
 	class UBoopComponent* BoopComponent;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities)
+	class UAbilityBase* AbilityComponent;
+	
 	UFUNCTION()
 	void CallMenuEnter();
 
@@ -124,7 +127,9 @@ protected:
 
 	void Boop();
 
-	void AbilityPressed();
+	void AbilityTargeting();
+	
+	void AbilityFire();
 
 	void AbilityCanceled();
 

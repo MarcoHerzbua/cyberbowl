@@ -31,6 +31,8 @@ public:
 protected:
 	virtual void Fire() override;
 	
+	virtual void Targeting() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void ConvertMetersToUnrealUnits();
 
