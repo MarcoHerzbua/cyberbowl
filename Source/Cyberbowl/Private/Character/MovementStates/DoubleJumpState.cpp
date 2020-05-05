@@ -11,7 +11,10 @@ void UDoubleJumpState::InitializeState(UCBCharacterMovementComponent* moveCompon
 void UDoubleJumpState::Activate(ECBMovementMode previousMode)
 {
 	UBaseMovementState::Activate(previousMode);
-	MovementComponent->animinstance->SetIsDoubleJumping(true);
+	if(previousMode != ECBMovementMode::CBMOVE_Dash)
+	{
+		MovementComponent->animinstance->SetIsDoubleJumping(true);
+	}
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(EndDoubleJumpAnimation, this, &UDoubleJumpState::EndDoubleJumpingAnimation, MovementComponent->DoubleJumpDuration);
 }
 
