@@ -103,7 +103,8 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ACyberbowlCharacter::LookUpAtRate);
 
 	// Handle ability input
-	PlayerInputComponent->BindAction("Ult", IE_Pressed, this, &ACyberbowlCharacter::AbilityPressed);
+	PlayerInputComponent->BindAction("Ult", IE_Pressed, this, &ACyberbowlCharacter::AbilityTargeting);
+	PlayerInputComponent->BindAction("Ult", IE_Released, this, &ACyberbowlCharacter::AbilityFire);
 	PlayerInputComponent->BindAction("CancelUlt", IE_Pressed, this, &ACyberbowlCharacter::AbilityCanceled);
 
 	PlayerInputComponent->BindAction("ToggleBallCam", IE_Pressed, this, &ACyberbowlCharacter::CallOnBallCamToggled);
@@ -181,9 +182,10 @@ void ACyberbowlCharacter::BeginPlay()
 
 	BoopComponent = FindComponentByClass<UBoopComponent>();
 	CBCharacterMoveComponent = FindComponentByClass<UCBCharacterMovementComponent>();
-	if(!BoopComponent || !CBCharacterMoveComponent)
+	AbilityComponent = FindComponentByClass<UAbilityBase>();
+	if(!BoopComponent || !CBCharacterMoveComponent || AbilityComponent)
 	{
-		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: Vital Components not set in character blueprint! (BoopComponent, CBCharacterMovementComponent)"));
+		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: Vital Components not set in character blueprint! (BoopComponent, CBCharacterMovementComponent, AbilityComponent)"));
 	}
 	{
 		CBCharacterMoveComponent->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
@@ -239,70 +241,48 @@ void ACyberbowlCharacter::Boop()
 	}
 }
 
-void ACyberbowlCharacter::AbilityPressed()
+void ACyberbowlCharacter::AbilityTargeting()
 {
 	auto cooldownComponent = FindComponentByClass<UCooldownComponent>();
-	TArray<UAbilityBase*, FDefaultAllocator> abilityComponents;
-	GetComponents<UAbilityBase, FDefaultAllocator>(abilityComponents);
-	UAbilityBase* abilityComponent = nullptr;
-	for (auto ability : abilityComponents)
-	{
-		if (ability->GetReadableName()!="AbilityBase")
-		{
-			abilityComponent = ability;
-		}
-	}
 
-	auto abilityState = abilityComponent->GetAbilityState();
+	auto abilityState = AbilityComponent->GetAbilityState();
 	
 	if (cooldownComponent->IsUltReady())
 	{
-		abilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
+		AbilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 		
 		if (abilityState == EAbilityState::ABILITY_DEFAULT)
 		{
-			abilityComponent->SetAbilityState(EAbilityState::ABILITY_TARGETING);
+			AbilityComponent->SetAbilityState(EAbilityState::ABILITY_TARGETING);
 			bIsTargetingAbility = true;
 		}
-
-		else if (abilityState == EAbilityState::ABILITY_TARGETING)
-		{
-			abilityComponent->SetAbilityState(EAbilityState::ABILITY_FIRE);
-			bIsTargetingAbility = false;
-		}
-
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Error: Something is terribly wrong!"))
+			UE_LOG(LogTemp, Warning, TEXT("CyberbowlCharacter::AbilityTargeting - Something is terribly wrong!"))
 		}
 	}
-
 	else
 	{
 		forceFeedback.Broadcast();
 	}
 }
 
+void ACyberbowlCharacter::AbilityFire()
+{
+	if (bIsTargetingAbility)
+	{
+		AbilityComponent->SetAbilityState(EAbilityState::ABILITY_FIRE);
+		bIsTargetingAbility = false;
+	}
+}
+
 void ACyberbowlCharacter::AbilityCanceled()
 {
-	if(!bIsTargetingAbility)
+	if(bIsTargetingAbility)
 	{
-		return;
+		AbilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
+		bIsTargetingAbility = false;
 	}
-	
-	TArray<UAbilityBase*, FDefaultAllocator> abilityComponents;
-	GetComponents<UAbilityBase, FDefaultAllocator>(abilityComponents);
-	UAbilityBase* abilityComponent = nullptr;
-	for (auto ability : abilityComponents)
-	{
-		if (ability->GetReadableName() != "AbilityBase")
-		{
-			abilityComponent = ability;
-		}
-	}
-
-	bIsTargetingAbility = false;
-	abilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 }
 
 void ACyberbowlCharacter::CallOnBallCamToggled()
