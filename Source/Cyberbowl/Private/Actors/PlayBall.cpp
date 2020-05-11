@@ -18,7 +18,7 @@ void APlayBall::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	BallStaticMesh = FindComponentByClass<UStaticMeshComponent>();
+	BallStaticMesh = Cast<UStaticMeshComponent>(GetComponentsByTag(UStaticMeshComponent::StaticClass(), "PhysicalMesh").Last());
 	if (!BallStaticMesh)
 	{
 		return;

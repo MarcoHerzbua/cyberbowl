@@ -41,9 +41,13 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(CurrState == EAbilityState::ABILITY_FIRE || CurrState == EAbilityState::ABILITY_TARGETING)
+	if(CurrState == EAbilityState::ABILITY_FIRE)
 	{
 		Fire();
+	}
+	else if(CurrState == EAbilityState::ABILITY_TARGETING)
+	{
+		Targeting();
 	}
 
 	if (bIsInGrabMode)
@@ -97,13 +101,34 @@ void UAirAbility::Fire()
 		const auto cameraLookAtRotation = FRotator(0.f, character->GetCameraBoom()->GetTargetRotation().Yaw, 0.f);
 		character->SetActorRotation(cameraLookAtRotation);
 
-		tornadoComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, tornadoEffect, character->GetActorLocation());
-		GetWorld()->GetTimerManager().SetTimer(TornadoEffectDurationHandle, this, &UAirAbility::DestroyTornado, tornadoDuration, false);
+		OnGrabMode.Broadcast();
 	}
+
+	else
+	{
+		OnFailedGrab.Broadcast();
+	}
+
+	tornadoComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, tornadoEffect, character->GetActorLocation());
+	GetWorld()->GetTimerManager().SetTimer(TornadoEffectDurationHandle, this, &UAirAbility::DestroyTornado, tornadoDuration, false);
 
 	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	playSoundTargeting = true;
+}
+
+void UAirAbility::Targeting()
+{
+	
+	FVector cylinderEnd = GetOwner()->GetActorLocation();
+	cylinderEnd.Z += 2000.f;
+	DrawDebugCylinder(GetWorld(), GetOwner()->GetActorLocation(), cylinderEnd, grabRadiusMeters, 32, FColor::Red, false, 0.01f, 0, 5.f);
+	if (playSoundTargeting)
+	{
+		OnTargeting.Broadcast();
+		playSoundTargeting = false;
+	}
 }
 
 void UAirAbility::ConvertMetersToUnrealUnits()
