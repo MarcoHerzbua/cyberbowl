@@ -125,6 +125,8 @@ void UBoopComponent::PushBall(UPrimitiveComponent* OverlappedComp, AActor* Other
 		//DrawDebugLine(Owner->GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + 100.f * cameraForwardVec, FColor::Emerald, false, 10.f, 0, 5.f);
 	}
 
+	//extra linetrace to determine the distance of ball to cast center
+	//the push force is lowered the higher the distance
 	FHitResult traceToBall;
 	GetWorld()->LineTraceSingleByProfile(traceToBall, BoopEffectSpawnLocation->GetComponentLocation(), OtherActor->GetActorLocation(), "BlockAll");
 
