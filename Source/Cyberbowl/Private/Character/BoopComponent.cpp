@@ -10,6 +10,7 @@
 #include "Actors/PlayBall.h"
 #include "Components/BoxComponent.h"
 #include "Character/CyberbowlCharacterAnimInstance.h"
+#include "Engine/Engine.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -123,7 +124,25 @@ void UBoopComponent::PushBall(UPrimitiveComponent* OverlappedComp, AActor* Other
 		cameraForwardVec.Z = FMath::DegreesToRadians(UpwardsAngle);
 		//DrawDebugLine(Owner->GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + 100.f * cameraForwardVec, FColor::Emerald, false, 10.f, 0, 5.f);
 	}
-	ball->PushBall(Force, cameraForwardVec);
+
+	FHitResult traceToBall;
+	GetWorld()->LineTraceSingleByProfile(traceToBall, BoopEffectSpawnLocation->GetComponentLocation(), OtherActor->GetActorLocation(), "BlockAll");
+
+	auto pushForce = Force;
+	if(traceToBall.bBlockingHit)
+	{
+		auto hitboxExtent = BoopHitbox->GetScaledBoxExtent();
+		auto distanceNormalized = traceToBall.Distance / (hitboxExtent.X * 2.f);
+
+		auto forceModifier = ForceFalloffCurve->GetFloatValue(FMath::Clamp(distanceNormalized, 0.01f, 1.f));
+		
+		pushForce *= forceModifier;
+	}
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("extent: %f, %f, %f"), hitDistance.X, hitDistance.Y, hitDistance.Z));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("force: %f"), pushForce));
+	
+	ball->PushBall(pushForce, cameraForwardVec);
 
 	//deactivate hitbox so ball only gets pushed once when inside hitbox
 	DeactivateBoopHitbox();
