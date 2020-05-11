@@ -33,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AFirewall> FireWallClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector fireWallExtent = (FVector(3000, 50, 1000));
+
 private:
 
 	virtual void BeginPlay() override;
@@ -46,6 +49,9 @@ private:
 	UCameraComponent* camera;
 	FVector fireWallPosition;
 	bool bValidTarget;
-	bool bValidTargetBoxSize;
-	FVector boxScale;
+	bool bTargetingVisible;
+	UStaticMeshComponent* targetingComponent;
+	ACyberbowlCharacter* character;
+
+
 };

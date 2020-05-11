@@ -15,6 +15,7 @@ class CYBERBOWL_API AFirewall : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
+	//AFirewall();
 	AFirewall();
 	
 
@@ -31,9 +32,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* root;
 
-	FVector firewallColliderSize = (FVector(3000, 1000, 1000));
+	//FVector firewallColliderSize = (FVector(3000, 1000, 1000));
 
 	
 	virtual void Tick(float DeltaTime) override;
-	FVector GetBoxExtent() { return box->GetUnscaledBoxExtent(); };
+	void SetBoxExtent(FVector extent) { box->SetBoxExtent(extent); };
 };
