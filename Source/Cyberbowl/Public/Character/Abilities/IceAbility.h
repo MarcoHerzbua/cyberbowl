@@ -71,4 +71,7 @@ protected:
 	bool IsWithinCone(FVector hitPoint, FVector coneDirectionNormal);
 
 	void DestroyCoCEffect();
+
+	UStaticMeshComponent* targetingComponent;
+	bool bTargetingVisible;
 };

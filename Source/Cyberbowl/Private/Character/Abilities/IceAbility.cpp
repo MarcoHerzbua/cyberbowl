@@ -17,6 +17,8 @@
 
 void UIceAbility::Fire()
 {
+	targetingComponent->SetVisibility(false);
+
 	OnAbilityCasted.Broadcast();
 	float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
 	float coneRadius = ConeLength * FMath::Tan(ConeAngle) / 2.f;
@@ -69,6 +71,7 @@ void UIceAbility::Fire()
 	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	bTargetingVisible = false;
 }
 
 void UIceAbility::Targeting()
@@ -78,6 +81,19 @@ void UIceAbility::Targeting()
 
 	FVector start = GetOwner()->GetActorLocation();
 	FVector direction = ownerAsPawn->GetControlRotation().Vector();
+
+	if (!bTargetingVisible)
+	{
+		float radius = ConeLength/50 * tan(coneAngleInRadians);
+		targetingComponent->SetWorldScale3D(FVector(radius, radius, ConeLength/100));
+		targetingComponent->SetVisibility(true);
+		bTargetingVisible = true;
+	}
+
+	FRotator controlRotation = ownerAsPawn->GetControlRotation();
+	targetingComponent->SetWorldRotation(FRotator(controlRotation.Pitch + 90, controlRotation.Yaw , controlRotation.Roll));
+	direction.Normalize(0);
+	targetingComponent->SetWorldLocation(start + direction * ConeLength/2);
 	DrawDebugCone(GetOwner()->GetWorld(), start, direction, ConeLength, coneAngleInRadians, coneAngleInRadians, 12, FColor::Blue, false, 0.01, 0, 4.f);
 }
 
@@ -98,7 +114,10 @@ void UIceAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 void UIceAbility::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	ACyberbowlCharacter* character = Cast<ACyberbowlCharacter>(GetOwner());
+	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
+	bTargetingVisible = false;
 }
 
 void UIceAbility::UnfreezeActors()
