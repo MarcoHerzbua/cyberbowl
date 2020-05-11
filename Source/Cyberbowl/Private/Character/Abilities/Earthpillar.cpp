@@ -24,6 +24,7 @@ AEarthpillar::AEarthpillar()
 	triggerMesh->SetupAttachment(root);
 	triggerMesh->SetCollisionProfileName("OverlapAllDynamic");
 	currPlayerTeam = -1;
+	
 }
 
 
