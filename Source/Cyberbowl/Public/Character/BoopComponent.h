@@ -26,6 +26,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
 	float UpwardsAngle = 20.f;
 	
+	//Time Input (x-Axis) defines the distance between boop center and ball - needs to be in range from 0 to 1
+	//Value Output (y-Axis) defines the modifier that is applied to the overall Force - needs to be in range from 0 to 1
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params"/*, meta = (UIMin = "0.1", UIMax = "1.0")*/)
+	class UCurveFloat* ForceFalloffCurve;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boop Params")
 	float BoopDuration = 1.f;
 
