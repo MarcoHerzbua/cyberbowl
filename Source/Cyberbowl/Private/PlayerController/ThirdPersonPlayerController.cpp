@@ -22,6 +22,8 @@ void AThirdPersonPlayerController::BeginPlay()
 	
 	SetAsLocalPlayerController();
 	SpawnActors();
+	//Disable movement til the countdown when starting the game ends.
+	OnPauseGamePlay();
 }
 
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)

@@ -25,7 +25,7 @@ AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectIniti
 	static ConstructorHelpers::FClassFinder<APawn> DummyCharacterFinder(TEXT("/Game/Characters/Dummy/DummyBase"));
 	dummyClass = DummyCharacterFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> countdownWidgetClassFinder(TEXT("/Game/UI/Countdown"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> countdownWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_CharacterSelectionComplete"));
 	countdownWidgetClass = countdownWidgetClassFinder.Class;
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyNotJoinedWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_LobbyNotJoined"));
@@ -82,7 +82,7 @@ void AMainMenuGameMode::OnPlayerReadyUnready()
 	auto countdownWidget = CreateWidget(UGameplayStatics::GetPlayerControllerFromID(this, 0), countdownWidgetClass);
 	countdownWidget->AddToViewport();
 
-	GetWorld()->GetTimerManager().SetTimer(CountdownTimer, this, &AMainMenuGameMode::StartMatch , 3.f, false);
+	GetWorld()->GetTimerManager().SetTimer(CountdownTimer, this, &AMainMenuGameMode::StartMatch , 1.f, false);
 }
 
 void AMainMenuGameMode::StartMatch()

@@ -27,7 +27,11 @@ void AInGameGameMode::BeginPlay()
 
 
 	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &AInGameGameMode::GameEnd, GamePlayTime);
-	StartGamePlay.Broadcast();
+	//Pause Game Timer til the countdown when starting the game ends.
+	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
+	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
+	
+	//StartGamePlay.Broadcast();
 
 	TArray<AActor*> controllers;
 	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), controllers);
@@ -39,6 +43,8 @@ void AInGameGameMode::BeginPlay()
 		playerController->OnPlayerPausedGame.AddDynamic(this, &AInGameGameMode::TogglePauseGame);
 		playerControllers.AddUnique(playerController);
 	}
+
+	bGamePlayStarted = false;
 }
 
 void AInGameGameMode::GameEnd()
@@ -159,12 +165,17 @@ void AInGameGameMode::SelectGameOverMenu(int LevelIndex)
 void AInGameGameMode::RegroupPlayers()
 {
 	Regroup.Broadcast();
-	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Restart, GameIntermediateTime);
+	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
 
 }
 
-void AInGameGameMode::Restart()
+void AInGameGameMode::Start()
 {
+	if (!bGamePlayStarted)
+	{
+		MatchCoundownEnd.Broadcast();
+		bGamePlayStarted = true;
+	}
 	StartGamePlay.Broadcast();
 	RoundCoundownEnd.Broadcast();
 	GetWorldTimerManager().UnPauseTimer(GameEndTimerHandle);
