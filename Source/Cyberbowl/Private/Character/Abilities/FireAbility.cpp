@@ -65,7 +65,7 @@ void UFireAbility::Targeting()
 
 	bValidTarget = UAbilityUtils::FindTargetPoint(world, fireWallPosition, actorLoc, end, 100.f);
 
-	if (!bTargetingVisible)
+	if (!bTargetingVisible && bValidTarget)
 	{
 		targetingComponent->SetWorldScale3D(FVector(fireWallExtent)/50.f);
 		targetingComponent->SetVisibility(true);

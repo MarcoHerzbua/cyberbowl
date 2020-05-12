@@ -100,4 +100,7 @@ protected:
 	UNiagaraComponent* tornadoComponent;
 
 	bool playSoundTargeting = true;
+	
+	UStaticMeshComponent* targetingComponent;
+	bool bTargetingVisible;
 };

@@ -28,13 +28,16 @@ void UAirAbility::BeginPlay()
 	
 	character = Cast<ACyberbowlCharacter>(GetOwner());
 	movementComp = Cast<UCBCharacterMovementComponent>(character->GetMovementComponent());
+	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
+	bTargetingVisible = false;
 	
-
 	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
 	ballLocationSpringArm = Cast<USpringArmComponent>(character->GetComponentsByTag(USpringArmComponent::StaticClass(), "BallLocationArm").Last());
 	ballPulledAttachComponent = Cast<USceneComponent>(character->GetComponentsByTag(USceneComponent::StaticClass(), "TornadoBallLocation").Last());
 
 	ball->OnBallBooped.AddDynamic(this, &UAirAbility::ExitGrabModeByPush);
+
+
 }
 
 void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -75,6 +78,7 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 void UAirAbility::Fire()
 {
+	targetingComponent->SetVisibility(false);
 	FVector cylinderEnd = GetOwner()->GetActorLocation();
 	cylinderEnd.Z += 2000.f;
 	DrawDebugCylinder(GetWorld(), GetOwner()->GetActorLocation(), cylinderEnd, grabRadiusMeters, 32, FColor::Red, false, grabDurationSeconds, 0, 5.f);
@@ -116,6 +120,7 @@ void UAirAbility::Fire()
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
 	playSoundTargeting = true;
+	bTargetingVisible = false;
 }
 
 void UAirAbility::Targeting()
@@ -123,7 +128,16 @@ void UAirAbility::Targeting()
 	
 	FVector cylinderEnd = GetOwner()->GetActorLocation();
 	cylinderEnd.Z += 2000.f;
-	DrawDebugCylinder(GetWorld(), GetOwner()->GetActorLocation(), cylinderEnd, grabRadiusMeters, 32, FColor::Red, false, 0.01f, 0, 5.f);
+
+	if (!bTargetingVisible)
+	{
+		targetingComponent->SetWorldScale3D(FVector(grabRadiusMeters / 45, grabRadiusMeters / 50, (cylinderEnd.Z)/100));
+		targetingComponent->SetVisibility(true);
+		bTargetingVisible = true;
+	}
+
+	FVector cylinderPosition = FVector(character->GetActorLocation().X, character->GetActorLocation().Y, (cylinderEnd.Z)/2);
+	targetingComponent->SetWorldLocation(cylinderPosition);
 	if (playSoundTargeting)
 	{
 		OnTargeting.Broadcast();
