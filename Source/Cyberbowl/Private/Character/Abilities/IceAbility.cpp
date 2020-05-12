@@ -84,8 +84,8 @@ void UIceAbility::Targeting()
 
 	if (!bTargetingVisible)
 	{
-		float radius = ConeLength/50 * tan(coneAngleInRadians);
-		targetingComponent->SetWorldScale3D(FVector(radius, radius, ConeLength/100));
+		float radius = ConeLength/70* tan(coneAngleInRadians);
+		targetingComponent->SetWorldScale3D(FVector(radius, radius, ConeLength / 125));
 		targetingComponent->SetVisibility(true);
 		bTargetingVisible = true;
 	}
@@ -93,8 +93,7 @@ void UIceAbility::Targeting()
 	FRotator controlRotation = ownerAsPawn->GetControlRotation();
 	targetingComponent->SetWorldRotation(FRotator(controlRotation.Pitch + 90, controlRotation.Yaw , controlRotation.Roll));
 	direction.Normalize(0);
-	targetingComponent->SetWorldLocation(start + direction * ConeLength/2);
-	DrawDebugCone(GetOwner()->GetWorld(), start, direction, ConeLength, coneAngleInRadians, coneAngleInRadians, 12, FColor::Blue, false, 0.01, 0, 4.f);
+	targetingComponent->SetWorldLocation(start + direction * ConeLength/2.5);
 }
 
 void UIceAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
