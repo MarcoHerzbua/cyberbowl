@@ -166,6 +166,7 @@ void AInGameGameMode::RegroupPlayers()
 void AInGameGameMode::Restart()
 {
 	StartGamePlay.Broadcast();
+	RoundCoundownEnd.Broadcast();
 	GetWorldTimerManager().UnPauseTimer(GameEndTimerHandle);
 }
 

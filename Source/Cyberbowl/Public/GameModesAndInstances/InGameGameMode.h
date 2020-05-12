@@ -15,6 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndGameEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGamePlayEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRegroupEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartGamePlayEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoundCountdownEndingEvent);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API AInGameGameMode : public AGameModeBase
@@ -61,6 +62,8 @@ public:
 	FRegroupEvent Regroup;
 	UPROPERTY(BlueprintAssignable)
 	FRestartGamePlayEvent StartGamePlay;
+	UPROPERTY(BlueprintAssignable)
+	FRoundCountdownEndingEvent RoundCoundownEnd;
 
 	UFUNCTION(BlueprintCallable)
 	void SelectGameOverMenu(int LevelIndex);
