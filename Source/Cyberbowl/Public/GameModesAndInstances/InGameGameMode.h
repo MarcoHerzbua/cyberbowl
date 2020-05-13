@@ -17,6 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRegroupEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartGamePlayEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoundCountdownEndingEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMatchountdownEndingEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartingLastMinuteEvent);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API AInGameGameMode : public AGameModeBase
@@ -67,6 +68,8 @@ public:
 	FRoundCountdownEndingEvent RoundCoundownEnd;
 	UPROPERTY(BlueprintAssignable)
 	FMatchountdownEndingEvent MatchCoundownEnd;
+	UPROPERTY(BlueprintAssignable)
+	FStartingLastMinuteEvent StartingLastMinute;
 
 	UFUNCTION(BlueprintCallable)
 	void SelectGameOverMenu(int LevelIndex);
@@ -108,4 +111,5 @@ private:
 	TSubclassOf<UUserWidget> WGamePausedInitiator;
 
 	bool bGamePlayStarted;
+	bool bLastMinuteFired;
 };
