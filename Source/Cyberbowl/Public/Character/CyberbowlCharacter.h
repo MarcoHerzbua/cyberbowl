@@ -100,8 +100,6 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnVerticalDash OnVerticalDash;
 
-	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnWallrunEnd OnWallrunEnd;
 
 
 

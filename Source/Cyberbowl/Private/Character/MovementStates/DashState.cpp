@@ -59,7 +59,7 @@ void UDashState::Activate(ECBMovementMode previousMode)
 	else
 	{
 		character->DashRotationHand = FRotator(0.f, 0.f, 0.f);
-		character->DashRotationFoot = FRotator(0.f, 0.f, 0.f);
+		character->DashRotationFoot = FRotator(180.f, 0.f, 0.f);
 	}
 	PreviousMovementMode = previousMode;
 	MovementComponent->GravityScale = 0.f;
