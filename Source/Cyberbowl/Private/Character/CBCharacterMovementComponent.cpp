@@ -126,14 +126,13 @@ void UCBCharacterMovementComponent::EndWallrun(UPrimitiveComponent* OverlappedCo
     {
         auto movementState = Cast<UWallrunState>(GetCBMovementState());
         timeOnWall = movementState->GetTimeOnWall();
-        if (!movementState->IsLaunching())
+        isLaunched = movementState->IsLaunching();
+        if (!isLaunched)
         {
-            isLaunched = true;
             SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
         }
+		OnWallrunEnd.Broadcast(timeOnWall, isLaunched);
     }
-
-    OnWallrunEnd.Broadcast(timeOnWall, isLaunched);
 }
 
 
