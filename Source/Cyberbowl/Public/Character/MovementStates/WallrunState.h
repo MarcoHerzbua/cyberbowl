@@ -5,8 +5,6 @@
 //#include "K2Node_FunctionResult.h"
 #include "WallrunState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunFinish, float, timeOnWall, bool, launchedAway);
-
 UENUM(BlueprintType)
 enum class EWallRunDirection : uint8
 {
@@ -30,9 +28,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsLaunching() { return bIsLaunching; }
 
-	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnWallrunFinish OnWallrunFinish;
-	
+	UFUNCTION(BlueprintCallable)
+	float GetTimeOnWall() { return timeOnWall; }
+
+	//Get the vector where the character should be launched (the force is already calculated in)
+	UFUNCTION(BlueprintCallable)
+	FVector GetLaunchVector();
 protected:
 	float DefaultGravityScale;
 	FVector WallrunDirection;
@@ -40,6 +41,7 @@ protected:
 	const int initializeAnimationFrames = 5;
 	int currInitializeAnimationFrames;
 	bool bIsLaunching = false;
+	float timeOnWall;
 
 	UPROPERTY()
 	FTimerHandle LaunchTimerHandle;
@@ -53,5 +55,4 @@ protected:
 	UFUNCTION()
 	void EndWallrun();
 
-	float timeOnWall;
 };

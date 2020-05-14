@@ -41,7 +41,8 @@ void UWallrunState::Deactivate()
 
 	MovementComponent->animinstance->SetIsWallRidingClockWise(false);
 	MovementComponent->animinstance->SetIsWallRidingCounterClockWise(false);
-	
+
+	timeOnWall = 0.f;
 }
 
 void UWallrunState::OnTick(float DeltaTime)
@@ -86,18 +87,8 @@ void UWallrunState::OnTick(float DeltaTime)
 	MovementComponent->GetCharacterOwner()->SetActorRotation(FRotator(0.f, wallrunDirRotator.Yaw, 0.f));
 }
 
-void UWallrunState::BindInputActions()
+FVector UWallrunState::GetLaunchVector()
 {
-	InputComponent->BindAction("WallrunJump", IE_Pressed, this, &UWallrunState::LaunchCharacter);
-}
-
-void UWallrunState::LaunchCharacter()
-{
-	if(MovementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Wallrun)
-	{
-		return;
-	}
-
 	FHitResult wallRunHitResult;
 	HitDirection(wallRunHitResult);
 	FVector wallNormal = wallRunHitResult.Normal;
@@ -111,21 +102,26 @@ void UWallrunState::LaunchCharacter()
 
 	launchVec *= MovementComponent->WallrunLaunchForce;
 	launchVec.Z = MovementComponent->WallrunUpwardsLaunchForce;
-	
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("x: %f, y: %f, z: %f"), launchVec.X, launchVec.Y, launchVec.Z));
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%f"), angleUp));
 
+	return launchVec;
+}
+
+void UWallrunState::BindInputActions()
+{
+	InputComponent->BindAction("WallrunJump", IE_Pressed, this, &UWallrunState::LaunchCharacter);
+}
+
+void UWallrunState::LaunchCharacter()
+{
+	if(MovementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Wallrun)
+	{
+		return;
+	}
+	
+	LaunchVector = GetLaunchVector();
 	bIsLaunching = true;
-	LaunchVector = launchVec;
 	MovementComponent->animinstance->SetIsDashing(true);
 	MovementComponent->GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &UWallrunState::EndWallrun, MovementComponent->WallrunLaunchDuration);
-
-	OnWallrunFinish.Broadcast(timeOnWall, true);
-	timeOnWall = 0.f;
-	
-	//MovementComponent->GetCharacterOwner()->LaunchCharacter(launchVec, true, true);
-
-	//MovementComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 
 EWallRunDirection UWallrunState::HitDirection(FHitResult& hitResult)

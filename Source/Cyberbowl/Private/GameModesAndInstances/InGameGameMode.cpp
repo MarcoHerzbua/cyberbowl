@@ -45,6 +45,7 @@ void AInGameGameMode::BeginPlay()
 	}
 
 	bGamePlayStarted = false;
+	bLastMinuteFired = false;
 }
 
 void AInGameGameMode::GameEnd()
@@ -147,6 +148,11 @@ void AInGameGameMode::Tick(float DeltaSeconds)
 {
 	GameEndTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameEndTimerHandle);
 	GameIntermediateTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameCountdownTimerHandle);
+	if(GameEndTimeRemaining<=60 && !bLastMinuteFired)
+	{
+		StartingLastMinute.Broadcast();
+		bLastMinuteFired = true;
+	}
 }
 
 void AInGameGameMode::SelectGameOverMenu(int LevelIndex)

@@ -18,7 +18,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoop);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunEnd, float, timeOnWall, bool, launchedAway);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable, public ILaunchable
@@ -150,9 +149,6 @@ protected:
 
 	UFUNCTION()
 	void CallOnVerticalDash();
-
-	UFUNCTION()
-	void CallOnWallRunEnd(float timeOnWall, bool launchedAway);
 
 #pragma endregion 
 	// APawn interface

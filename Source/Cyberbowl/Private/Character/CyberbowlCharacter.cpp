@@ -189,7 +189,6 @@ void ACyberbowlCharacter::BeginPlay()
 	}
 	{
 		CBCharacterMoveComponent->OnVertDash.AddDynamic(this, &ACyberbowlCharacter::CallOnVerticalDash);
-		CBCharacterMoveComponent->OnWallRunFinished.AddDynamic(this, &ACyberbowlCharacter::CallOnWallRunEnd);
 	}
 }
 
@@ -296,12 +295,6 @@ void ACyberbowlCharacter::CallOnVerticalDash()
 {
 	OnVerticalDash.Broadcast();
 }
-
-void ACyberbowlCharacter::CallOnWallRunEnd(float timeOnWall, bool launchedAway)
-{
-	OnWallrunEnd.Broadcast(timeOnWall, launchedAway);
-}
-
 
 void ACyberbowlCharacter::TurnAtRate(float Rate)
 {
