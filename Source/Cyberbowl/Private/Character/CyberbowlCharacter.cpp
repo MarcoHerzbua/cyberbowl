@@ -183,7 +183,7 @@ void ACyberbowlCharacter::BeginPlay()
 	BoopComponent = FindComponentByClass<UBoopComponent>();
 	CBCharacterMoveComponent = FindComponentByClass<UCBCharacterMovementComponent>();
 	AbilityComponent = FindComponentByClass<UAbilityBase>();
-	if(!BoopComponent || !CBCharacterMoveComponent || AbilityComponent)
+	if(!BoopComponent || !CBCharacterMoveComponent || !AbilityComponent)
 	{
 		UE_LOG(LogActor, Error, TEXT("CyberbowlCharacter: Vital Components not set in character blueprint! (BoopComponent, CBCharacterMovementComponent, AbilityComponent)"));
 	}

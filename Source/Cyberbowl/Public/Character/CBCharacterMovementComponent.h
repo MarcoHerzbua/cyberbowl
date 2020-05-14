@@ -50,11 +50,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Dash Params")
 	float DashDuration = 0.3f;
 
-	UPROPERTY(EditAnywhere, Category = "Dash Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
 	float DashForce = 10000.f;
 
 	UPROPERTY(EditAnywhere, Category = "Double Jump Params")
 	float DoubleJumpDuration = 0.2f;
+
+
 
 	/*
 	 * 	This is the Range (in degrees) in which the character does not keep momentum after dashing, takes the View of the camera as starting point 
