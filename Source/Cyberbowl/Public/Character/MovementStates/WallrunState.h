@@ -5,10 +5,6 @@
 //#include "K2Node_FunctionResult.h"
 #include "WallrunState.generated.h"
 
-
-/**
- *
- */
 UENUM(BlueprintType)
 enum class EWallRunDirection : uint8
 {
@@ -29,11 +25,26 @@ public:
 	void Deactivate() override;
 	void OnTick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	bool IsLaunching() { return bIsLaunching; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetTimeOnWall() { return timeOnWall; }
+
+	//Get the vector where the character should be launched (the force is already calculated in)
+	UFUNCTION(BlueprintCallable)
+	FVector GetLaunchVector();
 protected:
 	float DefaultGravityScale;
 	FVector WallrunDirection;
+	FVector LaunchVector;
 	const int initializeAnimationFrames = 5;
 	int currInitializeAnimationFrames;
+	bool bIsLaunching = false;
+	float timeOnWall;
+
+	UPROPERTY()
+	FTimerHandle LaunchTimerHandle;
 
 	void BindInputActions() override;
 
@@ -41,5 +52,7 @@ protected:
 	void LaunchCharacter();
 	UFUNCTION()
 	EWallRunDirection HitDirection(FHitResult& hitResult);
-	
+	UFUNCTION()
+	void EndWallrun();
+
 };

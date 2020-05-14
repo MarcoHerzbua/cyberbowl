@@ -7,12 +7,17 @@
 #include "Components/StaticMeshComponent.h"
 #include "Actors/IFreezeable.h"
 #include "GameModesAndInstances/InGameGameMode.h"
+#include "ILaunchable.h"
 #include "PlayBall.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu ; Just how I like it :3
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallFrozen); 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallUnfrozen); 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBallHit, FName, collisionProfile, float, velocity); 
+
 
 UCLASS()
-class CYBERBOWL_API APlayBall : public AActor, public IFreezeable
+class CYBERBOWL_API APlayBall : public AActor, public IFreezeable, public ILaunchable
 {
 	GENERATED_BODY()
 	
@@ -31,14 +36,26 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
 	FOnBallBooped OnBallBooped;
 		
-	
+	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	FOnBallFrozen OnBallFrozen;
+		
+	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	FOnBallUnfrozen OnBallUnfrozen;
+		
+	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	FOnBallHit OnBallHit;
+		
+	UPROPERTY(BlueprintReadOnly, Category = "BoopComponent")
+	bool IsBallFrozen;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-private:
-	FVector StartPosition;
+	UFUNCTION()
+	void ResolveCollision(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
+	FVector StartPosition;
+	FVector CachedVelocity;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -59,4 +76,6 @@ public:
 
 	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
 	void UnFreeze_Implementation() override;
+
+	void Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical) override;
 };

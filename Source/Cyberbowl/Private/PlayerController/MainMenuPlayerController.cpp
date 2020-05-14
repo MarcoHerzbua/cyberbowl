@@ -22,6 +22,8 @@ void AMainMenuPlayerController::SetupInputComponent()
 	InputComponent->BindAction("MenuBack", IE_Pressed, this, &AMainMenuPlayerController::PopFromMenuStack);
 	InputComponent->BindAction("MenuNavigationDown", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
 	InputComponent->BindAction("MenuNavigationUp", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
+	InputComponent->BindAction("MenuNavigationRight", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
+	InputComponent->BindAction("MenuNavigationLeft", IE_Pressed, this, &AMainMenuPlayerController::FMainMenuNavigated);
 }
 
 void AMainMenuPlayerController::BeginPlay()

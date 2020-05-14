@@ -25,16 +25,16 @@ AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectIniti
 	static ConstructorHelpers::FClassFinder<APawn> DummyCharacterFinder(TEXT("/Game/Characters/Dummy/DummyBase"));
 	dummyClass = DummyCharacterFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> countdownWidgetClassFinder(TEXT("/Game/UI/Countdown"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> countdownWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_CharacterSelectionComplete"));
 	countdownWidgetClass = countdownWidgetClassFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyNotJoinedWidgetClassFinder(TEXT("/Game/UI/W_LobbyNotJoined"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyNotJoinedWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_LobbyNotJoined"));
 	lobbyNotJoinedWidgetClass = lobbyNotJoinedWidgetClassFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyWidgetClassFinder(TEXT("/Game/UI/W_Lobby"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> lobbyWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_Lobby"));
 	lobbyWidgetClass = lobbyWidgetClassFinder.Class;
 
-	static ConstructorHelpers::FClassFinder<UWMainMenu> mainMenuWidgetClassFinder(TEXT("/Game/UI/W_MainMenu"));
+	static ConstructorHelpers::FClassFinder<UWMainMenu> mainMenuWidgetClassFinder(TEXT("/Game/UI/MainMenu/W_MainMenu"));
 	mainMenuWidgetClass = mainMenuWidgetClassFinder.Class;
 }
 
@@ -52,10 +52,9 @@ void AMainMenuGameMode::BeginPlay()
 void AMainMenuGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogClass, Log, TEXT("Tick"));
+	
 	if (bAllReady)
-	{
-		
+	{	
 		currentCooldown -= DeltaTime;
 	}
 }
@@ -83,7 +82,7 @@ void AMainMenuGameMode::OnPlayerReadyUnready()
 	auto countdownWidget = CreateWidget(UGameplayStatics::GetPlayerControllerFromID(this, 0), countdownWidgetClass);
 	countdownWidget->AddToViewport();
 
-	GetWorld()->GetTimerManager().SetTimer(CountdownTimer, this, &AMainMenuGameMode::StartMatch , 3.f, false);
+	GetWorld()->GetTimerManager().SetTimer(CountdownTimer, this, &AMainMenuGameMode::StartMatch , 1.f, false);
 }
 
 void AMainMenuGameMode::StartMatch()

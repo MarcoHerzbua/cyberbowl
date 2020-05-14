@@ -20,29 +20,37 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "Character/Abilities/CooldownComponent.h"
+#include "Character/CyberbowlCharacterAnimInstance.h"
 
 void UAirAbility::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	character = Cast<ACyberbowlCharacter>(GetOwner());
-	movementComp = Cast<UCharacterMovementComponent>(character->GetMovementComponent());
+	movementComp = Cast<UCBCharacterMovementComponent>(character->GetMovementComponent());
+	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
+	bTargetingVisible = false;
 	
-
-	ball = Cast<APlayBall>(Cast<AInGameGameMode>(UGameplayStatics::GetGameMode(this))->Ball);
+	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
 	ballLocationSpringArm = Cast<USpringArmComponent>(character->GetComponentsByTag(USpringArmComponent::StaticClass(), "BallLocationArm").Last());
 	ballPulledAttachComponent = Cast<USceneComponent>(character->GetComponentsByTag(USceneComponent::StaticClass(), "TornadoBallLocation").Last());
 
-	ball->OnBallBooped.AddDynamic(this, &UAirAbility::ExitGrabMode);
+	ball->OnBallBooped.AddDynamic(this, &UAirAbility::ExitGrabModeByPush);
+
+
 }
 
 void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(CurrState == EAbilityState::ABILITY_FIRE || CurrState == EAbilityState::ABILITY_TARGETING)
+	if(CurrState == EAbilityState::ABILITY_FIRE)
 	{
 		Fire();
+	}
+	else if(CurrState == EAbilityState::ABILITY_TARGETING)
+	{
+		Targeting();
 	}
 
 	if (bIsInGrabMode)
@@ -60,11 +68,17 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 		const FRotator cameraLookAt = FRotator(character->GetCameraBoom()->GetTargetRotation().Pitch * (-1), ballLocationSpringArm->GetComponentRotation().Yaw, 0);
 		ballLocationSpringArm->SetWorldRotation(cameraLookAt);
+
+		if(!movementComp->animinstance->GetIsGrabbing())
+		{
+			movementComp->animinstance->SetIsGrabbing(true);
+		}
 	}
 }
 
 void UAirAbility::Fire()
 {
+	targetingComponent->SetVisibility(false);
 	FVector cylinderEnd = GetOwner()->GetActorLocation();
 	cylinderEnd.Z += 2000.f;
 	DrawDebugCylinder(GetWorld(), GetOwner()->GetActorLocation(), cylinderEnd, grabRadiusMeters, 32, FColor::Red, false, grabDurationSeconds, 0, 5.f);
@@ -91,19 +105,62 @@ void UAirAbility::Fire()
 		const auto cameraLookAtRotation = FRotator(0.f, character->GetCameraBoom()->GetTargetRotation().Yaw, 0.f);
 		character->SetActorRotation(cameraLookAtRotation);
 
-		tornadoComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, tornadoEffect, character->GetActorLocation());
-		GetWorld()->GetTimerManager().SetTimer(TornadoEffectDurationHandle, this, &UAirAbility::DestroyTornado, tornadoDuration, false);
+		OnGrabMode.Broadcast();
 	}
+
+	else
+	{
+		OnFailedGrab.Broadcast();
+	}
+
+	tornadoComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, tornadoEffect, character->GetActorLocation());
+	GetWorld()->GetTimerManager().SetTimer(TornadoEffectDurationHandle, this, &UAirAbility::DestroyTornado, tornadoDuration, false);
 
 	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	playSoundTargeting = true;
+	bTargetingVisible = false;
+}
+
+void UAirAbility::Targeting()
+{
+	
+	FVector cylinderEnd = GetOwner()->GetActorLocation();
+	cylinderEnd.Z += 2000.f;
+
+	if (!bTargetingVisible)
+	{
+		targetingComponent->SetWorldScale3D(FVector(grabRadiusMeters / 45, grabRadiusMeters / 50, (cylinderEnd.Z)/100));
+		targetingComponent->SetVisibility(true);
+		bTargetingVisible = true;
+	}
+
+	FVector cylinderPosition = FVector(character->GetActorLocation().X, character->GetActorLocation().Y, (cylinderEnd.Z)/2);
+	targetingComponent->SetWorldLocation(cylinderPosition);
+	if (playSoundTargeting)
+	{
+		OnTargeting.Broadcast();
+		playSoundTargeting = false;
+	}
 }
 
 void UAirAbility::ConvertMetersToUnrealUnits()
 {
 	// Conversion from meters to cm, as unreal functions generally output centimeters, but meters is easier for game design tweaks
 	grabRadiusMeters *= 100.f;
+}
+
+void UAirAbility::ExitGrabModeByPush()
+{
+	if (!bIsInGrabMode)
+	{
+		return;
+	}
+	
+	ExitGrabMode();
+	OnGrabModeExitByPush.Broadcast();
+
 }
 
 void UAirAbility::ExitGrabMode()
@@ -120,6 +177,11 @@ void UAirAbility::ExitGrabMode()
 	character->bTurretMode = false;
 	character->GetCameraBoom()->bUsePawnControlRotation = true;
 	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	if (movementComp->animinstance->GetIsGrabbing())
+	{
+		movementComp->animinstance->SetIsGrabbing(false);
+	}
 }
 
 void UAirAbility::DestroyTornado()

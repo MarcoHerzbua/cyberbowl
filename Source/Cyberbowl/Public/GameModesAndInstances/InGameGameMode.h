@@ -15,6 +15,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndGameEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGamePlayEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRegroupEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartGamePlayEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoundCountdownEndingEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMatchountdownEndingEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartingLastMinuteEvent);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API AInGameGameMode : public AGameModeBase
@@ -28,7 +31,10 @@ public:
 	AActor* GoalColliderTeam0;
 	UPROPERTY(BlueprintReadWrite)
 	AActor* GoalColliderTeam1;
-	void Add_Points(AActor* Collider);
+
+	UFUNCTION()
+	void Add_Points(int teamIndex);
+	
 	UPROPERTY(BlueprintReadWrite)
 	int PointsTeam0;
 	UPROPERTY(BlueprintReadWrite)
@@ -58,13 +64,19 @@ public:
 	FRegroupEvent Regroup;
 	UPROPERTY(BlueprintAssignable)
 	FRestartGamePlayEvent StartGamePlay;
+	UPROPERTY(BlueprintAssignable)
+	FRoundCountdownEndingEvent RoundCoundownEnd;
+	UPROPERTY(BlueprintAssignable)
+	FMatchountdownEndingEvent MatchCoundownEnd;
+	UPROPERTY(BlueprintAssignable)
+	FStartingLastMinuteEvent StartingLastMinute;
 
 	UFUNCTION(BlueprintCallable)
 	void SelectGameOverMenu(int LevelIndex);
 	UFUNCTION(BlueprintCallable)
 	void RegroupPlayers();
 	UFUNCTION(BlueprintCallable)
-	void Restart();
+	void Start();
 
 	UFUNCTION()
 	bool GetIsPaused() const;
@@ -98,4 +110,6 @@ private:
 	UPROPERTY(Editanywhere)
 	TSubclassOf<UUserWidget> WGamePausedInitiator;
 
+	bool bGamePlayStarted;
+	bool bLastMinuteFired;
 };

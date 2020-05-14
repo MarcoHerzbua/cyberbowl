@@ -18,9 +18,10 @@ enum class ECBMovementMode : uint8
 	CBMOVE_Dash UMETA(DisplayName="Dash")
 };
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVertDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWallrunStart);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallRunEnd, float, timeOnWall, bool, launchedAway);
+
 UCLASS()
 class CYBERBOWL_API UCBCharacterMovementComponent : public UCharacterMovementComponent
 {
@@ -35,6 +36,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunLaunchForce = 700.f;
 	
+	//modifies the force by which the character gets launched UPWARDS from the wall when jumping during wallrun
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
+	float WallrunUpwardsLaunchForce = 3000.f;
+	
+	//modifies how long the character is launched (how long the Launch Forces are applied to the char, similar to Dash)
+	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
+	float WallrunLaunchDuration = 0.1f;
+	
 	//modifies the angle in which the character get launched away from the wall when jumping during wallrun
 	UPROPERTY(EditAnywhere, Category = "Wallrun Params")
 	float WallrunLaunchAngle = 45.f;
@@ -42,8 +51,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Dash Params")
 	float DashDuration = 0.3f;
 
-	UPROPERTY(EditAnywhere, Category = "Dash Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
 	float DashForce = 10000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Double Jump Params")
+	float DoubleJumpDuration = 0.2f;
+
+
 
 	/*
 	 * 	This is the Range (in degrees) in which the character does not keep momentum after dashing, takes the View of the camera as starting point 
@@ -55,8 +69,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Dash Params")
 	FFloatRange DashMomentumStopRange = TRange<float>(45.f, 135.f);
 
-	//UFUNCTION(BlueprintCallable, Category = "Cyberbowl Movement")
-	//void Jump();
+#pragma region MovementStatemachine
 	
 	UFUNCTION(BlueprintCallable)
 	void SetCBMovementMode(ECBMovementMode mode);
@@ -64,13 +77,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	ECBMovementMode GetCBMovementMode() { return CBMovementMode; }
 
-	FVector GetCharacterTransform() { return GetOwner()->GetActorLocation(); };
+	UFUNCTION(BlueprintCallable)
+	UBaseMovementState* GetCBMovementState() { return MovementStates.Contains(GetCBMovementMode()) ? MovementStates[GetCBMovementMode()] : nullptr; }
 
-	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	class UCyberbowlCharacterAnimInstance* animinstance;
-	
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	ECBMovementMode CBMovementMode;
@@ -78,14 +87,52 @@ protected:
 	UPROPERTY()
 	TMap<ECBMovementMode, UBaseMovementState*> MovementStates;
 
-	//UPROPERTY()
-	//UCooldownComponent* CooldownComponent;
-	//
+	void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
+#pragma endregion
+
+#pragma region Wallrun
+
+public:
+
+	//This function calls EndWallrun without any collision parameters
+	UFUNCTION()
+	void ForceEndWallrun();
+
+	UPROPERTY(BlueprintAssignable, Category = "Wallrun Delegate")
+	FOnWallrunStart OnWallrunStart;
+
+	UPROPERTY(BlueprintAssignable, Category = "Wallrun Delegate")
+	FOnWallRunEnd OnWallrunEnd;
+
+protected:
+	UFUNCTION()
+	void CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
+	UPROPERTY()
+	class USphereComponent* WallrunCollider;
+
+#pragma endregion 
+
+public:
+	
+	FVector GetCharacterTransform() { return GetOwner()->GetActorLocation(); };
+	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	class UCyberbowlCharacterAnimInstance* animinstance;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnVertDash OnVertDash;
+
+
 	virtual void BeginPlay() override;
 
-	void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
+	UFUNCTION()
+	void CallOnVerticalDash();
 
-	void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration) override;
 /*
  *
  *
@@ -103,5 +150,3 @@ protected:
  * 
  */
 };
-
-

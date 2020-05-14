@@ -24,6 +24,7 @@ AEarthpillar::AEarthpillar()
 	triggerMesh->SetupAttachment(root);
 	triggerMesh->SetCollisionProfileName("OverlapAllDynamic");
 	currPlayerTeam = -1;
+	
 }
 
 
@@ -41,133 +42,93 @@ void AEarthpillar::Tick(float DeltaTime)
 
 	float val = GetActorLocation().Z;
 
-	if ((GetActorLocation().Z) >= maxRise)
+	if ((GetActorLocation().Z) >= MaxRise)
 	{
 		bIsRising = false;
 		triggerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	
-	if (bIsRising && GetActorLocation().Z <= maxRise)
+	if (bIsRising && GetActorLocation().Z <= MaxRise)
 	{
 		Rising(DeltaTime);
-		
 	}
-
 	else if (val > maxLowering)
 	{
 		Lowering(DeltaTime);
 	}
-
 	else
 	{
 		triggerMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 
-	TickLaunch();
+	//TickLaunch();
 }
 
 void AEarthpillar::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ACyberbowlCharacter* overlappingActor = Cast<ACyberbowlCharacter>(OtherActor);
-	if(overlappingActor)
+	if(OtherActor->GetClass()->ImplementsInterface(ULaunchable::StaticClass()) && !GetWorld()->GetTimerManager().IsTimerActive(LaunchTimerHandle))
 	{
-		
-		AThirdPersonPlayerController* controller = Cast<AThirdPersonPlayerController>(overlappingActor->GetController());
-		if (controller->currPlayerTeam == currPlayerTeam)
-		{
-			LaunchActor(OtherActor);
-			bAdjustRotation = false;
-			UE_LOG(LogTemp, Warning, TEXT("I'am on the pillar and a Character :D"));
-		}
-	}
-	else
-	{
+		GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &AEarthpillar::EndLaunch, LaunchCooldown/* - LaunchCooldown / 10.f*/);
+		ILaunchable::Execute_Launch(OtherActor, OtherActor->GetVelocity().GetSafeNormal(), LaunchForceHorizontal, LaunchForceVertical);
 		bIsRising = true;
-		//LaunchActor(OtherActor);
-		UE_LOG(LogTemp, Warning, TEXT("I'am on the pillar and a Ball :D"));
+		OnActorLaunched.Broadcast(OtherActor);
 	}
 }
 
 void AEarthpillar::Rising(float DeltaTime)
 {
-	SetActorLocation(GetActorLocation() + GetActorUpVector() * FVector(riseTime * DeltaTime));
+	SetActorLocation(GetActorLocation() + GetActorUpVector() * FVector(RiseTime * DeltaTime));
 }
 
 void AEarthpillar::Lowering(float DeltaTime)
 {
-	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(loweringTime * DeltaTime));
+	SetActorLocation(GetActorLocation() - GetActorUpVector() * FVector(LoweringTime * DeltaTime));
 }
 
 void AEarthpillar::TickLaunch()
 {
-	if (!GetWorld()->GetTimerManager().IsTimerActive(LaunchTimerHandle) || !LaunchedActor)
-	{
-		return;
-	}
+	//if (!GetWorld()->GetTimerManager().IsTimerActive(LaunchTimerHandle))
+	//{
+	//	return;
+	//}
 
-	float elapsedLeapTime = GetWorld()->GetTimerManager().GetTimerElapsed(LaunchTimerHandle);
-	elapsedLeapTime /= LaunchDuration;
-	
-	FVector leapMiddle = LaunchStart + (LaunchTarget - LaunchStart) / 2.f + FVector::UpVector * LaunchHeight;
+	//float elapsedLeapTime = GetWorld()->GetTimerManager().GetTimerElapsed(LaunchTimerHandle);
+	//elapsedLeapTime /= LaunchCooldown;
+	//
+	//FVector leapMiddle = LaunchStart + (LaunchTarget - LaunchStart) / 2.f + FVector::UpVector * LaunchHeight;
 
-	FVector startToMiddle = FMath::Lerp<FVector>(LaunchStart, leapMiddle, elapsedLeapTime);
-	FVector middleToEnd = FMath::Lerp<FVector>(leapMiddle, LaunchTarget, elapsedLeapTime);
-	FVector leapLocation = FMath::Lerp<FVector>(startToMiddle, middleToEnd, elapsedLeapTime);
+	//FVector startToMiddle = FMath::Lerp<FVector>(LaunchStart, leapMiddle, elapsedLeapTime);
+	//FVector middleToEnd = FMath::Lerp<FVector>(leapMiddle, LaunchTarget, elapsedLeapTime);
+	//FVector leapLocation = FMath::Lerp<FVector>(startToMiddle, middleToEnd, elapsedLeapTime);
 
-	LaunchedActor->SetActorLocation(leapLocation, true);
+	//LaunchedActor->SetActorLocation(leapLocation, true);
 
-	if (!bAdjustRotation)
-	{
-		FVector start2middle = leapMiddle - LaunchStart;
-		auto launchAngle = (FVector::UpVector.X * start2middle.X + FVector::UpVector.Y * start2middle.Y + FVector::UpVector.Z * start2middle.Z) / (FVector::UpVector.Size() * start2middle.Size());
-		auto launchAngleDegr = (launchAngle * 180) / PI;
-		auto currRotation = GetActorRotation();
+	//if (!bAdjustRotation)
+	//{
+	//	FVector start2middle = leapMiddle - LaunchStart;
+	//	auto launchAngle = (FVector::UpVector.X * start2middle.X + FVector::UpVector.Y * start2middle.Y + FVector::UpVector.Z * start2middle.Z) / (FVector::UpVector.Size() * start2middle.Size());
+	//	auto launchAngleDegr = (launchAngle * 180) / PI;
+	//	auto currRotation = GetActorRotation();
 
-		//SetActorRotation(FRotator(launchAngle));
-		SetActorRotation(FRotator(90-launchAngleDegr, currRotation.Yaw, currRotation.Roll));
-		bAdjustRotation = true;
-	}
+	//	//SetActorRotation(FRotator(launchAngle));
+	//	SetActorRotation(FRotator(90-launchAngleDegr, currRotation.Yaw, currRotation.Roll));
+	//	bAdjustRotation = true;
+	//}
 }
 
 void AEarthpillar::EndLaunch()
 {
-	LaunchedActor = nullptr;
+	//LaunchedActor = nullptr;
 }
 
-void AEarthpillar::SetCurrPlayerTeam(int playerTeam)
+void AEarthpillar::InitializePillar(int playerTeam, float maxLoweringPos, float lifeSpan)
 {
 	currPlayerTeam = playerTeam;
-}
-
-void AEarthpillar::SetMaxLoweringPos(float pos)
-{
-	maxLowering = pos;
-}
-
-void AEarthpillar::InitializePillar(FVector launchTarget, float launchDuration, float launchHeight)
-{
-	LaunchTarget = launchTarget;
-	LaunchDuration = launchDuration;
-	LaunchHeight = launchHeight;
-}
-
-void AEarthpillar::LaunchActor(AActor* actor)
-{
-	if (!GetWorld()->GetTimerManager().IsTimerActive(LaunchTimerHandle))
-	{
-		if(GetLifeSpan() < LaunchDuration)
-		{
-			SetLifeSpan(LaunchDuration);
-		}
-		LaunchedActor = actor;
-		LaunchStart = actor->GetActorLocation();
-		bIsRising = true;
-		GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &AEarthpillar::EndLaunch, LaunchDuration/* - LaunchDuration / 10.f*/);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("EarthPillar: Another Actor is currently launching"));
-	}
+	maxLowering = maxLoweringPos;
+	SetLifeSpan(lifeSpan);
+	//LaunchTarget = launchTarget;
+	//LaunchCooldown = launchDuration;
+	//LaunchHeight = launchHeight;
 }
 
 float AEarthpillar::GetPillarLocationZ()

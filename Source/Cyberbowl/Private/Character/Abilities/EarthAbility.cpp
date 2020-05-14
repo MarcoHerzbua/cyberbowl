@@ -2,6 +2,8 @@
 
 
 #include "Character/Abilities/EarthAbility.h"
+
+#include "Character/Abilities/AbilityUtils.h"
 #include "Character/CyberbowlCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -14,6 +16,7 @@
 #include "Engine/Engine.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "PlayerController/TutorialPlayerController.h"
 #include "TimerManager.h"
 
 void UEarthAbility::BeginPlay()
@@ -21,25 +24,27 @@ void UEarthAbility::BeginPlay()
 	Super::BeginPlay();
 
 	character = Cast<ACyberbowlCharacter>(GetOwner());
-
+	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
+	bTargetingVisible = false;
 }
 
 void UEarthAbility::Fire()
 {
+	targetingComponent->SetVisibility(false);
 	if(!bValidTarget)
 	{
-		SetAbilityState(EAbilityState::ABILITY_TARGETING);
+		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 		return;
 	}
 
-	LeapStart = GetOwner()->GetActorLocation();
+	targetingComponent->SetVisibility(false);
 	SpawnPillar();
-	pillar->LaunchActor(GetOwner());
 	
 	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
 	bValidTarget = false;
+	bTargetingVisible = false;
 }
 
 void UEarthAbility::Targeting()
@@ -47,73 +52,82 @@ void UEarthAbility::Targeting()
 	UWorld* world = GetWorld();
 	auto ownerAsPawn = Cast<APawn>(GetOwner());
 	FVector actorLoc = GetOwner()->GetActorLocation();
-	FVector camViewDir = ownerAsPawn->GetControlRotation().Vector();
-	FVector end = actorLoc + camViewDir * MaxTargetDistance;
-
-	FHitResult hitResult;
-	world->LineTraceSingleByProfile(hitResult, actorLoc, end, "AbilityTrace");
+	//FVector camViewDir = ownerAsPawn->GetControlRotation().Vector();
 
 	FRotator camViewRotator = ownerAsPawn->GetControlRotation();
 	//Set Pitch to zero cause we are only interested in the Yaw (Roll is always 0)
 	camViewRotator.Pitch = 0.f;
+	FVector end = actorLoc + camViewRotator.Vector() * TargetDistance;
 
-	bValidTarget = true;
-	if (hitResult.bBlockingHit)
+	bValidTarget = UAbilityUtils::FindTargetPoint(world, PillarSpawnPoint, actorLoc, end, TargetIndicatorRadius);
+
+
+
+	if (bValidTarget)
 	{
-		LeapTarget = hitResult.ImpactPoint;
-
-		//Edge Case when player aims at the Wall
-		if(hitResult.GetComponent()->GetCollisionProfileName() == "StadiumWall")
+		if (!bTargetingVisible)
 		{
-			//get a point a certain distant away from the wall
-			FVector hitPointWithOffset = hitResult.ImpactPoint + hitResult.ImpactNormal * TargetIndicatorRadius;
-
-			FHitResult floorTrace;
-			world->LineTraceSingleByProfile(floorTrace, hitPointWithOffset, hitPointWithOffset + FVector::DownVector * 10000.f, "AbilityTrace");
-
-			if (floorTrace.bBlockingHit)
-			{
-				float distanceToActor = (floorTrace.ImpactPoint - actorLoc).Size();
-				if (distanceToActor < MinTargetDistance)
-				{
-					bValidTarget = false;
-				}
-				else
-				{
-					LeapTarget = floorTrace.ImpactPoint;
-				}
-			}
+			targetingComponent->SetVisibility(true);
+			targetingComponent->SetWorldScale3D(FVector(TargetIndicatorRadius / 50, TargetIndicatorRadius / 50, 1.f));
+			bTargetingVisible = true;
 		}
-		//case if the player aims at the ground close to character
-		else if(hitResult.Distance < MinTargetDistance)
-		{
-			LeapTarget = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
-		}
-	}
-	else
-	{
-		FHitResult floorTrace;
-		world->LineTraceSingleByProfile(floorTrace, end, end + FVector::DownVector * 10000.f, "AbilityTrace");
 
-		if(floorTrace.bBlockingHit)
-		{
-			//This check is needed when player aims straight into the air
-			float distanceToActor = (floorTrace.ImpactPoint - actorLoc).Size();
-			if(distanceToActor < MinTargetDistance)
-			{
-				LeapTarget = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
-			}
-			else
-			{
-				LeapTarget = floorTrace.ImpactPoint;
-			}
-		}
+		targetingComponent->SetWorldLocation(FVector(PillarSpawnPoint.X, PillarSpawnPoint.Y, PillarSpawnPoint.Z+50.f));
 	}
+#pragma region Dynamic Targeting (old)
+	//bValidTarget = true;
+	//if (hitResult.bBlockingHit)
+	//{
+	//	LeapTarget = hitResult.ImpactPoint;
 
-	if(bValidTarget)
-	{
-		DrawDebugCylinder(world, LeapTarget, LeapTarget + FVector::UpVector * 100.f, TargetIndicatorRadius, 12, FColor::Red, false, 0.01f, 0, 5);
-	}
+	//	//Edge Case when player aims at the Wall
+	//	if(hitResult.GetComponent()->GetCollisionProfileName() == "StadiumWall")
+	//	{
+	//		//get a point a certain distant away from the wall
+	//		FVector hitPointWithOffset = hitResult.ImpactPoint + hitResult.ImpactNormal * TargetIndicatorRadius;
+
+	//		FHitResult floorTrace;
+	//		world->LineTraceSingleByProfile(floorTrace, hitPointWithOffset, hitPointWithOffset + FVector::DownVector * 10000.f, "AbilityTrace");
+
+	//		if (floorTrace.bBlockingHit)
+	//		{
+	//			float distanceToActor = (floorTrace.ImpactPoint - actorLoc).Size();
+	//			if (distanceToActor < MinTargetDistance)
+	//			{
+	//				bValidTarget = false;
+	//			}
+	//			else
+	//			{
+	//				LeapTarget = floorTrace.ImpactPoint;
+	//			}
+	//		}
+	//	}
+	//	//case if the player aims at the ground close to character
+	//	else if(hitResult.Distance < MinTargetDistance)
+	//	{
+	//		LeapTarget = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
+	//	}
+	//}
+	//else
+	//{
+	//	FHitResult floorTrace;
+	//	world->LineTraceSingleByProfile(floorTrace, end, end + FVector::DownVector * 10000.f, "AbilityTrace");
+
+	//	if(floorTrace.bBlockingHit)
+	//	{
+	//		//This check is needed when player aims straight into the air
+	//		float distanceToActor = (floorTrace.ImpactPoint - actorLoc).Size();
+	//		if(distanceToActor < MinTargetDistance)
+	//		{
+	//			LeapTarget = FVector(actorLoc.X, actorLoc.Y, hitResult.ImpactPoint.Z) + camViewRotator.Vector() * MinTargetDistance;
+	//		}
+	//		else
+	//		{
+	//			LeapTarget = floorTrace.ImpactPoint;
+	//		}
+	//	}
+	//}
+#pragma endregion 
 }
 
 void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -137,30 +151,21 @@ void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UEarthAbility::SpawnPillar()
 {
-	auto world = GetWorld();
-	FHitResult hitResult;
-	FVector actorLocation = character->GetActorLocation();
-	FVector end = FVector(0.f, 0., -10000.f);
-	world->LineTraceSingleByProfile(hitResult, actorLocation, end, "AbilityTrace");
-	FVector earthPillarPosition;
+	auto pillar = GetWorld()->SpawnActor<AEarthpillar>(EarthPillarClass, PillarSpawnPoint, FRotator());
 
-	if (hitResult.bBlockingHit)
+	if (!characterController)
 	{
-		earthPillarPosition = hitResult.ImpactPoint;
-		FVector spawnLocation = earthPillarPosition;
-		float yawRotation = character->GetCameraBoom()->GetTargetRotation().Yaw - 180;
-		pillar = GetWorld()->SpawnActor<AEarthpillar>(earthClass, spawnLocation, FRotator(20, yawRotation, 0));
-		pillar->InitializePillar(LeapTarget, LeapDuration, LeapHeight);
-		pillar->SetLifeSpan(PillarLifeSpan);
-		pillar->SetCurrPlayerTeam(characterController->currPlayerTeam);
-		pillar->SetMaxLoweringPos(spawnLocation.Z);
-		pillar->GetPillarLocationZ();
-		pillar->SetActorLocation(pillar->GetActorLocation() - FVector(0, pillar->GetPillarLocationZ(), 0));
+		pillar->InitializePillar(1, PillarSpawnPoint.Z, PillarLifeSpan);
 	}
 	else
 	{
-		UE_LOG(LogActor, Error, TEXT("EarthAbility: Error when tracing for pillar location."));
-		return;
+		pillar->InitializePillar(characterController->currPlayerTeam, PillarSpawnPoint.Z, PillarLifeSpan);
 	}
+	pillar->OnActorLaunched.AddDynamic(this, &UEarthAbility::CallOnActorLaunched);
+	//pillar->SetActorLocation(pillar->GetActorLocation() - FVector(0, pillar->GetPillarLocationZ(), 0));
+}
 
+void UEarthAbility::CallOnActorLaunched(AActor* launchedActor)
+{
+	OnAActorLaunched.Broadcast(launchedActor);
 }

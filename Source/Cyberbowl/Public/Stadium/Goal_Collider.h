@@ -8,33 +8,33 @@
 #include "Components/BoxComponent.h"
 #include "Goal_Collider.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGoalScored, int, team);
+
 UCLASS()
 class CYBERBOWL_API AGoal_Collider : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AGoal_Collider();
 
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* Ball;
-	
 
-private:
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnGoalScored OnGoalScored;
+
+	UPROPERTY(EditAnywhere)
+	int TeamIndex;
+	
+protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(VisibleAnywhere)
 	int Points;
+	
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	AInGameGameMode* CurrMode;
 	
 	UBoxComponent* BoxComponent;
 };

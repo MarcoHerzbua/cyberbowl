@@ -9,6 +9,7 @@
 #include "Containers/Array.h"
 #include <string>
 #include "Components/TextBlock.h"
+#include "Stadium/Goal_Collider.h"
 
 void AInGameGameMode::BeginPlay()
 {
@@ -16,9 +17,21 @@ void AInGameGameMode::BeginPlay()
 	PointsTeam0 = 0;
 	PointsTeam1 = 0;
 
+	TArray<AActor*> outGoals;
+	UGameplayStatics::GetAllActorsOfClass(this, AGoal_Collider::StaticClass(), outGoals);
+
+	for (auto actor : outGoals)
+	{
+		Cast<AGoal_Collider>(actor)->OnGoalScored.AddDynamic(this, &AInGameGameMode::Add_Points);
+	}
+
 
 	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &AInGameGameMode::GameEnd, GamePlayTime);
-	StartGamePlay.Broadcast();
+	//Pause Game Timer til the countdown when starting the game ends.
+	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
+	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
+	
+	//StartGamePlay.Broadcast();
 
 	TArray<AActor*> controllers;
 	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), controllers);
@@ -30,6 +43,9 @@ void AInGameGameMode::BeginPlay()
 		playerController->OnPlayerPausedGame.AddDynamic(this, &AInGameGameMode::TogglePauseGame);
 		playerControllers.AddUnique(playerController);
 	}
+
+	bGamePlayStarted = false;
+	bLastMinuteFired = false;
 }
 
 void AInGameGameMode::GameEnd()
@@ -109,14 +125,14 @@ void AInGameGameMode::ResumeGameForAll()
 	bGameIsPaused = false;
 }
 
-void AInGameGameMode::Add_Points(AActor* Collider)
+void AInGameGameMode::Add_Points(int teamIndex)
 {
-	if (Collider->GetName()=="BP_Goal_Collider_Team0")
+	if (teamIndex == 0)
 	{
 		PointsTeam1 += 1;
 		ScoringTeam = 1;
 	}
-	else if (Collider->GetName() == "BP_Goal_Collider_Team1")
+	else if (teamIndex == 1)
 	{
 		PointsTeam0 += 1;
 		ScoringTeam = 0;
@@ -132,6 +148,11 @@ void AInGameGameMode::Tick(float DeltaSeconds)
 {
 	GameEndTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameEndTimerHandle);
 	GameIntermediateTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameCountdownTimerHandle);
+	if(GameEndTimeRemaining<=60 && !bLastMinuteFired)
+	{
+		StartingLastMinute.Broadcast();
+		bLastMinuteFired = true;
+	}
 }
 
 void AInGameGameMode::SelectGameOverMenu(int LevelIndex)
@@ -150,13 +171,19 @@ void AInGameGameMode::SelectGameOverMenu(int LevelIndex)
 void AInGameGameMode::RegroupPlayers()
 {
 	Regroup.Broadcast();
-	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Restart, GameIntermediateTime);
+	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
 
 }
 
-void AInGameGameMode::Restart()
+void AInGameGameMode::Start()
 {
+	if (!bGamePlayStarted)
+	{
+		MatchCoundownEnd.Broadcast();
+		bGamePlayStarted = true;
+	}
 	StartGamePlay.Broadcast();
+	RoundCoundownEnd.Broadcast();
 	GetWorldTimerManager().UnPauseTimer(GameEndTimerHandle);
 }
 

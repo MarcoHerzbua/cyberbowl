@@ -4,6 +4,7 @@
 #include "Character/Abilities/IceAbility.h"
 
 #include "Actors/IFreezeable.h"
+#include "Actors/PlayBall.h"
 #include "Character/Abilities/CooldownComponent.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Pawn.h"
@@ -16,6 +17,9 @@
 
 void UIceAbility::Fire()
 {
+	targetingComponent->SetVisibility(false);
+
+	OnAbilityCasted.Broadcast();
 	float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
 	float coneRadius = ConeLength * FMath::Tan(ConeAngle) / 2.f;
 	APawn* ownerAsPawn = Cast<APawn>(GetOwner());
@@ -34,7 +38,7 @@ void UIceAbility::Fire()
 	//Spawn Niagara Effect
 	FRotator effectRotation = ownerAsPawn->GetControlRotation().Add(0.f, -45.f, 0.f);
 	NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetOwner(), CoCEffect, start, effectRotation);
-	GetWorld()->GetTimerManager().SetTimer(CoCEffectDurationHandle, this, &UIceAbility::DestroyCoCEffect, 1.f);
+	//GetWorld()->GetTimerManager().SetTimer(CoCEffectDurationHandle, this, &UIceAbility::DestroyCoCEffect, 1.f);
 	
 	FCollisionQueryParams queryParams;
 	queryParams.AddIgnoredActor(GetOwner());
@@ -67,10 +71,29 @@ void UIceAbility::Fire()
 	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	bTargetingVisible = false;
 }
 
 void UIceAbility::Targeting()
 {
+	float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
+	APawn* ownerAsPawn = Cast<APawn>(GetOwner());
+
+	FVector start = GetOwner()->GetActorLocation();
+	FVector direction = ownerAsPawn->GetControlRotation().Vector();
+
+	if (!bTargetingVisible)
+	{
+		float radius = ConeLength/70* tan(coneAngleInRadians);
+		targetingComponent->SetWorldScale3D(FVector(radius, radius, ConeLength / 125));
+		targetingComponent->SetVisibility(true);
+		bTargetingVisible = true;
+	}
+
+	FRotator controlRotation = ownerAsPawn->GetControlRotation();
+	targetingComponent->SetWorldRotation(FRotator(controlRotation.Pitch + 90, controlRotation.Yaw , controlRotation.Roll));
+	direction.Normalize(0);
+	targetingComponent->SetWorldLocation(start + direction * ConeLength/2.5);
 }
 
 void UIceAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -79,13 +102,7 @@ void UIceAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 	if(CurrState == EAbilityState::ABILITY_TARGETING)
 	{
-		float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
-		APawn* ownerAsPawn = Cast<APawn>(GetOwner());
-
-		FVector start = GetOwner()->GetActorLocation();
-		FVector direction = ownerAsPawn->GetControlRotation().Vector();
-		DrawDebugCone(GetOwner()->GetWorld(), start, direction, ConeLength, coneAngleInRadians, coneAngleInRadians, 12, FColor::Blue, false, DeltaTime, 0, 4.f);
-
+		Targeting();
 	}
 	if(CurrState == EAbilityState::ABILITY_FIRE)
 	{
@@ -96,7 +113,10 @@ void UIceAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 void UIceAbility::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	ACyberbowlCharacter* character = Cast<ACyberbowlCharacter>(GetOwner());
+	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
+	bTargetingVisible = false;
 }
 
 void UIceAbility::UnfreezeActors()

@@ -7,13 +7,16 @@
 #include "Character/Abilities/Earthpillar.h"
 #include "EarthAbility.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAActorLaunched, AActor*, launchedActor);
+
 UCLASS(ClassGroup = (Abilities), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API UEarthAbility : public UAbilityBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnAActorLaunched OnAActorLaunched;
 	
 protected:
 
@@ -25,34 +28,34 @@ protected:
 	
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MinTargetDistance = 500.f;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//float MinTargetDistance = 500.f;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//float MaxTargetDistance = 3000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MaxTargetDistance = 3000.f;
+	float TargetDistance = 5000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TargetIndicatorRadius = 400.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LeapDuration = 2.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LeapHeight = 2000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PillarLifeSpan = 4.f;
 
-	UPROPERTY(BlueprintReadOnly)
-	FVector LeapTarget;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AEarthpillar> EarthPillarClass;
+	//UPROPERTY(BlueprintReadOnly)
+	//FVector LeapTarget;
+
+	//UPROPERTY(BlueprintReadOnly)
+	//FVector LeapStart;
 
 	UPROPERTY(BlueprintReadOnly)
-	FVector LeapStart;
+	FVector PillarSpawnPoint;
 
 	UPROPERTY()
 	bool bValidTarget;
-
-	AEarthpillar* pillar;
 
 	class AThirdPersonPlayerController* characterController;
 
@@ -60,11 +63,12 @@ protected:
 
 	class ACyberbowlCharacter* character;
 
-	float pillarHeigth;
+	UFUNCTION()
+	void CallOnActorLaunched(AActor* launchedActor);
 
-public:
-	UPROPERTY(BlueprintReadWrite)
-	TSubclassOf<AEarthpillar> earthClass;
+	UStaticMeshComponent* targetingComponent;
+
+	bool bTargetingVisible;
 };
 
 

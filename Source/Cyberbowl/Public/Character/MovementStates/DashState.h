@@ -4,10 +4,8 @@
 #include "Character/MovementStates/BaseMovementState.h"
 #include "DashState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUpDash);
 
-/**
- *
- */
 UCLASS()
 class CYBERBOWL_API UDashState : public UBaseMovementState
 {
@@ -20,11 +18,14 @@ public:
 	void Deactivate() override;
 	void OnTick(float DeltaTime) override;
 
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnUpDash OnUpDash;
+
 protected:
 	float DefaultGravityScale;
 	float DefaultBrakingFrictionFactor;
 	bool bKeepMomentum;
-	//FVector InitialVelocity;
+	
 	FVector DashDirection;
 	ECBMovementMode PreviousMovementMode;
 	
@@ -32,7 +33,10 @@ protected:
 
 	UPROPERTY()
 	FTimerHandle DashTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DashParams")
+	FVector InitialVelocity;
 	
 	void BindInputActions() override;
-};
 
+};

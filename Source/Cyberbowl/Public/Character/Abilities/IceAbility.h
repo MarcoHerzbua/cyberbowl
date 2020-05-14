@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAbilityCasted);
+
 UCLASS(ClassGroup = (Abilities), meta = (BlueprintSpawnableComponent))
 class CYBERBOWL_API UIceAbility : public UAbilityBase
 {
@@ -18,6 +21,11 @@ public:
 
 	void Targeting() override;
 
+	//UFUNCTION(BlueprintCallable)
+	//bool IsBallFrozen()
+	//{
+	//	return bIsBallFrozen;
+	//}
 protected:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -38,6 +46,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "IceAbility")
 	class UNiagaraComponent* NiagaraComponent;
 
+	UPROPERTY(BlueprintAssignable, Category = "IceAbility")
+	FOnAbilityCasted OnAbilityCasted;
+	
 	UPROPERTY()
 	FTimerHandle FreezeTimerHandle;
 
@@ -47,10 +58,20 @@ protected:
 	UPROPERTY()
 	TArray<AActor*> FrozenActors;
 
+	//UPROPERTY()
+	//bool bIsBallFrozen;
+	//UFUNCTION()
+	//void SetBallFrozen() { bIsBallFrozen = true; }
+	//UFUNCTION()
+	//void SetBallUnfrozen() { bIsBallFrozen = false; }
+	
 	UFUNCTION(BlueprintCallable, Category = "IceAbility")
 	void UnfreezeActors();
 	
 	bool IsWithinCone(FVector hitPoint, FVector coneDirectionNormal);
 
 	void DestroyCoCEffect();
+
+	UStaticMeshComponent* targetingComponent;
+	bool bTargetingVisible;
 };

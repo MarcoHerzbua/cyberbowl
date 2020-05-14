@@ -15,10 +15,12 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
-	public:
+public:
 
 		virtual void NativeInitializeAnimation() override;
 
+protected:
+	
 		UFUNCTION(blueprintCallable)
 		void UpdateAnimationProperties();
 
@@ -41,6 +43,12 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 		bool bisInAir;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		bool bIsDoubleJumping;
+
+		UPROPERTY(editAnywhere, BlueprintReadWrite)
+		float doubleJumpPlayRate = 1.0f;
+
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		bool bisIsWallRidingCounterClockWise;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
@@ -51,18 +59,36 @@ class CYBERBOWL_API UCyberbowlCharacterAnimInstance : public UAnimInstance
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
 		float dashPlayRate = 1.f;
+	
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
+		bool bIsBooping;
 
-		void setIsWallRidingCounterClockWise(bool bIsCounterClockWise);
-		void setIsWallRidingClockWise(bool bisInWallRidingClockWise);
-		void setIsDashing(bool bDash);
-		void setDashPlayRate(float playRate);
+		UPROPERTY(editAnywhere, BlueprintReadWrite)
+		float boopPlayRate = 1.0f;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
-		class APawn* pawn;
+		bool bIsGrabbing;
 
 		UPROPERTY(editAnywhere, BlueprintReadOnly)
-		class ACyberbowlCharacter* main;
+			class APawn* pawn;
 
+		UPROPERTY(editAnywhere, BlueprintReadOnly)
+			class ACyberbowlCharacter* main;
+
+public:
+
+		void SetIsWallRidingCounterClockWise(bool bIsCounterClockWise);
+		void SetIsWallRidingClockWise(bool bisInWallRidingClockWise);
+		void SetIsDashing(bool bDash);
+		void SetDashPlayRate(float playRate);
+		void SetIsBooping(bool bBooping);
+		void SetBoopPlayRate(float playRate);
+		void SetIsDoubleJumping(bool bDoubleJump);
+		void SetDoubleJumpPlayRate(float playRate);
+		void SetIsGrabbing(bool bGrabbing);
+		bool GetIsGrabbing();
+		bool GetIsInAir();
+	
 private:
 	float MaxCharacterSpeed;
 	
