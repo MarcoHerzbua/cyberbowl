@@ -10,7 +10,7 @@
 #include "ILaunchable.h"
 #include "PlayBall.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallBooped); // uwu ; Just how I like it :3
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBallBooped, AActor*, instigator); // uwu ; Just how I like it :3
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallFrozen); 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallUnfrozen); 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBallHit, FName, collisionProfile, float, velocity); 
@@ -60,7 +60,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void PushBall(float force, FVector direction);
+	void PushBall(AActor* instigator, float force, FVector direction);
 
 	UFUNCTION(BlueprintCallable)
 	void StopBall();

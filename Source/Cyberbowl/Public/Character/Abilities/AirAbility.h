@@ -49,7 +49,7 @@ protected:
 	void ConvertMetersToUnrealUnits();
 
 	UFUNCTION()
-	void ExitGrabModeByPush();
+	void ExitGrabModeByPush(AActor* instigator);
 
 	UFUNCTION()
 	void ExitGrabMode();

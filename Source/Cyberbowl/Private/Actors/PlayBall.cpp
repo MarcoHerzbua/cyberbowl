@@ -58,7 +58,7 @@ void APlayBall::Tick(float DeltaTime)
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%s"), *GetVelocity().ToString()));
 }
 
-void APlayBall::PushBall(float force, FVector direction)
+void APlayBall::PushBall(AActor* instigator, float force, FVector direction)
 {
 	if(IsBallFrozen)
 	{
@@ -68,7 +68,7 @@ void APlayBall::PushBall(float force, FVector direction)
 	//Is this only moving the mesh? -> Marco: the mesh is a scene component and the root of the actor, so everything in this actor is moved
 	BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
 	
-	OnBallBooped.Broadcast();
+	OnBallBooped.Broadcast(instigator);
 }
 
 void APlayBall::PlayBall()
