@@ -19,7 +19,8 @@ enum class ECBMovementMode : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVertDash);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallRunFinished, float, timeOnWall, bool, launchedAway);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWallrunStart);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallRunEnd, float, timeOnWall, bool, launchedAway);
 
 UCLASS()
 class CYBERBOWL_API UCBCharacterMovementComponent : public UCharacterMovementComponent
@@ -66,8 +67,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Dash Params")
 	FFloatRange DashMomentumStopRange = TRange<float>(45.f, 135.f);
 
-	//UFUNCTION(BlueprintCallable, Category = "Cyberbowl Movement")
-	//void Jump();
+#pragma region MovementStatemachine
 	
 	UFUNCTION(BlueprintCallable)
 	void SetCBMovementMode(ECBMovementMode mode);
@@ -78,8 +78,45 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UBaseMovementState* GetCBMovementState() { return MovementStates.Contains(GetCBMovementMode()) ? MovementStates[GetCBMovementMode()] : nullptr; }
 
-	FVector GetCharacterTransform() { return GetOwner()->GetActorLocation(); };
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	ECBMovementMode CBMovementMode;
 
+	UPROPERTY()
+	TMap<ECBMovementMode, UBaseMovementState*> MovementStates;
+
+	void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
+#pragma endregion
+
+#pragma region Wallrun
+
+public:
+
+	//This function calls EndWallrun without any collision parameters
+	UFUNCTION()
+	void ForceEndWallrun();
+
+	UPROPERTY(BlueprintAssignable, Category = "Wallrun Delegate")
+	FOnWallrunStart OnWallrunStart;
+
+	UPROPERTY(BlueprintAssignable, Category = "Wallrun Delegate")
+	FOnWallRunEnd OnWallrunEnd;
+
+protected:
+	UFUNCTION()
+	void CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
+	UPROPERTY()
+	class USphereComponent* WallrunCollider;
+
+#pragma endregion 
+
+public:
+	
+	FVector GetCharacterTransform() { return GetOwner()->GetActorLocation(); };
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -88,24 +125,12 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnVertDash OnVertDash;
 
-	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnWallRunFinished OnWallRunFinished;
 
-protected:
-	UPROPERTY(BlueprintReadOnly)
-	ECBMovementMode CBMovementMode;
-
-	UPROPERTY()
-	TMap<ECBMovementMode, UBaseMovementState*> MovementStates;
-
-	//UPROPERTY()
-	//UCooldownComponent* CooldownComponent;
-	//
 	virtual void BeginPlay() override;
 
-	void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
+	UFUNCTION()
+	void CallOnVerticalDash();
 
-	void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration) override;
 /*
  *
  *
@@ -117,12 +142,6 @@ protected:
 	void PhysCustom(float deltaTime, int32 Iterations) override;
 
 	void PhysWallrun(float deltaTime, int32 Iterations);
-
-	UFUNCTION()
-	void CallOnVerticalDash();
-
-	UFUNCTION()
-	void CallOnWallRunFinished(float timeOnWall, bool launchedAway);
 /*
  *
  *
