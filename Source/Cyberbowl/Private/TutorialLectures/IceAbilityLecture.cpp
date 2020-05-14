@@ -98,5 +98,5 @@ void AIceAbilityLecture::LaunchBall() const
 		launchDirection = { 0, -1, 0 };
 	}
 
-	ball->PushBall(4000.f, launchDirection);
+	ball->PushBall(nullptr, 4000.f, launchDirection);
 }

@@ -27,7 +27,11 @@ void AInGameGameMode::BeginPlay()
 
 
 	GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &AInGameGameMode::GameEnd, GamePlayTime);
-	StartGamePlay.Broadcast();
+	//Pause Game Timer til the countdown when starting the game ends.
+	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
+	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
+	
+	//StartGamePlay.Broadcast();
 
 	TArray<AActor*> controllers;
 	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), controllers);
@@ -39,6 +43,9 @@ void AInGameGameMode::BeginPlay()
 		playerController->OnPlayerPausedGame.AddDynamic(this, &AInGameGameMode::TogglePauseGame);
 		playerControllers.AddUnique(playerController);
 	}
+
+	bGamePlayStarted = false;
+	bLastMinuteFired = false;
 }
 
 void AInGameGameMode::GameEnd()
@@ -124,23 +131,31 @@ void AInGameGameMode::Add_Points(int teamIndex)
 	{
 		PointsTeam1 += 1;
 		ScoringTeam = 1;
+		effectRotation = effectRotationTeam0;
 	}
 	else if (teamIndex == 1)
 	{
 		PointsTeam0 += 1;
 		ScoringTeam = 0;
+		effectRotation = effectRotationTeam1;
 	}
 
+	effectLocation = Ball->GetActorLocation();
 	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
 	PauseGamePlay.Broadcast();
 	GetWorldTimerManager().SetTimer(GameIntermediateTimerHandle, this, &AInGameGameMode::RegroupPlayers, GameIntermediateTime);
-	
+
 }
 
 void AInGameGameMode::Tick(float DeltaSeconds)
 {
 	GameEndTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameEndTimerHandle);
 	GameIntermediateTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameCountdownTimerHandle);
+	if(GameEndTimeRemaining<=60 && !bLastMinuteFired)
+	{
+		StartingLastMinute.Broadcast();
+		bLastMinuteFired = true;
+	}
 }
 
 void AInGameGameMode::SelectGameOverMenu(int LevelIndex)
@@ -159,13 +174,19 @@ void AInGameGameMode::SelectGameOverMenu(int LevelIndex)
 void AInGameGameMode::RegroupPlayers()
 {
 	Regroup.Broadcast();
-	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Restart, GameIntermediateTime);
+	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
 
 }
 
-void AInGameGameMode::Restart()
+void AInGameGameMode::Start()
 {
+	if (!bGamePlayStarted)
+	{
+		MatchCoundownEnd.Broadcast();
+		bGamePlayStarted = true;
+	}
 	StartGamePlay.Broadcast();
+	RoundCoundownEnd.Broadcast();
 	GetWorldTimerManager().UnPauseTimer(GameEndTimerHandle);
 }
 

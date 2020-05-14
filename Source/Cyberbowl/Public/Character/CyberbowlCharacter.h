@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Character/Abilities/AbilityBase.h"
 #include "PlayerController/FPlayerInfo.h"
+#include "NiagaraSystem.h"
 #include "CyberbowlCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
@@ -17,7 +18,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoop);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWallrunEnd, float, timeOnWall, bool, launchedAway);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable, public ILaunchable
@@ -75,6 +75,27 @@ public:
 	UPROPERTY()
 	float DefaultTimeDilation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	UNiagaraSystem* DashEffect;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Dash Params")
+	FRotator DashRotationHand;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationHandNormal = FRotator(0.f, 0.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationHandUpwards = FRotator(0.f, -45.f, 0.f);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Dash Params")
+	FRotator DashRotationFoot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationFootNormal = FRotator(180.f, 0.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationFootUpwards = FRotator(0.f, 0.f, 0.f);
+
 #pragma region EventDispatchers
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnBallCamToggled OnToggledBallCam;
@@ -91,8 +112,8 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnVerticalDash OnVerticalDash;
 
-	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnWallrunEnd OnWallrunEnd;
+
+
 
 #pragma endregion
 	
@@ -138,9 +159,6 @@ protected:
 
 	UFUNCTION()
 	void CallOnVerticalDash();
-
-	UFUNCTION()
-	void CallOnWallRunEnd(float timeOnWall, bool launchedAway);
 
 #pragma endregion 
 	// APawn interface

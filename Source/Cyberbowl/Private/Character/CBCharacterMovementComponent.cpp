@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#pragma once
 
 #include "Character/CBCharacterMovementComponent.h"
 
@@ -9,6 +9,8 @@
 #include "Character/MovementStates/DoubleJumpState.h"
 #include "Engine/Engine.h"
 #include "Character/CyberbowlCharacterAnimInstance.h"
+#include "Components/SphereComponent.h"
+#include "Character/BoopComponent.h"
 
 void UCBCharacterMovementComponent::SetCBMovementMode(ECBMovementMode mode)
 {
@@ -34,28 +36,33 @@ void UCBCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick Ti
     MovementStates[CBMovementMode]->OnTick(DeltaTime);
 }
 
-void UCBCharacterMovementComponent::CallOnWallRunFinished(float timeOnWall, bool launchedAway)
-{
-    OnWallRunFinished.Broadcast(timeOnWall, launchedAway);
-}
-
 void UCBCharacterMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+    WallrunCollider = Cast<USphereComponent>(GetOwner()->GetComponentsByTag(USphereComponent::StaticClass(), "WallrunCollider").Last());
+    auto boopComponent = CharacterOwner->FindComponentByClass<UBoopComponent>();
+    if (!WallrunCollider || !boopComponent)
+    {
+        UE_LOG(LogInit, Error, TEXT("CBCharacterMoveComponent: Vital Components not set in Character Blueprint! (WallrunCollider, BoopComponent)"));
+    }
+    else
+    {
+        WallrunCollider->OnComponentBeginOverlap.AddDynamic(this, &UCBCharacterMovementComponent::CheckForWallrun);
+        WallrunCollider->OnComponentEndOverlap.AddDynamic(this, &UCBCharacterMovementComponent::EndWallrun);
+        boopComponent->OnBoopStarted.AddDynamic(this, &UCBCharacterMovementComponent::ForceEndWallrun);
+    }
+
     CBMovementMode = ECBMovementMode::CBMOVE_Running;
 
     MovementStates.Add(ECBMovementMode::CBMOVE_Running, NewObject<UBaseMovementState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_Jump, NewObject<UJumpState>());
     MovementStates.Add(ECBMovementMode::CBMOVE_DoubleJump, NewObject<UDoubleJumpState>());
+    MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, NewObject<UWallrunState>());
 
     auto dashState = NewObject<UDashState>();
     dashState->OnUpDash.AddDynamic(this, &UCBCharacterMovementComponent::CallOnVerticalDash);
     MovementStates.Add(ECBMovementMode::CBMOVE_Dash, dashState);
-
-    auto wallrunState = NewObject<UWallrunState>();
-    wallrunState->OnWallrunFinish.AddDynamic(this, &UCBCharacterMovementComponent::CallOnWallRunFinished);
-    MovementStates.Add(ECBMovementMode::CBMOVE_Wallrun, wallrunState);
 
 	for(auto state : MovementStates)
 	{
@@ -80,24 +87,54 @@ void UCBCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
 	}
 }
 
-void UCBCharacterMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid,
-	float BrakingDeceleration)
+void UCBCharacterMovementComponent::ForceEndWallrun()
 {
-    Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
+    if (GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+    {
+        auto movementState = Cast<UWallrunState>(GetCBMovementState());
+        FVector launchVector = movementState->GetLaunchVector();
+        launchVector = launchVector.GetSafeNormal() * 1000.f;
+        AddImpulse(launchVector, true);
+    }
 
-	//if(CBMovementMode == ECBMovementMode::CBMOVE_Running)
-	//{
-	//	if(Acceleration.IsZero())
-	//	{
-	//        Velocity = FVector::ZeroVector;
-	//	}
-	//    else
-	//    {
-	//        Velocity = GetMaxSpeed() * Acceleration.GetSafeNormal();
-	//    }
-	//	
-	//}
+    EndWallrun(nullptr, nullptr, nullptr, 0);
 }
+
+void UCBCharacterMovementComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+                                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (GetCBMovementMode() != ECBMovementMode::CBMOVE_Running)
+    {
+        //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("WallrunCmp valid Wallrun")));
+
+        //push character against the wall 
+        AddImpulse(SweepResult.Normal * 1000.f);
+
+		SetCBMovementMode(ECBMovementMode::CBMOVE_Wallrun);
+        OnWallrunStart.Broadcast();
+    }
+
+}
+
+void UCBCharacterMovementComponent::EndWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+    bool isLaunched = false;
+    float timeOnWall = 0.f;
+    //This check is necessary to avoid bugs when character just walks up to a wall 
+    if (GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+    {
+        auto movementState = Cast<UWallrunState>(GetCBMovementState());
+        timeOnWall = movementState->GetTimeOnWall();
+        isLaunched = movementState->IsLaunching();
+        if (!isLaunched)
+        {
+            SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
+        }
+		OnWallrunEnd.Broadcast(timeOnWall, isLaunched);
+    }
+}
+
 
 /*
  *

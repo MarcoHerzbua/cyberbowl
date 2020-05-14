@@ -7,6 +7,7 @@
 
 #include "Character/CyberbowlCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Character/CBCharacterMovementComponent.h"
 
 void AWallrunLecture::Tick(float DeltaTime)
 {
@@ -27,7 +28,7 @@ void AWallrunLecture::BeginPlay()
 {
 	Super::BeginPlay();
 
-	tutorialCharacter->OnWallrunEnd.AddDynamic(this, &AWallrunLecture::OnWallrunEnd);
+	Cast<UCBCharacterMovementComponent>(tutorialCharacter->GetMovementComponent())->OnWallrunEnd.AddDynamic(this, &AWallrunLecture::OnWallrunEnd);
 }
 
 void AWallrunLecture::SetupTasks()

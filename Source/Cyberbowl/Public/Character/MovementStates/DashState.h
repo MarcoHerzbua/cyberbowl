@@ -25,7 +25,7 @@ protected:
 	float DefaultGravityScale;
 	float DefaultBrakingFrictionFactor;
 	bool bKeepMomentum;
-	//FVector InitialVelocity;
+	
 	FVector DashDirection;
 	ECBMovementMode PreviousMovementMode;
 	
@@ -33,6 +33,9 @@ protected:
 
 	UPROPERTY()
 	FTimerHandle DashTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DashParams")
+	FVector InitialVelocity;
 	
 	void BindInputActions() override;
 

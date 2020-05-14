@@ -49,7 +49,18 @@ void UDashState::Activate(ECBMovementMode previousMode)
 		DashDirection = axisInput;
 	}
 	
-	//InitialVelocity = MovementComponent->Velocity;
+	InitialVelocity = MovementComponent->Velocity;
+	ACyberbowlCharacter* character = Cast<ACyberbowlCharacter>(MovementComponent->GetPawnOwner());
+	if (InitialVelocity.X + InitialVelocity.Y == 0.0)
+	{
+		character->DashRotationHand = character->DashRotationHandUpwards;
+		character->DashRotationFoot = character->DashRotationFootUpwards;
+	}
+	else
+	{
+		character->DashRotationHand = character->DashRotationHandNormal;
+		character->DashRotationFoot = character->DashRotationFootNormal;
+	}
 	PreviousMovementMode = previousMode;
 	MovementComponent->GravityScale = 0.f;
 	MovementComponent->BrakingFrictionFactor = 0.f;
