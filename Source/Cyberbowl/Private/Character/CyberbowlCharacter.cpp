@@ -113,7 +113,8 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 void ACyberbowlCharacter::Jump()
 {
 	if (CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_DoubleJump
-		|| CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+		|| CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun
+		|| CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Dash)
 	{
 		return;
 	}
