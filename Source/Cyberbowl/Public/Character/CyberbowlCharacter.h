@@ -78,11 +78,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
 	UNiagaraSystem* DashEffect;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	UPROPERTY(BlueprintReadOnly, Category = "Dash Params")
 	FRotator DashRotationHand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationHandNormal = FRotator(0.f, 0.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationHandUpwards = FRotator(0.f, -45.f, 0.f);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Dash Params")
 	FRotator DashRotationFoot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationFootNormal = FRotator(180.f, 0.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationFootUpwards = FRotator(0.f, 0.f, 0.f);
 
 #pragma region EventDispatchers
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
