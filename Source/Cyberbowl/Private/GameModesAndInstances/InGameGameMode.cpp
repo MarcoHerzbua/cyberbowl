@@ -131,17 +131,20 @@ void AInGameGameMode::Add_Points(int teamIndex)
 	{
 		PointsTeam1 += 1;
 		ScoringTeam = 1;
+		effectRotation = effectRotationTeam0;
 	}
 	else if (teamIndex == 1)
 	{
 		PointsTeam0 += 1;
 		ScoringTeam = 0;
+		effectRotation = effectRotationTeam1;
 	}
 
+	effectLocation = Ball->GetActorLocation();
 	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
 	PauseGamePlay.Broadcast();
 	GetWorldTimerManager().SetTimer(GameIntermediateTimerHandle, this, &AInGameGameMode::RegroupPlayers, GameIntermediateTime);
-	
+
 }
 
 void AInGameGameMode::Tick(float DeltaSeconds)
