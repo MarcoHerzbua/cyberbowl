@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Character/Abilities/AbilityBase.h"
 #include "PlayerController/FPlayerInfo.h"
+#include "NiagaraSystem.h"
 #include "CyberbowlCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallErrorFeedback);
@@ -74,6 +75,15 @@ public:
 	UPROPERTY()
 	float DefaultTimeDilation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	UNiagaraSystem* DashEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationHand;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
+	FRotator DashRotationFoot;
+
 #pragma region EventDispatchers
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnBallCamToggled OnToggledBallCam;
@@ -89,6 +99,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnVerticalDash OnVerticalDash;
+
+
+
+
 #pragma endregion
 	
 protected:
