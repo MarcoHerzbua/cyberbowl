@@ -3,6 +3,8 @@
 
 #include "Actors/PlayBall.h"
 
+
+#include "Character/Abilities/AbilityUtils.h"
 #include "Engine/Engine.h"
 
 // Sets default values
@@ -113,10 +115,11 @@ void APlayBall::UnFreeze_Implementation()
 	OnBallUnfrozen.Broadcast();
 }
 
-void APlayBall::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical)
+void APlayBall::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical, UNiagaraSystem* launchEffect, float launchEffectDuration)
 {
 	FVector newVel = direction * forceHorizontal;
 	newVel.Z = forceVertical;
 	BallStaticMesh->AddImpulse(newVel, NAME_None, true);
+	UAbilityUtils::SpawnTimedEffect(GetWorld(), this, launchEffect, launchEffectDuration);
 }
 

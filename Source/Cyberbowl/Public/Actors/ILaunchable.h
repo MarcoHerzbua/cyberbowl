@@ -20,5 +20,5 @@ class CYBERBOWL_API ILaunchable
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ILaunchable")
-	void Launch(FVector direction, float forceHorizontal, float forceVertical);
+	void Launch(FVector direction, float forceHorizontal, float forceVertical, class UNiagaraSystem* launchEffect, float launchEffectDuration);
 };
