@@ -17,4 +17,11 @@ public:
 	 */
     UFUNCTION(BlueprintCallable, Category = "AbilityUtils")
     static bool FindTargetPoint(UWorld* worldContext, FVector& targetPoint, FVector traceStart, FVector traceEnd, float wallOffset);
+
+	/**
+	 * Spawn a Niagara Effect that is attached to an actor and destroyed after the duration
+	 * @param location - custom location in world space - if Zero the effect is spawned on the actor position
+	*/
+    UFUNCTION(BlueprintCallable, Category = "AbilityUtils")
+    static void SpawnTimedEffect(UWorld* worldContext, AActor* attachActor, class UNiagaraSystem* effect, float duration, FVector location = FVector::ZeroVector);
 };

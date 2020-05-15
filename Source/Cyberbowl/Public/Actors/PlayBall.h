@@ -77,5 +77,5 @@ public:
 	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
 	void UnFreeze_Implementation() override;
 
-	void Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical) override;
+	void Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical, class UNiagaraSystem* launchEffect, float launchEffectDuration) override;
 };

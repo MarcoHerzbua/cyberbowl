@@ -5,6 +5,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Character/Abilities/AbilityBase.h"
+#include "Character/Abilities/AbilityUtils.h"
 #include "Character/BallCamComponent.h"
 #include "Character/BoopComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -19,6 +20,7 @@
 #include "PlayerController/ThirdPersonPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "PlayerController/TutorialPlayerController.h"
 #include "Widgets/WNameTag.h"
 
@@ -113,7 +115,8 @@ void ACyberbowlCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 void ACyberbowlCharacter::Jump()
 {
 	if (CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_DoubleJump
-		|| CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun)
+		|| CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Wallrun
+		|| CBCharacterMoveComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Dash)
 	{
 		return;
 	}
@@ -166,13 +169,19 @@ void ACyberbowlCharacter::UnFreeze_Implementation()
 	CustomTimeDilation = DefaultTimeDilation;
 }
 
-void ACyberbowlCharacter::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical)
+void ACyberbowlCharacter::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical, UNiagaraSystem* launchEffect, float launchEffectDuration)
 {
 	CBCharacterMoveComponent->StopMovementImmediately();
 	CBCharacterMoveComponent->DoJump(true);
 	CBCharacterMoveComponent->Velocity = direction * forceHorizontal;
 	CBCharacterMoveComponent->Velocity.Z = forceVertical;
 
+	FVector effectSpawnLocation;
+	auto feetDistance = GetMesh()->GetSocketLocation("RightFoot") - GetMesh()->GetSocketLocation("LeftFoot");
+	effectSpawnLocation = GetMesh()->GetSocketLocation("LeftFoot") + feetDistance / 2.f;
+	
+	UAbilityUtils::SpawnTimedEffect(GetWorld(), this, launchEffect, launchEffectDuration, effectSpawnLocation);
+	
 	CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
 }
 
