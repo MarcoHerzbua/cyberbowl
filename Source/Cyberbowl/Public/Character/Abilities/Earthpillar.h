@@ -93,8 +93,6 @@ protected:
 
 	void EndLaunch();
 
-	void SpawnEffect(AActor* launchedActor);
-
 	//UPROPERTY(BlueprintReadOnly)
 	//AActor* LaunchedActor;
 

@@ -3,6 +3,9 @@
 #include "Character/Abilities/AbilityUtils.h"
 #include "Engine/World.h"
 #include "Components/PrimitiveComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "TimerManager.h"
 
 bool UAbilityUtils::FindTargetPoint(UWorld* worldContext, FVector& targetPoint, FVector traceStart, FVector traceEnd, float wallOffset)
 {
@@ -44,4 +47,31 @@ bool UAbilityUtils::FindTargetPoint(UWorld* worldContext, FVector& targetPoint, 
 	}
 
 	return true;
+}
+
+void UAbilityUtils::SpawnTimedEffect(UWorld* worldContext, AActor* attachActor, UNiagaraSystem* effect, float duration,
+	FVector location)
+{
+	if(location == FVector::ZeroVector)
+	{
+		location = attachActor->GetActorLocation();
+	}
+	
+	UNiagaraComponent* niagaraCmp = UNiagaraFunctionLibrary::SpawnSystemAttached(effect, attachActor->GetRootComponent(), NAME_None, location, FRotator::ZeroRotator, FVector(1, 1, 1), EAttachLocation::KeepWorldPosition, false, ENCPoolMethod::None);
+	//TWeakObjectPtr<UNiagaraComponent> niagaraCmpWeakPtr = TWeakObjectPtr<UNiagaraComponent>(niagaraCmp);
+	FTimerDelegate callback;
+	callback.BindLambda([niagaraCmp]
+	{
+		if (niagaraCmp)
+		{
+			niagaraCmp->DestroyComponent();
+		}
+		else
+		{
+			UE_LOG(LogActor, Error, TEXT("AbilityUtils: Something went wrong when destroying a timed effect (Ptr to NiagaraComponent is null)"));
+		}
+	});
+
+	FTimerHandle timer;
+	worldContext->GetTimerManager().SetTimer(timer, callback, duration, false);
 }

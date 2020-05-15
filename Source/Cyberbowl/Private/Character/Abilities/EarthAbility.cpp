@@ -61,8 +61,6 @@ void UEarthAbility::Targeting()
 
 	bValidTarget = UAbilityUtils::FindTargetPoint(world, PillarSpawnPoint, actorLoc, end, TargetIndicatorRadius);
 
-
-
 	if (bValidTarget)
 	{
 		if (!bTargetingVisible)
@@ -151,7 +149,7 @@ void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UEarthAbility::SpawnPillar()
 {
-	auto pillar = GetWorld()->SpawnActor<AEarthpillar>(EarthPillarClass, PillarSpawnPoint, FRotator());
+	auto pillar = GetWorld()->SpawnActor<AEarthpillar>(EarthPillarClass, PillarSpawnPoint, FRotator::ZeroRotator);
 
 	if (!characterController)
 	{

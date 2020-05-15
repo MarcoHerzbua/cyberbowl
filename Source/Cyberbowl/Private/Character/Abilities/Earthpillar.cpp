@@ -71,8 +71,7 @@ void AEarthpillar::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	if(OtherActor->GetClass()->ImplementsInterface(ULaunchable::StaticClass()) && !GetWorld()->GetTimerManager().IsTimerActive(LaunchTimerHandle))
 	{
 		GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &AEarthpillar::EndLaunch, LaunchCooldown/* - LaunchCooldown / 10.f*/);
-		ILaunchable::Execute_Launch(OtherActor, OtherActor->GetVelocity().GetSafeNormal(), LaunchForceHorizontal, LaunchForceVertical);
-		SpawnEffect(OtherActor);
+		ILaunchable::Execute_Launch(OtherActor, OtherActor->GetVelocity().GetSafeNormal(), LaunchForceHorizontal, LaunchForceVertical, LaunchEffect, LaunchEffectDuration);
 		bIsRising = true;
 		OnActorLaunched.Broadcast(OtherActor);
 	}
@@ -122,27 +121,6 @@ void AEarthpillar::TickLaunch()
 void AEarthpillar::EndLaunch()
 {
 	//LaunchedActor = nullptr;
-}
-
-void AEarthpillar::SpawnEffect(AActor* launchedActor)
-{
-	UNiagaraComponent* niagaraCmp = UNiagaraFunctionLibrary::SpawnSystemAttached(LaunchEffect, launchedActor->GetRootComponent(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, FVector(1, 1, 1), EAttachLocation::SnapToTarget, false, ENCPoolMethod::None);
-	//TWeakObjectPtr<UNiagaraComponent> niagaraCmpWeakPtr = TWeakObjectPtr<UNiagaraComponent>(niagaraCmp);
-	FTimerDelegate callback;
-	callback.BindLambda([niagaraCmp]
-	{
-		if(niagaraCmp)
-		{
-			niagaraCmp->DestroyComponent();
-		}
-		else
-		{
-			UE_LOG(LogActor, Error, TEXT("EarthPillar: Something went wrong when destroying the LaunchEffect (Ptr to NiagaraComponent is null)"));
-		}
-	});
-
-	FTimerHandle timer;
-	GetWorld()->GetTimerManager().SetTimer(timer, callback, LaunchEffectDuration, false);
 }
 
 void AEarthpillar::InitializePillar(int playerTeam, float maxLoweringPos, float lifeSpan)
