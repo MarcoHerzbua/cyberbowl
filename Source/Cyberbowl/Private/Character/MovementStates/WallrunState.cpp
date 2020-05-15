@@ -63,7 +63,7 @@ void UWallrunState::OnTick(float DeltaTime)
 		timeOnWall += DeltaTime;
 	}
 	
-	//More then one Tick is needed to finalize the WallRunDirection, therefore the frist 5 Ticks are used to correct the Animation.
+	//More then one Tick is needed to finalize the WallRunDirection, therefore the first 5 Ticks are used to correct the Animation.
 	if (currInitializeAnimationFrames < initializeAnimationFrames)
 	{
 		FHitResult wallRunHitResult;
@@ -80,6 +80,12 @@ void UWallrunState::OnTick(float DeltaTime)
 			MovementComponent->animinstance->SetIsWallRidingCounterClockWise(true);
 			MovementComponent->animinstance->SetIsWallRidingClockWise(false);
 		}
+		currInitializeAnimationFrames++;
+	}
+	else if (currInitializeAnimationFrames == initializeAnimationFrames)
+	{
+		ACyberbowlCharacter* character = Cast<ACyberbowlCharacter>(MovementComponent->GetCharacterOwner());
+		character->OnFinishedInitializingWallrun.Broadcast();
 		currInitializeAnimationFrames++;
 	}
 	

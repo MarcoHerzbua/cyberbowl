@@ -18,6 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDoubleJump);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoop);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishedInitializingWallrun);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable, public ILaunchable
@@ -96,6 +97,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Params")
 	FRotator DashRotationFootUpwards = FRotator(0.f, 0.f, 0.f);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wallrun Params")
+	UNiagaraSystem* WallRunEffect;
+
 #pragma region EventDispatchers
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnBallCamToggled OnToggledBallCam;
@@ -112,7 +116,8 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnVerticalDash OnVerticalDash;
 
-
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnFinishedInitializingWallrun OnFinishedInitializingWallrun;
 
 
 #pragma endregion
