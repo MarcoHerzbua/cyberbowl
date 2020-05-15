@@ -144,7 +144,7 @@ void UBoopComponent::PushBall(UPrimitiveComponent* OverlappedComp, AActor* Other
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("extent: %f, %f, %f"), hitDistance.X, hitDistance.Y, hitDistance.Z));
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("force: %f"), pushForce));
 	
-	ball->PushBall(pushForce, cameraForwardVec);
+	ball->PushBall(GetOwner(), pushForce, cameraForwardVec);
 
 	//deactivate hitbox so ball only gets pushed once when inside hitbox
 	DeactivateBoopHitbox();

@@ -151,7 +151,7 @@ void UAirAbility::ConvertMetersToUnrealUnits()
 	grabRadiusMeters *= 100.f;
 }
 
-void UAirAbility::ExitGrabModeByPush()
+void UAirAbility::ExitGrabModeByPush(AActor* instigator)
 {
 	if (!bIsInGrabMode)
 	{

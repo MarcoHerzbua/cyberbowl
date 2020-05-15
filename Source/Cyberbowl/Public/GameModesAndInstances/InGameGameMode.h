@@ -43,6 +43,14 @@ public:
 	int WinningTeam;
 	UPROPERTY(BlueprintReadWrite)
 	int ScoringTeam;
+	UPROPERTY(BlueprintReadOnly)
+	FVector effectLocation;
+	UPROPERTY(BlueprintReadOnly)
+	FRotator effectRotation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Effect")
+	FRotator effectRotationTeam0 = FRotator(0,0,0);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	FRotator effectRotationTeam1 = FRotator(0, 180, 0);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float GamePlayTime = 180.f;
