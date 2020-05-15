@@ -5,24 +5,26 @@
 
 #include "Actors/PlayBall.h"
 #include "Character/CyberbowlCharacter.h"
-#include "PlayerController/ThirdPersonPlayerController.h"
 #include "TimerManager.h"
-#include "Character/CBCharacterMovementComponent.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+
+
 // Sets default values
 AEarthpillar::AEarthpillar()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	root = CreateDefaultSubobject<USceneComponent>(FName("EarthPillarRoot"));
-	RootComponent = root;
-	cylinder = CreateDefaultSubobject<UStaticMeshComponent>(FName("CylinderMesh"));
-	cylinder->SetupAttachment(root);
-	cylinder->SetCollisionProfileName("BlockAllDynamic");
-	triggerMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("TriggerMesh"));
-	triggerMesh->SetupAttachment(root);
-	triggerMesh->SetCollisionProfileName("OverlapAllDynamic");
+	Root = CreateDefaultSubobject<USceneComponent>(FName("EarthPillarRoot"));
+	RootComponent = Root;
+	PillarMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("PillarMesh"));
+	PillarMesh->SetupAttachment(Root);
+	PillarMesh->SetCollisionProfileName("BlockAllDynamic");
+	TriggerMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("TriggerMesh"));
+	TriggerMesh->SetupAttachment(Root);
+	TriggerMesh->SetCollisionProfileName("OverlapAllDynamic");
 	currPlayerTeam = -1;
 	
 }
@@ -32,7 +34,7 @@ AEarthpillar::AEarthpillar()
 void AEarthpillar::BeginPlay()
 {
 	Super::BeginPlay();
-	triggerMesh->OnComponentBeginOverlap.AddDynamic(this, &AEarthpillar::BeginOverlap);
+	TriggerMesh->OnComponentBeginOverlap.AddDynamic(this, &AEarthpillar::BeginOverlap);
 }
 
 // Called every frame
@@ -45,7 +47,7 @@ void AEarthpillar::Tick(float DeltaTime)
 	if ((GetActorLocation().Z) >= MaxRise)
 	{
 		bIsRising = false;
-		triggerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		TriggerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	
 	if (bIsRising && GetActorLocation().Z <= MaxRise)
@@ -58,7 +60,7 @@ void AEarthpillar::Tick(float DeltaTime)
 	}
 	else
 	{
-		triggerMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		TriggerMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 
 	//TickLaunch();
@@ -70,6 +72,7 @@ void AEarthpillar::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		GetWorld()->GetTimerManager().SetTimer(LaunchTimerHandle, this, &AEarthpillar::EndLaunch, LaunchCooldown/* - LaunchCooldown / 10.f*/);
 		ILaunchable::Execute_Launch(OtherActor, OtherActor->GetVelocity().GetSafeNormal(), LaunchForceHorizontal, LaunchForceVertical);
+		SpawnEffect(OtherActor);
 		bIsRising = true;
 		OnActorLaunched.Broadcast(OtherActor);
 	}
@@ -119,6 +122,27 @@ void AEarthpillar::TickLaunch()
 void AEarthpillar::EndLaunch()
 {
 	//LaunchedActor = nullptr;
+}
+
+void AEarthpillar::SpawnEffect(AActor* launchedActor)
+{
+	UNiagaraComponent* niagaraCmp = UNiagaraFunctionLibrary::SpawnSystemAttached(LaunchEffect, launchedActor->GetRootComponent(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, FVector(1, 1, 1), EAttachLocation::SnapToTarget, false, ENCPoolMethod::None);
+	//TWeakObjectPtr<UNiagaraComponent> niagaraCmpWeakPtr = TWeakObjectPtr<UNiagaraComponent>(niagaraCmp);
+	FTimerDelegate callback;
+	callback.BindLambda([niagaraCmp]
+	{
+		if(niagaraCmp)
+		{
+			niagaraCmp->DestroyComponent();
+		}
+		else
+		{
+			UE_LOG(LogActor, Error, TEXT("EarthPillar: Something went wrong when destroying the LaunchEffect (Ptr to NiagaraComponent is null)"));
+		}
+	});
+
+	FTimerHandle timer;
+	GetWorld()->GetTimerManager().SetTimer(timer, callback, LaunchEffectDuration, false);
 }
 
 void AEarthpillar::InitializePillar(int playerTeam, float maxLoweringPos, float lifeSpan)

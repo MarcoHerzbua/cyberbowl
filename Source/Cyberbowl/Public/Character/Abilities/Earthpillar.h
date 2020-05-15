@@ -24,13 +24,13 @@ public:
 	AEarthpillar();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMeshComponent* cylinder;
+	UStaticMeshComponent* PillarMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMeshComponent* triggerMesh;
+	UStaticMeshComponent* TriggerMesh;
 
 	UPROPERTY(VisibleAnywhere)
-	USceneComponent* root;
+	USceneComponent* Root;
 
 	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
 	float MaxRise = 200.f;
@@ -50,18 +50,20 @@ public:
 	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
 	float LaunchCooldown = 0.2f;
 	
+	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
+	class UNiagaraSystem* LaunchEffect;
+	
+	UPROPERTY(EditAnywhere, Category = "EarthPillarParams")
+	float LaunchEffectDuration = 1.f;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-	virtual void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 	//void SetCurrPlayerTeam(int playerTeam);
 
 	//void SetMaxLoweringPos(float pos);
-	
 
 	UFUNCTION(BlueprintCallable)
 	void InitializePillar(int playerTeam, float maxLoweringPos, float lifeSpan);
@@ -73,10 +75,6 @@ public:
 	
 protected:
 	FRotator rotation;
-
-	void Rising(float DeltaTime);
-	void Lowering(float DeltaTime);
-
 	bool bIsRising;
 	bool bIsLowering;
 	int currPlayerTeam;
@@ -84,6 +82,18 @@ protected:
 
 	UPROPERTY()
 	FTimerHandle LaunchTimerHandle;
+
+	UFUNCTION()
+	virtual void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void Rising(float DeltaTime);
+	void Lowering(float DeltaTime);
+
+	void TickLaunch();
+
+	void EndLaunch();
+
+	void SpawnEffect(AActor* launchedActor);
 
 	//UPROPERTY(BlueprintReadOnly)
 	//AActor* LaunchedActor;
@@ -100,8 +110,4 @@ protected:
 	//UPROPERTY(BlueprintReadOnly)
 	//float LaunchHeight;
 
-	
-	void TickLaunch();
-
-	void EndLaunch();
 };
