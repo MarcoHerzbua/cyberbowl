@@ -131,8 +131,8 @@ void UCBCharacterMovementComponent::EndWallrun(UPrimitiveComponent* OverlappedCo
         {
             SetCBMovementMode(ECBMovementMode::CBMOVE_Jump);
         }
-		OnWallrunEnd.Broadcast(timeOnWall, isLaunched);
     }
+	OnWallrunEnd.Broadcast(timeOnWall, isLaunched);
 }
 
 

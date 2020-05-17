@@ -19,7 +19,6 @@ void UFireAbility::BeginPlay()
 	fireWallPosition = FVector(0.f);
 	bValidTarget = false;
 	bTargetingVisible = false;
-	fireWallLifeTime = 8.f;
 	character = Cast<ACyberbowlCharacter>(GetOwner());
 	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
 }
