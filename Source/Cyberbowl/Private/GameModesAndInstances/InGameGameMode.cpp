@@ -72,6 +72,11 @@ void AInGameGameMode::GameEnd()
 
 void AInGameGameMode::TogglePauseGame(int playerIndexInitiator)
 {
+	if (playerIndexInitiator != 0)
+	{
+		return;
+	}
+	
 	if (bGameIsPaused)
 	{
 		ResumeGameForAll();
@@ -85,28 +90,12 @@ void AInGameGameMode::TogglePauseGame(int playerIndexInitiator)
 void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
 {
 	UGameplayStatics::SetGlobalTimeDilation(this, 0);
-	
-	for (auto playerController : playerControllers)
-	{		
-		if (UGameplayStatics::GetPlayerControllerID(playerController) == playerIndexInitiator)
-		{
-			auto widget = CreateWidget(playerController, WGamePausedInitiator);
-			widget->AddToPlayerScreen();
-			Cast<UButton>(widget->GetWidgetFromName("Button_Resume"))->SetKeyboardFocus();
-			
-			pauseWidgets.AddUnique(widget);
-		}
-		else
-		{
-			auto widget = CreateWidget(playerController, WGamePausedAll);
-			const int indexToActualPlayer = playerIndexInitiator + 1;
-			FString widgetText = FString("Player ").Append(std::to_string(indexToActualPlayer).c_str()).Append(" has paused the game!");
-			Cast<UTextBlock>(widget->GetWidgetFromName("PauseGameInitiatorText"))->SetText(FText::FromString(widgetText));
-			widget->AddToPlayerScreen();
-			
-			pauseWidgets.AddUnique(widget);
-		}
-	}
+
+	const auto controller = UGameplayStatics::GetPlayerControllerFromID(this, 0);
+
+	pauseWidget = CreateWidget(controller, WGamePausedInitiator);
+	pauseWidget->AddToViewport();
+	Cast<UButton>(pauseWidget->GetWidgetFromName("Button_Resume"))->SetKeyboardFocus();
 
 	bGameIsPaused = true;
 }
@@ -114,15 +103,15 @@ void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
 void AInGameGameMode::ResumeGameForAll()
 {
 	UGameplayStatics::SetGlobalTimeDilation(this, 1);
-	
-	for (auto pauseWidget : pauseWidgets)
-	{
-		pauseWidget->RemoveFromParent();
-	}
-	
-	pauseWidgets.Empty();
+
+	pauseWidget->RemoveFromParent();
 
 	bGameIsPaused = false;
+}
+
+void AInGameGameMode::SetPauseWidget(UUserWidget* widget)
+{
+	pauseWidget = widget;
 }
 
 void AInGameGameMode::Add_Points(int teamIndex)
