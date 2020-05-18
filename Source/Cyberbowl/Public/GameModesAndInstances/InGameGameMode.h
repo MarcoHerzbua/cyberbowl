@@ -110,10 +110,10 @@ private:
 	TArray<AThirdPersonPlayerController*> playerControllers;
 
 	UPROPERTY()
-	TArray<UUserWidget*> pauseWidgets;
+	UUserWidget* pauseWidget;
 
-	UPROPERTY(Editanywhere)
-	TSubclassOf<UUserWidget> WGamePausedAll;
+	UFUNCTION(BlueprintCallable)
+	void SetPauseWidget(UUserWidget* widget);
 
 	UPROPERTY(Editanywhere)
 	TSubclassOf<UUserWidget> WGamePausedInitiator;

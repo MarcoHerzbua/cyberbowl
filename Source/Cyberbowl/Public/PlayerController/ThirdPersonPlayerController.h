@@ -14,6 +14,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCallGameOverMenuNavigated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerPausedGame, int, playerIndexInitiator);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedDown);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedUp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedRight);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuNavigatedLeft);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuEnter);
 
 UCLASS()
@@ -75,6 +77,12 @@ private:
 	UFUNCTION()
 	void CallMenuNavigationUp();
 
+	UFUNCTION()
+	void CallMenuNavigationLeft();
+
+	UFUNCTION()
+	void CallMenuNavigationRight();
+
 	void UpdateNametagPositions();
 	
 
@@ -90,6 +98,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnMenuNavigatedUp OnMenuNavigatedUp;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuNavigatedLeft OnMenuNavigatedLeft;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnMenuNavigatedRight OnMenuNavigatedRight;
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnMenuEnter OnMenuEnter;
