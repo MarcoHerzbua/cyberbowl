@@ -19,12 +19,13 @@ void UFireAbility::BeginPlay()
 	fireWallPosition = FVector(0.f);
 	bValidTarget = false;
 	bTargetingVisible = false;
-
+	character = Cast<ACyberbowlCharacter>(GetOwner());
 }
 
 
 void UFireAbility::Fire()
 {
+	spawnedIndicator->Destroy();
 	if(!bValidTarget)
 	{
 		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
@@ -64,15 +65,15 @@ void UFireAbility::Targeting()
 
 	if (!bTargetingVisible && bValidTarget)
 	{
-		//targetingComponent->SetWorldScale3D(FVector(fireWallExtent)/50.f);
-		//targetingComponent->SetVisibility(true);
+		spawnedIndicator = GetWorld()->SpawnActor<AActor>(TargetingIndicator, fireWallPosition, indicatorRotation);
+		spawnedIndicator->SetActorScale3D(FVector(fireWallExtent)/50.f);
+		spawnedIndicator->SetOwner(character);
 		bTargetingVisible = true;
 	}
 
-	FVector boxPosition = fireWallPosition + FVector(0.f, 0.f, fireWallExtent.Z);
-	//targetingComponent->SetWorldLocation(boxPosition);
-	//targetingComponent->SetWorldRotation(indicatorRotation);
-	
+	spawnedIndicator->SetActorLocation(fireWallPosition + FVector(0.f, 0.f, fireWallExtent.Z));
+	spawnedIndicator->SetActorRotation(indicatorRotation);
+
 }
 
 void UFireAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

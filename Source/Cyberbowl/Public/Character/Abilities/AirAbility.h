@@ -103,5 +103,5 @@ protected:
 	
 	bool bTargetingVisible;
 
-	AActor* spawnedIndicator;
+
 };
