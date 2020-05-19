@@ -167,6 +167,7 @@ void ACyberbowlCharacter::UnFreeze_Implementation()
 	EnableInput(Cast<APlayerController>(Controller));
 	//ToggleAbilities(true);
 	CustomTimeDilation = DefaultTimeDilation;
+	CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
 }
 
 void ACyberbowlCharacter::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical, UNiagaraSystem* launchEffect, float launchEffectDuration)
