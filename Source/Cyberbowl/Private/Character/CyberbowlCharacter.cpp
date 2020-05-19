@@ -159,6 +159,8 @@ void ACyberbowlCharacter::Freeze_Implementation(AActor* instigtr)
 	//Pause all animations
 	DefaultTimeDilation = CustomTimeDilation;
 	CustomTimeDilation = 0.f;
+
+	OnCharacterFrozen.Broadcast();
 }
 
 void ACyberbowlCharacter::UnFreeze_Implementation()
@@ -168,6 +170,7 @@ void ACyberbowlCharacter::UnFreeze_Implementation()
 	//ToggleAbilities(true);
 	CustomTimeDilation = DefaultTimeDilation;
 	CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_DoubleJump);
+	OnCharacterUnfrozen.Broadcast();
 }
 
 void ACyberbowlCharacter::Launch_Implementation(FVector direction, float forceHorizontal, float forceVertical, UNiagaraSystem* launchEffect, float launchEffectDuration)
