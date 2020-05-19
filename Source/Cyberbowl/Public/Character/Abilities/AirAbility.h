@@ -101,6 +101,7 @@ protected:
 
 	bool playSoundTargeting = true;
 	
-	UStaticMeshComponent* targetingComponent;
 	bool bTargetingVisible;
+
+	AActor* spawnedIndicator;
 };

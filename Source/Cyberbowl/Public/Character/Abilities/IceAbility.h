@@ -72,6 +72,6 @@ protected:
 
 	void DestroyCoCEffect();
 
-	UStaticMeshComponent* targetingComponent;
+	//UStaticMeshComponent* targetingComponent;
 	bool bTargetingVisible;
 };
