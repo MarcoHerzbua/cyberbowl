@@ -28,7 +28,6 @@ void UAirAbility::BeginPlay()
 	
 	character = Cast<ACyberbowlCharacter>(GetOwner());
 	movementComp = Cast<UCBCharacterMovementComponent>(character->GetMovementComponent());
-	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
 	bTargetingVisible = false;
 	
 	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
@@ -78,7 +77,7 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 void UAirAbility::Fire()
 {
-	targetingComponent->SetVisibility(false);
+	spawnedIndicator->Destroy();
 	FVector cylinderEnd = GetOwner()->GetActorLocation();
 	cylinderEnd.Z += 2000.f;
 	DrawDebugCylinder(GetWorld(), GetOwner()->GetActorLocation(), cylinderEnd, grabRadiusMeters, 32, FColor::Red, false, grabDurationSeconds, 0, 5.f);
@@ -128,16 +127,20 @@ void UAirAbility::Targeting()
 	
 	FVector cylinderEnd = GetOwner()->GetActorLocation();
 	cylinderEnd.Z += 2000.f;
-
+	FVector cylinderPosition = FVector(character->GetActorLocation().X, character->GetActorLocation().Y, (cylinderEnd.Z) / 2);
 	if (!bTargetingVisible)
 	{
-		targetingComponent->SetWorldScale3D(FVector(grabRadiusMeters / 45, grabRadiusMeters / 50, (cylinderEnd.Z)/100));
-		targetingComponent->SetVisibility(true);
+		spawnedIndicator = GetWorld()->SpawnActor<AActor>(TargetingIndicator, cylinderPosition, FRotator::ZeroRotator);
+
+		spawnedIndicator->SetActorScale3D(FVector(grabRadiusMeters/50, grabRadiusMeters/50, cylinderEnd.Z/100));
+
+		spawnedIndicator->SetOwner(character);
+
+		//targetingComponent->SetVisibility(true);
 		bTargetingVisible = true;
 	}
-
-	FVector cylinderPosition = FVector(character->GetActorLocation().X, character->GetActorLocation().Y, (cylinderEnd.Z)/2);
-	targetingComponent->SetWorldLocation(cylinderPosition);
+	
+	spawnedIndicator->SetActorLocation(cylinderPosition);
 	if (playSoundTargeting)
 	{
 		OnTargeting.Broadcast();
