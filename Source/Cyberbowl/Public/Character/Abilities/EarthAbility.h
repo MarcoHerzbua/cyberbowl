@@ -66,7 +66,7 @@ protected:
 	UFUNCTION()
 	void CallOnActorLaunched(AActor* launchedActor);
 
-	UStaticMeshComponent* targetingComponent;
+	//UStaticMeshComponent* targetingComponent;
 
 	bool bTargetingVisible;
 };
