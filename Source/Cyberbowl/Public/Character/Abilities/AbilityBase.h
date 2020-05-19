@@ -37,6 +37,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ResetAbilityState();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Targeting")
+	TSubclassOf<AActor> TargetingIndicator;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

@@ -19,14 +19,12 @@ void UFireAbility::BeginPlay()
 	fireWallPosition = FVector(0.f);
 	bValidTarget = false;
 	bTargetingVisible = false;
-	character = Cast<ACyberbowlCharacter>(GetOwner());
-	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
+
 }
 
 
 void UFireAbility::Fire()
 {
-	targetingComponent->SetVisibility(false);
 	if(!bValidTarget)
 	{
 		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
@@ -66,14 +64,14 @@ void UFireAbility::Targeting()
 
 	if (!bTargetingVisible && bValidTarget)
 	{
-		targetingComponent->SetWorldScale3D(FVector(fireWallExtent)/50.f);
-		targetingComponent->SetVisibility(true);
+		//targetingComponent->SetWorldScale3D(FVector(fireWallExtent)/50.f);
+		//targetingComponent->SetVisibility(true);
 		bTargetingVisible = true;
 	}
 
 	FVector boxPosition = fireWallPosition + FVector(0.f, 0.f, fireWallExtent.Z);
-	targetingComponent->SetWorldLocation(boxPosition);
-	targetingComponent->SetWorldRotation(indicatorRotation);
+	//targetingComponent->SetWorldLocation(boxPosition);
+	//targetingComponent->SetWorldRotation(indicatorRotation);
 	
 }
 
