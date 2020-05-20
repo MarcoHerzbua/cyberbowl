@@ -181,10 +181,8 @@ void UAirAbility::ExitGrabMode()
 	character->GetCameraBoom()->bUsePawnControlRotation = true;
 	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
 
-	if (movementComp->animinstance->GetIsGrabbing())
-	{
-		movementComp->animinstance->SetIsGrabbing(false);
-	}
+	movementComp->animinstance->SetIsGrabbing(false);
+	
 }
 
 void UAirAbility::DestroyTornado()
