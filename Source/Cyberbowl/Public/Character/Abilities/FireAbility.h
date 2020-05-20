@@ -50,7 +50,7 @@ private:
 	FVector fireWallPosition;
 	bool bValidTarget;
 	bool bTargetingVisible;
-	UStaticMeshComponent* targetingComponent;
+	//UStaticMeshComponent* targetingComponent;
 	ACyberbowlCharacter* character;
 
 

@@ -24,20 +24,17 @@ void UEarthAbility::BeginPlay()
 	Super::BeginPlay();
 
 	character = Cast<ACyberbowlCharacter>(GetOwner());
-	targetingComponent = Cast<UStaticMeshComponent>(character->GetComponentsByTag(UStaticMeshComponent::StaticClass(), "AbilityTargetingComponent").Last());
 	bTargetingVisible = false;
 }
 
 void UEarthAbility::Fire()
 {
-	targetingComponent->SetVisibility(false);
 	if(!bValidTarget)
 	{
 		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 		return;
 	}
 
-	targetingComponent->SetVisibility(false);
 	SpawnPillar();
 	
 	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
@@ -65,12 +62,12 @@ void UEarthAbility::Targeting()
 	{
 		if (!bTargetingVisible)
 		{
-			targetingComponent->SetVisibility(true);
-			targetingComponent->SetWorldScale3D(FVector(TargetIndicatorRadius / 50, TargetIndicatorRadius / 50, 1.f));
+			//targetingComponent->SetVisibility(true);
+			//targetingComponent->SetWorldScale3D(FVector(TargetIndicatorRadius / 50, TargetIndicatorRadius / 50, 1.f));
 			bTargetingVisible = true;
 		}
 
-		targetingComponent->SetWorldLocation(FVector(PillarSpawnPoint.X, PillarSpawnPoint.Y, PillarSpawnPoint.Z+50.f));
+		//targetingComponent->SetWorldLocation(FVector(PillarSpawnPoint.X, PillarSpawnPoint.Y, PillarSpawnPoint.Z+50.f));
 	}
 #pragma region Dynamic Targeting (old)
 	//bValidTarget = true;

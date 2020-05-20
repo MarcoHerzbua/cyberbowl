@@ -19,6 +19,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVerticalDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoop);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishedInitializingWallrun);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterFrozen);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterUnfrozen);
 
 UCLASS(config=Game)
 class ACyberbowlCharacter : public ACharacter, public IFreezeable, public ILaunchable
@@ -119,15 +121,21 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnFinishedInitializingWallrun OnFinishedInitializingWallrun;
 
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnCallErrorFeedback forceFeedback;
+	
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnCharacterFrozen OnCharacterFrozen;
+	
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnCharacterUnfrozen OnCharacterUnfrozen;
 
 #pragma endregion
 	
-protected:
-	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
-	FOnCallErrorFeedback forceFeedback;
 
 
 #pragma region Movement/Camera/Abilities
+protected:
 	
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
