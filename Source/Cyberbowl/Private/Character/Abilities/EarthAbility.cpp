@@ -29,6 +29,7 @@ void UEarthAbility::BeginPlay()
 
 void UEarthAbility::Fire()
 {
+	spawnedIndicator->Destroy();
 	if(!bValidTarget)
 	{
 		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
@@ -62,11 +63,12 @@ void UEarthAbility::Targeting()
 	{
 		if (!bTargetingVisible)
 		{
-			//targetingComponent->SetVisibility(true);
-			//targetingComponent->SetWorldScale3D(FVector(TargetIndicatorRadius / 50, TargetIndicatorRadius / 50, 1.f));
+			spawnedIndicator = GetWorld()->SpawnActor<AActor>(TargetingIndicator);
+			spawnedIndicator->SetOwner(character);
 			bTargetingVisible = true;
 		}
 
+		spawnedIndicator->SetActorLocation(PillarSpawnPoint);
 		//targetingComponent->SetWorldLocation(FVector(PillarSpawnPoint.X, PillarSpawnPoint.Y, PillarSpawnPoint.Z+50.f));
 	}
 #pragma region Dynamic Targeting (old)
