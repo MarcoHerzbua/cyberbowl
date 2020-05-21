@@ -10,7 +10,7 @@
 #include "ILaunchable.h"
 #include "PlayBall.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBallBooped, AActor*, instigator); // uwu ; Just how I like it :3
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBallBooped, AActor*, instigator, float, force); // uwu ; Just how I like it :3
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallFrozen); 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBallUnfrozen); 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBallHit, FName, collisionProfile, float, velocity); 
