@@ -51,7 +51,7 @@ protected:
 	void ConvertMetersToUnrealUnits();
 
 	UFUNCTION()
-	void ExitGrabModeByPush(AActor* instigator);
+	void ExitGrabModeByPush(AActor* instigator, float force);
 
 	UFUNCTION()
 	void ExitGrabMode();

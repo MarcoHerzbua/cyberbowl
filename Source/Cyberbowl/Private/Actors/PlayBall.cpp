@@ -69,7 +69,7 @@ void APlayBall::PushBall(AActor* instigator, float force, FVector direction)
 	//Is this only moving the mesh? -> Marco: the mesh is a scene component and the root of the actor, so everything in this actor is moved
 	BallStaticMesh->AddImpulse(direction * force, NAME_None, true);
 	
-	OnBallBooped.Broadcast(instigator);
+	OnBallBooped.Broadcast(instigator, force);
 }
 
 void APlayBall::PlayBall()
