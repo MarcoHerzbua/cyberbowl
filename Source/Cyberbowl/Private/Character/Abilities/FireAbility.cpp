@@ -32,7 +32,8 @@ void UFireAbility::Fire()
 		return;
 	}
 
-	spawnedIndicator->Destroy();
+	ResetTargeting();
+	
 	FVector boxPosition = fireWallPosition + FVector(0.f, 0.f, fireWallExtent.Z);
 	auto rotation = character->GetCameraBoom()->GetTargetRotation();
 	FRotator indicatorRotation = FRotator(0.f, rotation.Yaw + 90, 0.f);
@@ -47,6 +48,7 @@ void UFireAbility::Fire()
 	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
+	
 }
 
 void UFireAbility::Targeting()
