@@ -236,7 +236,7 @@ void ACyberbowlCharacter::Dash()
 		forceFeedback.Broadcast();
 	}
 	
-	if(cooldownComponent->IsDashReady() && !bIsTargetingAbility)
+	if(cooldownComponent->IsDashReady())
 	{
 		CBCharacterMoveComponent->SetCBMovementMode(ECBMovementMode::CBMOVE_Dash);
 		cooldownComponent->StartCooldown("Dash");
