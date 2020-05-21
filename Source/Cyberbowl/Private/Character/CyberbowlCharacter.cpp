@@ -294,6 +294,7 @@ void ACyberbowlCharacter::AbilityCanceled()
 	{
 		AbilityComponent->SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 		bIsTargetingAbility = false;
+		AbilityComponent->ResetTargeting();
 	}
 }
 

@@ -39,6 +39,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnFailedGrab OnFailedGrab;
+
+	void ResetTargeting() override;
 	
 protected:
 	virtual void Fire() override;
@@ -100,8 +102,4 @@ protected:
 	UNiagaraComponent* tornadoComponent;
 
 	bool playSoundTargeting = true;
-	
-	bool bTargetingVisible;
-
-
 };

@@ -47,8 +47,6 @@ void UFireAbility::Fire()
 	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
-	bValidTarget = false;
-	bTargetingVisible = false;
 }
 
 void UFireAbility::Targeting()
@@ -80,6 +78,12 @@ void UFireAbility::Targeting()
 
 }
 
+void UFireAbility::ResetTargeting()
+{
+	Super::ResetTargeting();
+	bValidTarget = false;
+}
+
 void UFireAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -92,4 +96,3 @@ void UFireAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		Targeting();
 	}
 }
-

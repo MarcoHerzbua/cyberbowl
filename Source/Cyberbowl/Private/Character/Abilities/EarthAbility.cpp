@@ -29,13 +29,14 @@ void UEarthAbility::BeginPlay()
 
 void UEarthAbility::Fire()
 {
-	spawnedIndicator->Destroy();
+	
 	if(!bValidTarget)
 	{
 		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 		return;
 	}
-
+	
+	ResetTargeting();
 	SpawnPillar();
 	
 	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
@@ -165,4 +166,10 @@ void UEarthAbility::SpawnPillar()
 void UEarthAbility::CallOnActorLaunched(AActor* launchedActor)
 {
 	OnAActorLaunched.Broadcast(launchedActor);
+}
+
+void UEarthAbility::ResetTargeting()
+{
+	Super::ResetTargeting();
+	bValidTarget = false;
 }
