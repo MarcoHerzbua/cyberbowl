@@ -103,7 +103,8 @@ void UCBCharacterMovementComponent::ForceEndWallrun()
 void UCBCharacterMovementComponent::CheckForWallrun(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
                                                     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (GetCBMovementMode() != ECBMovementMode::CBMOVE_Running)
+    if (GetCBMovementMode() != ECBMovementMode::CBMOVE_Running
+        && MovementMode != EMovementMode::MOVE_Walking)
     {
         //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("WallrunCmp valid Wallrun")));
 
