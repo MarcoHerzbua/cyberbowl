@@ -26,25 +26,33 @@ public:
 
 	UStaticMeshComponent* BallStaticMesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayBall Properties")
 	float ScaleModifier = 3.f;
 		
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayBall Properties")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayBall Properties")
 	float MaxSpeed = 4000.f;
 
-	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayBall Properties")
+	UNiagaraSystem* CollisionEffect;
+
+	//0.95 = Effect only spawns on almost MaxSpeed Collisions
+	//0.1 = Effects even spawns on small bounces
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin="0.1", UIMax="0.95"), Category = "PlayBall Properties")
+	float CollisionEffectTriggerForce = 0.5f;
+
+	UPROPERTY(BlueprintAssignable, Category = "PlayBall")
 	FOnBallBooped OnBallBooped;
 		
-	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	UPROPERTY(BlueprintAssignable, Category = "PlayBall")
 	FOnBallFrozen OnBallFrozen;
 		
-	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	UPROPERTY(BlueprintAssignable, Category = "PlayBall")
 	FOnBallUnfrozen OnBallUnfrozen;
 		
-	UPROPERTY(BlueprintAssignable, Category = "BoopComponent")
+	UPROPERTY(BlueprintAssignable, Category = "PlayBall")
 	FOnBallHit OnBallHit;
 		
-	UPROPERTY(BlueprintReadOnly, Category = "BoopComponent")
+	UPROPERTY(BlueprintReadOnly, Category = "PlayBall")
 	bool IsBallFrozen;
 protected:
 	// Called when the game starts or when spawned
@@ -53,6 +61,9 @@ protected:
 	UFUNCTION()
 	void ResolveCollision(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
+	UPROPERTY(BlueprintReadWrite, Category = "PlayBall")
+	float LastHitTeamColor = 0.f;
+	
 	FVector StartPosition;
 	FVector CachedVelocity;
 public:	

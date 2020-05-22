@@ -6,6 +6,8 @@
 
 #include "Character/Abilities/AbilityUtils.h"
 #include "Engine/Engine.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 APlayBall::APlayBall()
@@ -36,16 +38,24 @@ void APlayBall::BeginPlay()
 
 void APlayBall::ResolveCollision(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
 {	
-	FName otherCollisionProfile = Hit.Component->GetCollisionProfileName();
-	float ballVelMagnitude = CachedVelocity.Size();
-	//GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Emerald, NormalImpulse.ToString());
-
-	//hotfix: this prevents constant firing of the event when the ball just rolls on the floor
+	//TODO: hotfix: this prevents constant firing of the event when the ball just rolls on the floor
 	if(NormalImpulse.Size() <= 40000.f)
 	{
 		return;
 	}
-	OnBallHit.Broadcast(otherCollisionProfile, ballVelMagnitude / MaxSpeed);
+
+	FName otherCollisionProfile = Hit.Component->GetCollisionProfileName();
+	float ballVelMagnitude = CachedVelocity.Size();
+	float ballVelMagnitudeNormalized = ballVelMagnitude / MaxSpeed;
+	//GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Emerald, NormalImpulse.ToString());
+
+	if(ballVelMagnitudeNormalized >= CollisionEffectTriggerForce)
+	{
+		auto niagraCmp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), CollisionEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation().Add(90.f, 0, 0));
+		niagraCmp->SetFloatParameter("User.CurveIndex.Color", LastHitTeamColor);
+	}
+	
+	OnBallHit.Broadcast(otherCollisionProfile, ballVelMagnitudeNormalized);
 }
 
 // Called every frame
