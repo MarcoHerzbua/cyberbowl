@@ -64,3 +64,9 @@ void UAbilityBase::SetAbilityState(EAbilityState state)
 	CurrState = state;
 }
 
+void UAbilityBase::ResetTargeting()
+{
+	spawnedIndicator->Destroy();
+	bTargetingVisible = false;
+}
+

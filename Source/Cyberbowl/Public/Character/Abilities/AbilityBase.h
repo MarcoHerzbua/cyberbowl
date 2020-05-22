@@ -34,6 +34,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void Targeting();
 
+
+
 	UFUNCTION(BlueprintCallable)
 	void ResetAbilityState();
 
@@ -41,7 +43,8 @@ protected:
 	TSubclassOf<AActor> TargetingIndicator;
 
 	AActor* spawnedIndicator;
-
+	bool bTargetingVisible;
+	
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -49,5 +52,5 @@ public:
 	EAbilityState CurrState;
 	virtual EAbilityState GetAbilityState() { return CurrState; };
 	virtual void SetAbilityState(EAbilityState state);
-		
+	virtual void ResetTargeting();
 };

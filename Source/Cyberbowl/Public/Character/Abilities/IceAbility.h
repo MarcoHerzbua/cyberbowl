@@ -21,6 +21,8 @@ public:
 
 	void Targeting() override;
 
+	void ResetTargeting() override;
+
 	//UFUNCTION(BlueprintCallable)
 	//bool IsBallFrozen()
 	//{
@@ -71,7 +73,4 @@ protected:
 	bool IsWithinCone(FVector hitPoint, FVector coneDirectionNormal);
 
 	void DestroyCoCEffect();
-
-	//UStaticMeshComponent* targetingComponent;
-	bool bTargetingVisible;
 };
