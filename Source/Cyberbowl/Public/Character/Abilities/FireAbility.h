@@ -23,6 +23,7 @@ public:
 
 	UFireAbility() = default;
 
+	void ResetTargeting() override;
 
 	UPROPERTY(EditAnywhere)
 	float fireWallLifeTime;
@@ -49,7 +50,7 @@ private:
 	UCameraComponent* camera;
 	FVector fireWallPosition;
 	bool bValidTarget;
-	bool bTargetingVisible;
+
 	//UStaticMeshComponent* targetingComponent;
 	ACyberbowlCharacter* character;
 

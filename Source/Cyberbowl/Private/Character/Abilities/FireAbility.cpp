@@ -25,13 +25,15 @@ void UFireAbility::BeginPlay()
 
 void UFireAbility::Fire()
 {
-	spawnedIndicator->Destroy();
+
 	if(!bValidTarget)
 	{
 		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 		return;
 	}
 
+	ResetTargeting();
+	
 	FVector boxPosition = fireWallPosition + FVector(0.f, 0.f, fireWallExtent.Z);
 	auto rotation = character->GetCameraBoom()->GetTargetRotation();
 	FRotator indicatorRotation = FRotator(0.f, rotation.Yaw + 90, 0.f);
@@ -46,8 +48,7 @@ void UFireAbility::Fire()
 	auto cooldownComponent = character->FindComponentByClass<UCooldownComponent>();
 	cooldownComponent->StartCooldown("Ult");
 	SetAbilityState(EAbilityState::ABILITY_COOLDOWN);
-	bValidTarget = false;
-	bTargetingVisible = false;
+	
 }
 
 void UFireAbility::Targeting()
@@ -63,17 +64,26 @@ void UFireAbility::Targeting()
 
 	bValidTarget = UAbilityUtils::FindTargetPoint(world, fireWallPosition, actorLoc, end, 100.f);
 
-	if (!bTargetingVisible && bValidTarget)
+	if (bValidTarget)
 	{
-		spawnedIndicator = GetWorld()->SpawnActor<AActor>(TargetingIndicator, fireWallPosition, indicatorRotation);
-		spawnedIndicator->SetActorScale3D(FVector(fireWallExtent)/50.f);
-		spawnedIndicator->SetOwner(character);
-		bTargetingVisible = true;
+		if (!bTargetingVisible)
+		{
+			spawnedIndicator = GetWorld()->SpawnActor<AActor>(TargetingIndicator, fireWallPosition, indicatorRotation);
+			spawnedIndicator->SetActorScale3D(FVector(fireWallExtent) / 50.f);
+			spawnedIndicator->SetOwner(character);
+			bTargetingVisible = true;
+		}
+
+		spawnedIndicator->SetActorLocation(fireWallPosition + FVector(0.f, 0.f, fireWallExtent.Z));
+		spawnedIndicator->SetActorRotation(indicatorRotation);
 	}
 
-	spawnedIndicator->SetActorLocation(fireWallPosition + FVector(0.f, 0.f, fireWallExtent.Z));
-	spawnedIndicator->SetActorRotation(indicatorRotation);
+}
 
+void UFireAbility::ResetTargeting()
+{
+	Super::ResetTargeting();
+	bValidTarget = false;
 }
 
 void UFireAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -88,4 +98,3 @@ void UFireAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		Targeting();
 	}
 }
-

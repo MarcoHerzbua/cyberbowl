@@ -17,7 +17,7 @@
 
 void UIceAbility::Fire()
 {
-	spawnedIndicator->Destroy();
+	ResetTargeting();
 	OnAbilityCasted.Broadcast();
 	float coneAngleInRadians = FMath::DegreesToRadians(ConeAngle);
 	float coneRadius = ConeLength * FMath::Tan(ConeAngle) / 2.f;
@@ -148,4 +148,9 @@ void UIceAbility::DestroyCoCEffect()
 {
 	NiagaraComponent->DestroyComponent();
 	NiagaraComponent = nullptr;
+}
+
+void UIceAbility::ResetTargeting()
+{
+	Super::ResetTargeting();
 }

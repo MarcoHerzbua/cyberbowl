@@ -77,7 +77,7 @@ void UAirAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 void UAirAbility::Fire()
 {
-	spawnedIndicator->Destroy();
+	ResetTargeting();
 	FVector cylinderEnd = GetOwner()->GetActorLocation();
 	cylinderEnd.Z += 2000.f;
 	DrawDebugCylinder(GetWorld(), GetOwner()->GetActorLocation(), cylinderEnd, grabRadiusMeters, 32, FColor::Red, false, grabDurationSeconds, 0, 5.f);
@@ -154,7 +154,7 @@ void UAirAbility::ConvertMetersToUnrealUnits()
 	grabRadiusMeters *= 100.f;
 }
 
-void UAirAbility::ExitGrabModeByPush(AActor* instigator)
+void UAirAbility::ExitGrabModeByPush(AActor* instigator, float force)
 {
 	if (!bIsInGrabMode)
 	{
@@ -188,4 +188,10 @@ void UAirAbility::ExitGrabMode()
 void UAirAbility::DestroyTornado()
 {
 	tornadoComponent->DestroyComponent();
+}
+
+void UAirAbility::ResetTargeting()
+{
+	Super::ResetTargeting();
+
 }

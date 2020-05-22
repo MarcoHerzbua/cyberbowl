@@ -28,6 +28,8 @@ protected:
 	
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void ResetTargeting() override;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	//float MinTargetDistance = 500.f;
 
@@ -65,10 +67,6 @@ protected:
 
 	UFUNCTION()
 	void CallOnActorLaunched(AActor* launchedActor);
-
-	//UStaticMeshComponent* targetingComponent;
-
-	bool bTargetingVisible;
 };
 
 

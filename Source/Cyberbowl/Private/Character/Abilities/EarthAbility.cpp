@@ -29,13 +29,14 @@ void UEarthAbility::BeginPlay()
 
 void UEarthAbility::Fire()
 {
-	spawnedIndicator->Destroy();
+	
 	if(!bValidTarget)
 	{
 		SetAbilityState(EAbilityState::ABILITY_DEFAULT);
 		return;
 	}
-
+	
+	ResetTargeting();
 	SpawnPillar();
 	
 	auto cooldownComponent = GetOwner()->FindComponentByClass<UCooldownComponent>();
@@ -56,6 +57,7 @@ void UEarthAbility::Targeting()
 	//Set Pitch to zero cause we are only interested in the Yaw (Roll is always 0)
 	camViewRotator.Pitch = 0.f;
 	FVector end = actorLoc + camViewRotator.Vector() * TargetDistance;
+	FRotator indicatorRotation = FRotator(0.f, camViewRotator.Yaw, 0.f);
 
 	bValidTarget = UAbilityUtils::FindTargetPoint(world, PillarSpawnPoint, actorLoc, end, TargetIndicatorRadius);
 
@@ -69,6 +71,7 @@ void UEarthAbility::Targeting()
 		}
 
 		spawnedIndicator->SetActorLocation(PillarSpawnPoint);
+		spawnedIndicator->SetActorRotation(indicatorRotation);
 		//targetingComponent->SetWorldLocation(FVector(PillarSpawnPoint.X, PillarSpawnPoint.Y, PillarSpawnPoint.Z+50.f));
 	}
 #pragma region Dynamic Targeting (old)
@@ -148,7 +151,10 @@ void UEarthAbility::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UEarthAbility::SpawnPillar()
 {
-	auto pillar = GetWorld()->SpawnActor<AEarthpillar>(EarthPillarClass, PillarSpawnPoint, FRotator::ZeroRotator);
+	auto ownerAsPawn = Cast<APawn>(GetOwner());
+	FRotator camViewRotator = ownerAsPawn->GetControlRotation();
+	FRotator indicatorRotation = FRotator(0.f, camViewRotator.Yaw, 0.f);
+	auto pillar = GetWorld()->SpawnActor<AEarthpillar>(EarthPillarClass, PillarSpawnPoint, indicatorRotation);
 
 	if (!characterController)
 	{
@@ -165,4 +171,10 @@ void UEarthAbility::SpawnPillar()
 void UEarthAbility::CallOnActorLaunched(AActor* launchedActor)
 {
 	OnAActorLaunched.Broadcast(launchedActor);
+}
+
+void UEarthAbility::ResetTargeting()
+{
+	Super::ResetTargeting();
+	bValidTarget = false;
 }
