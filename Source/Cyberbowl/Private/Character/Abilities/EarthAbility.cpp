@@ -74,6 +74,11 @@ void UEarthAbility::Targeting()
 		spawnedIndicator->SetActorRotation(indicatorRotation);
 		//targetingComponent->SetWorldLocation(FVector(PillarSpawnPoint.X, PillarSpawnPoint.Y, PillarSpawnPoint.Z+50.f));
 	}
+
+	else
+	{
+		ResetTargeting();
+	}
 #pragma region Dynamic Targeting (old)
 	//bValidTarget = true;
 	//if (hitResult.bBlockingHit)

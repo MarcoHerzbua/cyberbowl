@@ -187,7 +187,9 @@ void UAirAbility::ExitGrabMode()
 
 void UAirAbility::DestroyTornado()
 {
+	OnGrabModeEnd.Broadcast();
 	tornadoComponent->DestroyComponent();
+	
 }
 
 void UAirAbility::ResetTargeting()

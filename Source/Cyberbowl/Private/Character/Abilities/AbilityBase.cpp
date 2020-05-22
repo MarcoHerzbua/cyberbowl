@@ -66,7 +66,10 @@ void UAbilityBase::SetAbilityState(EAbilityState state)
 
 void UAbilityBase::ResetTargeting()
 {
-	spawnedIndicator->Destroy();
-	bTargetingVisible = false;
+	if (spawnedIndicator)
+	{
+		spawnedIndicator->Destroy();
+		bTargetingVisible = false;
+	}
 }
 

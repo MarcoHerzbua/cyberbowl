@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Actors/IFreezeable.h"
-#include "GameModesAndInstances/InGameGameMode.h"
 #include "ILaunchable.h"
 #include "PlayBall.generated.h"
 
@@ -70,6 +69,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetBallPosition();
+
+	void HideBall(bool hidden);
 
 	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "IFreezable")
 	void Freeze_Implementation(AActor* instigtr) override;

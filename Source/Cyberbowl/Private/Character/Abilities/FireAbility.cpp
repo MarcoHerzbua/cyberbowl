@@ -78,6 +78,10 @@ void UFireAbility::Targeting()
 		spawnedIndicator->SetActorRotation(indicatorRotation);
 	}
 
+	else
+	{
+		ResetTargeting();
+	}
 }
 
 void UFireAbility::ResetTargeting()
