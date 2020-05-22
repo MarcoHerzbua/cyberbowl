@@ -31,6 +31,9 @@ void APlayBall::BeginPlay()
 	StartPosition = GetActorLocation();
 
 	OnActorHit.AddDynamic(this, &APlayBall::ResolveCollision);
+
+	//enable Gravity and Physics after Countdown endet
+	StopBall();
 }
 
 void APlayBall::ResolveCollision(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
@@ -132,3 +135,7 @@ void APlayBall::Launch_Implementation(FVector direction, float forceHorizontal, 
 	UAbilityUtils::SpawnTimedEffect(GetWorld(), this, launchEffect, launchEffectDuration);
 }
 
+void APlayBall::HideBall(bool hidden)
+{
+	SetActorHiddenInGame(hidden);
+}
