@@ -10,6 +10,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGrabModeExitByPush);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTargeting);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGrabMode);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFailedGrab);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGrabModeEnd);
 
 class APlayBall;
 class UCharacterMovementComponent;
@@ -39,6 +40,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnFailedGrab OnFailedGrab;
+
+	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
+	FOnGrabModeEnd OnGrabModeEnd;
 
 	void ResetTargeting() override;
 	
