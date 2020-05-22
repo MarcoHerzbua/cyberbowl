@@ -30,8 +30,6 @@ void AInGameGameMode::BeginPlay()
 	//Pause Game Timer til the countdown when starting the game ends.
 	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
 	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
-	
-	//StartGamePlay.Broadcast();
 
 	TArray<AActor*> controllers;
 	UGameplayStatics::GetAllActorsOfClass(this, AThirdPersonPlayerController::StaticClass(), controllers);
@@ -68,6 +66,7 @@ void AInGameGameMode::GameEnd()
 		WinningTeam = 2;
 	}
 	EndGame.Broadcast();
+	Ball->StopBall();
 }
 
 void AInGameGameMode::TogglePauseGame(int playerIndexInitiator)
@@ -133,6 +132,8 @@ void AInGameGameMode::Add_Points(int teamIndex)
 	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
 	PauseGamePlay.Broadcast();
 	GetWorldTimerManager().SetTimer(GameIntermediateTimerHandle, this, &AInGameGameMode::RegroupPlayers, GameIntermediateTime);
+	Ball->StopBall();
+	Ball->HideBall(true);
 
 }
 
@@ -164,7 +165,8 @@ void AInGameGameMode::RegroupPlayers()
 {
 	Regroup.Broadcast();
 	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
-
+	Ball->ResetBallPosition();
+	Ball->HideBall(false);
 }
 
 void AInGameGameMode::Start()
@@ -177,6 +179,7 @@ void AInGameGameMode::Start()
 	StartGamePlay.Broadcast();
 	RoundCoundownEnd.Broadcast();
 	GetWorldTimerManager().UnPauseTimer(GameEndTimerHandle);
+	Ball->PlayBall();
 }
 
 bool AInGameGameMode::GetIsPaused() const

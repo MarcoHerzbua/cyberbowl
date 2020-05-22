@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "EngineUtils.h"
 #include "Blueprint/UserWidget.h"
+#include "Actors/PlayBall.h"
 #include "InGameGameMode.generated.h"
 
 class AThirdPersonPlayerController;
@@ -26,7 +27,7 @@ class CYBERBOWL_API AInGameGameMode : public AGameModeBase
 
 public:
 	UPROPERTY(BlueprintReadWrite)
-	AActor* Ball;
+	APlayBall* Ball;
 	UPROPERTY( BlueprintReadWrite)
 	AActor* GoalColliderTeam0;
 	UPROPERTY(BlueprintReadWrite)
