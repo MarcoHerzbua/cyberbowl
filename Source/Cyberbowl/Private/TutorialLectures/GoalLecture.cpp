@@ -28,6 +28,7 @@ void AGoalLecture::BeginPlay()
 	Super::BeginPlay();
 
 	ball = Cast<APlayBall>(UGameplayStatics::GetActorOfClass(this, APlayBall::StaticClass()));
+	ball->PlayBall();
 
 	TArray<AActor*> actors;
 	UGameplayStatics::GetAllActorsWithTag(this, "FireLectureBallStart", actors);
