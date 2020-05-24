@@ -70,6 +70,7 @@ void UAbilityBase::ResetTargeting()
 	{
 		spawnedIndicator->Destroy();
 		bTargetingVisible = false;
+		spawnedIndicator = nullptr;
 	}
 }
 
