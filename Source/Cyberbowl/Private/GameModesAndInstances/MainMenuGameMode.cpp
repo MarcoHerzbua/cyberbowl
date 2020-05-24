@@ -10,6 +10,7 @@
 #include "PlayerController/MainMenuPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
+#include "FMODStudioModule.h"
 #include "PlayerController/MainMenuPlayerController.h"
 #include "Widgets/WMainMenu.h"
 #include "TimerManager.h"
@@ -21,6 +22,8 @@ AMainMenuGameMode::AMainMenuGameMode(const class FObjectInitializer& ObjectIniti
 	DefaultPawnClass = nullptr;
 	PrimaryActorTick.bCanEverTick = true;
 	PlayerControllerClass = AMainMenuPlayerController::StaticClass();
+
+	IFMODStudioModule::Get();
 	
 	static ConstructorHelpers::FClassFinder<APawn> DummyCharacterFinder(TEXT("/Game/Characters/Dummy/DummyBase"));
 	dummyClass = DummyCharacterFinder.Class;

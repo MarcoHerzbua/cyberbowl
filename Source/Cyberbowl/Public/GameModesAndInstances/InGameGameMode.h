@@ -26,6 +26,8 @@ class CYBERBOWL_API AInGameGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	AInGameGameMode(const FObjectInitializer& ObjectInitializer);
+	
 	UPROPERTY(BlueprintReadWrite)
 	APlayBall* Ball;
 	UPROPERTY( BlueprintReadWrite)

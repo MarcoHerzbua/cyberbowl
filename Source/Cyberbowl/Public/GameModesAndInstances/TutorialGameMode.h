@@ -17,6 +17,8 @@ class CYBERBOWL_API ATutorialGameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
+	ATutorialGameMode(const FObjectInitializer& ObjectInitializer);
+	
 	UFUNCTION(BlueprintCallable)
 	void AdvanceTutorial();
 

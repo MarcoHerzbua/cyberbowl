@@ -9,6 +9,7 @@
 #include "Containers/Array.h"
 #include <string>
 #include "Components/TextBlock.h"
+#include "FMODStudioModule.h"
 #include "Stadium/Goal_Collider.h"
 
 void AInGameGameMode::BeginPlay()
@@ -111,6 +112,12 @@ void AInGameGameMode::ResumeGameForAll()
 void AInGameGameMode::SetPauseWidget(UUserWidget* widget)
 {
 	pauseWidget = widget;
+}
+
+AInGameGameMode::AInGameGameMode(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	IFMODStudioModule::Get();
 }
 
 void AInGameGameMode::Add_Points(int teamIndex)
