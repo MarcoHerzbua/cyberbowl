@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GameModesAndInstances/TutorialGameMode.h"
+
+#include "FMODStudioModule.h"
 #include "TutorialLectures/TutorialLectureBase.h"
 
 void ATutorialGameMode::BeginPlay()
@@ -14,6 +16,12 @@ void ATutorialGameMode::BeginPlay()
 void ATutorialGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+}
+
+ATutorialGameMode::ATutorialGameMode(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	IFMODStudioModule::Get();
 }
 
 void ATutorialGameMode::AdvanceTutorial()
