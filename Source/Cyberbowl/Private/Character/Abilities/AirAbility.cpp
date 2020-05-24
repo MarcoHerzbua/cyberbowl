@@ -182,12 +182,12 @@ void UAirAbility::ExitGrabMode()
 	movementComp->SetMovementMode(EMovementMode::MOVE_Walking);
 
 	movementComp->animinstance->SetIsGrabbing(false);
-	
+	OnGrabModeEnd.Broadcast();
 }
 
 void UAirAbility::DestroyTornado()
 {
-	OnGrabModeEnd.Broadcast();
+
 	tornadoComponent->DestroyComponent();
 	
 }
