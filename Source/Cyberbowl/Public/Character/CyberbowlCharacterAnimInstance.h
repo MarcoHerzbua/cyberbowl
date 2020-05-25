@@ -88,6 +88,7 @@ public:
 		void SetIsGrabbing(bool bGrabbing);
 		bool GetIsGrabbing();
 		bool GetIsInAir();
+		bool GetIsDoubleJumping();
 	
 private:
 	float MaxCharacterSpeed;

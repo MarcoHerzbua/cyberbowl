@@ -25,6 +25,8 @@ void AJumpLecture::BeginPlay()
 
 	tutorialCharacter->OnJump.AddDynamic(this, &AJumpLecture::OnJump);
 	tutorialCharacter->OnDoubleJump.AddDynamic(this, &AJumpLecture::OnDoubleJump);
+
+	movementComponent = Cast<UCBCharacterMovementComponent>(tutorialCharacter->GetMovementComponent());
 }
 
 void AJumpLecture::SetupTasks()
@@ -35,12 +37,20 @@ void AJumpLecture::SetupTasks()
 
 void AJumpLecture::OnJump()
 {
-	AdvanceIfCurrentTask(taskJump, 0.5f);
-	taskJumpAttempts++;
+	//WHY IS THIS WORKING?
+	if (movementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Jump)
+	{
+		AdvanceIfCurrentTask(taskJump, 0.5f);
+		taskJumpAttempts++;
+	}
 }
 
 void AJumpLecture::OnDoubleJump()
 {
-	AdvanceIfCurrentTask(taskDoubleJump);
-	taskDoubleJumpAttempts++;
+	//protection against counting double jump attempts in jump lesson
+	if (GetCurrentTask() == "taskDoubleJump")
+	{
+		AdvanceIfCurrentTask(taskDoubleJump, 0.5f);
+		taskDoubleJumpAttempts++;
+	}
 }
