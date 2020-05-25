@@ -64,6 +64,7 @@ void UAbilityUtils::SpawnTimedEffect(UWorld* worldContext, AActor* attachActor, 
 	{
 		if (niagaraCmp)
 		{
+			//Todo: Here exception thrown when going from tutorial to menu.
 			niagaraCmp->DestroyComponent();
 		}
 		else
