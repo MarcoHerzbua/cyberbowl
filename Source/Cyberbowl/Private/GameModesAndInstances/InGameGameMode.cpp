@@ -72,7 +72,7 @@ void AInGameGameMode::GameEnd()
 
 void AInGameGameMode::TogglePauseGame(int playerIndexInitiator)
 {
-	if (playerIndexInitiator != 0)
+	if (playerIndexInitiator != 0 || bInOptionsMenu)
 	{
 		return;
 	}
@@ -192,4 +192,9 @@ void AInGameGameMode::Start()
 bool AInGameGameMode::GetIsPaused() const
 {
 	return bGameIsPaused;
+}
+
+void AInGameGameMode::SetInOptionsMenu(bool inMenu)
+{
+	bInOptionsMenu = inMenu;
 }
