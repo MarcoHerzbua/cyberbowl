@@ -38,7 +38,7 @@ void AJumpLecture::SetupTasks()
 void AJumpLecture::OnJump()
 {
 	//WHY IS THIS WORKING?
-	if (movementComponent->GetCBMovementMode() != ECBMovementMode::CBMOVE_Jump)
+	if (movementComponent->GetCBMovementMode() == ECBMovementMode::CBMOVE_Jump)
 	{
 		AdvanceIfCurrentTask(taskJump, 0.5f);
 		taskJumpAttempts++;
