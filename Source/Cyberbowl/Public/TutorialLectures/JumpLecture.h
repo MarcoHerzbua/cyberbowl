@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TutorialLectures/TutorialLectureBase.h"
+#include "Character/CBCharacterMovementComponent.h"
 #include "JumpLecture.generated.h"
 
 /**
@@ -18,6 +19,7 @@ public:
 	void Tick(float DeltaTime) override;
 	void Enter() override;
 	void Exit() override;
+
 	
 protected:
 	void BeginPlay() override;
@@ -38,4 +40,7 @@ protected:
 
 	UFUNCTION()
 	void OnDoubleJump();
+
+	UCBCharacterMovementComponent* movementComponent;
+
 };

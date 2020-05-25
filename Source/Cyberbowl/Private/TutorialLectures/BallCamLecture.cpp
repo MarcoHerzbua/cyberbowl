@@ -33,6 +33,7 @@ void ABallCamLecture::SetupTasks()
 
 void ABallCamLecture::OnBallCamToggled()
 {
-	AdvanceIfCurrentTask(taskBallCamToggled);
+	//Set delay very low since this can be spamed and then there is a higher score then 3
+	AdvanceIfCurrentTask(taskBallCamToggled, 0.1f);
 	taskBallCamToggledAttempts++;
 }

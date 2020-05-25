@@ -34,6 +34,8 @@ public:
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnLectureFinished OnLectureFinished;
 
+	FString GetCurrentTask() { return currentTask; };
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -41,21 +41,31 @@ void ADashLecture::SetupTasks()
 
 void ADashLecture::OnRegularDash()
 {
-	if (!animInstance->GetIsInAir())
+	//double check current tasks in order to make sure, that the right counters are used
+	if (GetCurrentTask() == "taskRegularDash")
 	{
-		AdvanceIfCurrentTask(taskRegularDash);
-		taskRegularDashAttempts++;
+		if (!animInstance->GetIsInAir())
+		{
+			AdvanceIfCurrentTask(taskRegularDash);
+			taskRegularDashAttempts++;
+		}
 	}
 
-	if (animInstance->GetIsInAir())
+	if (GetCurrentTask() == "taskJumpDash")
 	{
-		AdvanceIfCurrentTask(taskJumpDash);
-		taskJumpDashAttempts++;
+		if (animInstance->GetIsInAir())
+		{
+			AdvanceIfCurrentTask(taskJumpDash);
+			taskJumpDashAttempts++;
+		}
 	}
 }
 
 void ADashLecture::OnVerticalDash()
 {
-	AdvanceIfCurrentTask(taskVerticalDash);
-	taskVerticalDashAttempts++;
+	if (GetCurrentTask() == "taskVerticalDash")
+	{
+		AdvanceIfCurrentTask(taskVerticalDash);
+		taskVerticalDashAttempts++;
+	}
 }
