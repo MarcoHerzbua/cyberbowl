@@ -92,6 +92,9 @@ public:
 	UFUNCTION()
 	bool GetIsPaused() const;
 
+	UFUNCTION(BlueprintCallable)
+	void SetInOptionsMenu(bool inMenu);
+
 private:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
@@ -122,5 +125,9 @@ private:
 	TSubclassOf<UUserWidget> WGamePausedInitiator;
 
 	bool bGamePlayStarted;
+
+	UPROPERTY()
+	bool bInOptionsMenu;
+	
 	bool bLastMinuteFired;
 };
