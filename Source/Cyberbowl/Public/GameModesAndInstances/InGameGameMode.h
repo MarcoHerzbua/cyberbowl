@@ -14,6 +14,7 @@ class AThirdPersonPlayerController;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndGameEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGamePlayEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGoalScored);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRegroupEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartGamePlayEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoundCountdownEndingEvent);
@@ -54,6 +55,10 @@ public:
 	FRotator effectRotationTeam0 = FRotator(0,0,0);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FRotator effectRotationTeam1 = FRotator(0, 180, 0);
+	UPROPERTY(BlueprintReadOnly)
+	float FModGoalShotIntensity;
+	UPROPERTY(BlueprintReadOnly)
+	float FModInGameStartingIntensity;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float GamePlayTime = 180.f;
@@ -81,6 +86,8 @@ public:
 	FMatchountdownEndingEvent MatchCoundownEnd;
 	UPROPERTY(BlueprintAssignable)
 	FStartingLastMinuteEvent StartingLastMinute;
+	UPROPERTY(BlueprintAssignable)
+	FGoalScored GoalScored;
 
 	UFUNCTION(BlueprintCallable)
 	void SelectGameOverMenu(int LevelIndex);
@@ -130,4 +137,6 @@ private:
 	bool bInOptionsMenu;
 	
 	bool bLastMinuteFired;
+
+	const float FModIntensityBoundery = 50.f;
 };
