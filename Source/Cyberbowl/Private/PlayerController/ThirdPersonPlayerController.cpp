@@ -13,6 +13,7 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Widgets/WNameTag.h"
 
@@ -145,15 +146,18 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 		UWidgetComponent* widgetComponent = widgetComponents.Pop();
 		UWNameTag* nameTagWidget = Cast<UWNameTag>(widgetComponent->GetUserWidgetObject());
 		UButton* nameplate = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
+		UImage* arrowIndicator = Cast<UImage>(nameTagWidget->GetWidgetFromName("ArrowIndicator"));
 		nameTagWidget->CharacterName = ToCharacterName(currPlayerType);	
 
 		if (currPlayerTeam == 1)
 		{
-			nameplate->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
+			nameplate->SetBackgroundColor(FLinearColor(0.97, 0.06, 0.38, 0.5));
+			arrowIndicator->SetBrushFromTexture(arrowIndicatorTeamRed);
 		}
 		else
 		{
-			nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
+			nameplate->SetBackgroundColor(FLinearColor(0.04, 0.76, 0.78, 0.5));
+			arrowIndicator->SetBrushFromTexture(arrowIndicatorTeamBlue);
 		}
 
 		widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());

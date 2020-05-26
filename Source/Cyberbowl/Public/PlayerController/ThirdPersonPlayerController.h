@@ -65,6 +65,12 @@ private:
 	UPROPERTY(Editanywhere)
 	TSubclassOf<UUserWidget> baseHudClass;
 
+	UPROPERTY(Editanywhere)
+	UTexture2D* arrowIndicatorTeamRed;
+
+	UPROPERTY(Editanywhere)
+	UTexture2D* arrowIndicatorTeamBlue;
+
 	UFUNCTION()
 	void CallGameOverMenuNavigated();
 
