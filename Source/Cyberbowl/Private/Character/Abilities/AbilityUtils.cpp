@@ -58,14 +58,17 @@ void UAbilityUtils::SpawnTimedEffect(UWorld* worldContext, AActor* attachActor, 
 	}
 	
 	UNiagaraComponent* niagaraCmp = UNiagaraFunctionLibrary::SpawnSystemAttached(effect, attachActor->GetRootComponent(), NAME_None, location, FRotator::ZeroRotator, FVector(1, 1, 1), EAttachLocation::KeepWorldPosition, false, ENCPoolMethod::None);
-	//TWeakObjectPtr<UNiagaraComponent> niagaraCmpWeakPtr = TWeakObjectPtr<UNiagaraComponent>(niagaraCmp);
+
+	TWeakObjectPtr<UNiagaraComponent> niagaraCmpWeakPtr(niagaraCmp);
+
+
 	FTimerDelegate callback;
-	callback.BindLambda([niagaraCmp]
+	callback.BindLambda([niagaraCmpWeakPtr]
 	{
-		if (niagaraCmp)
+		if (niagaraCmpWeakPtr.IsValid())
 		{
 			//Todo: Here exception thrown when going from tutorial to menu.
-			niagaraCmp->DestroyComponent();
+			niagaraCmpWeakPtr.Get()->DestroyComponent();
 		}
 		else
 		{
