@@ -42,7 +42,7 @@ private:
 	void OnStartGamePlay();
 
 	UFUNCTION()
-	void OnPauseGamePlay();
+	void OnGoalScored();
 
 	UFUNCTION()
 	void OnRegroup();
@@ -127,7 +127,6 @@ public:
 	
 protected:
 	ACyberbowlCharacter* character;
-	TArray<AActor*> savedPlayerStarts;
 	
 	TArray<UWidgetComponent*> otherPlayerNametags;
 

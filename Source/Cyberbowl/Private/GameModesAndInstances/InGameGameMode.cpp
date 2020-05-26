@@ -11,6 +11,7 @@
 #include "Components/TextBlock.h"
 #include "FMODStudioModule.h"
 #include "Stadium/Goal_Collider.h"
+#include "GameFramework/PlayerStart.h"
 
 void AInGameGameMode::BeginPlay()
 {
@@ -47,6 +48,9 @@ void AInGameGameMode::BeginPlay()
 	bLastMinuteFired = false;
 	FModGoalShotIntensity = 0;
 	FModInGameStartingIntensity = 5;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), savedPlayerStarts);
+	currPlayerStarts = savedPlayerStarts;
 }
 
 void AInGameGameMode::GameEnd()
@@ -198,6 +202,8 @@ void AInGameGameMode::SelectGameOverMenu(int LevelIndex)
 
 void AInGameGameMode::RegroupPlayers()
 {
+	Algo::Reverse(savedPlayerStarts);
+	currPlayerStarts = savedPlayerStarts;
 	Regroup.Broadcast();
 	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
 	Ball->ResetBallPosition();
@@ -225,4 +231,22 @@ bool AInGameGameMode::GetIsPaused() const
 void AInGameGameMode::SetInOptionsMenu(bool inMenu)
 {
 	bInOptionsMenu = inMenu;
+}
+
+APlayerStart* AInGameGameMode::GetPlayerStart(int playerTeam)
+{
+	APlayerStart* playerSpawn = nullptr;
+	for (AActor* currPlayerStart : currPlayerStarts)
+	{
+		playerSpawn = Cast<APlayerStart>(currPlayerStart);
+		int currPlayerTeam = FCString::Atoi(*playerSpawn->PlayerStartTag.ToString());
+		if (playerTeam == currPlayerTeam)
+		{
+			int idx = currPlayerStarts.Find(currPlayerStart);
+			currPlayerStarts.RemoveAt(idx);
+			return playerSpawn;
+		}
+	}
+	
+	return nullptr;
 }
