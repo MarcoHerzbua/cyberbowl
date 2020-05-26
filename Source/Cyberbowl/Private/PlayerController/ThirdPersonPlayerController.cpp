@@ -24,7 +24,7 @@ void AThirdPersonPlayerController::BeginPlay()
 	SetAsLocalPlayerController();
 	SpawnActors();
 	//Disable movement til the countdown when starting the game ends.
-	OnPauseGamePlay();
+	character->DisableInput(this);
 }
 
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)
@@ -67,21 +67,9 @@ void AThirdPersonPlayerController::SpawnActors()
 	currPlayerType = currPlayerInfo->CharacterType;
 	
 	TArray<AActor*> playerStarts;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), playerStarts);
-	APlayerStart* playerSpawn = nullptr;
-	savedPlayerStarts = playerStarts;
-	
-	for (AActor* currPlayerStart : playerStarts)
-	{
-		playerSpawn = Cast<APlayerStart>(currPlayerStart);
-		int playerTeam = FCString::Atoi(*playerSpawn->PlayerStartTag.ToString());
-		if (playerTeam == currPlayerTeam)
-		{
-			int idx = playerStarts.Find(currPlayerStart);
-			playerStarts.RemoveAt(idx);
-			break;
-		}
-	}
+
+	AInGameGameMode* gameMode = Cast<AInGameGameMode>(GetWorld()->GetAuthGameMode());
+	APlayerStart* playerSpawn = gameMode->GetPlayerStart(currPlayerTeam);
 
 	character = nullptr;
 	FVector spawnTransform = playerSpawn->GetTransform().GetLocation();
@@ -114,10 +102,10 @@ void AThirdPersonPlayerController::SpawnActors()
 	UUserWidget* baseWidget = CreateWidget<UUserWidget>(this, baseHudClass);
 	baseWidget->AddToPlayerScreen();
 
-	AInGameGameMode* gameMode = Cast<AInGameGameMode>(GetWorld()->GetAuthGameMode());
+
 
 	gameMode->StartGamePlay.AddDynamic(this, &AThirdPersonPlayerController::OnStartGamePlay);
-	gameMode->PauseGamePlay.AddDynamic(this, &AThirdPersonPlayerController::OnPauseGamePlay);
+	gameMode->GoalScored.AddDynamic(this, &AThirdPersonPlayerController::OnGoalScored);
 	gameMode->Regroup.AddDynamic(this, &AThirdPersonPlayerController::OnRegroup);
 	gameMode->EndGame.AddDynamic(this, &AThirdPersonPlayerController::OnEndGame);
 }
@@ -182,28 +170,15 @@ void AThirdPersonPlayerController::OnStartGamePlay()
 	character->EnableInput(this);
 }
 
-void AThirdPersonPlayerController::OnPauseGamePlay()
+void AThirdPersonPlayerController::OnGoalScored()
 {
 	character->DisableInput(this);
 }
 
 void AThirdPersonPlayerController::OnRegroup()
 {
-	Algo::Reverse(savedPlayerStarts);
-	TArray<AActor*> playerStarts = savedPlayerStarts;
-
-	APlayerStart* playerSpawn = nullptr;
-	for (AActor* currPlayerStart : playerStarts)
-	{
-		playerSpawn = Cast<APlayerStart>(currPlayerStart);
-		int playerTeam = FCString::Atoi(*playerSpawn->PlayerStartTag.ToString());
-		if (playerTeam == currPlayerTeam)
-		{
-			int idx = playerStarts.Find(currPlayerStart);
-			playerStarts.RemoveAt(idx);
-			break;
-		}
-	}
+	AInGameGameMode* gameMode = Cast<AInGameGameMode>(GetWorld()->GetAuthGameMode());
+	APlayerStart* playerSpawn = gameMode->GetPlayerStart(currPlayerTeam);
 
 	FVector spawnTransform = playerSpawn->GetTransform().GetLocation();
 	FRotator spawnRotation = playerSpawn->GetActorRotation();

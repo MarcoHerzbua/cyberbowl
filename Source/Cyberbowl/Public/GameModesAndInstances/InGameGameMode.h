@@ -102,6 +102,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetInOptionsMenu(bool inMenu);
 
+	class APlayerStart* GetPlayerStart(int playerTeam);
+
 private:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
@@ -139,4 +141,7 @@ private:
 	bool bLastMinuteFired;
 
 	const float FModIntensityBoundery = 50.f;
+
+	TArray<AActor*> savedPlayerStarts;
+	TArray<AActor*> currPlayerStarts;
 };
