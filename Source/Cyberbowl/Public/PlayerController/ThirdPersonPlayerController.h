@@ -42,7 +42,7 @@ private:
 	void OnStartGamePlay();
 
 	UFUNCTION()
-	void OnPauseGamePlay();
+	void OnGoalScored();
 
 	UFUNCTION()
 	void OnRegroup();
@@ -64,6 +64,12 @@ private:
 
 	UPROPERTY(Editanywhere)
 	TSubclassOf<UUserWidget> baseHudClass;
+
+	UPROPERTY(Editanywhere)
+	UTexture2D* arrowIndicatorTeamRed;
+
+	UPROPERTY(Editanywhere)
+	UTexture2D* arrowIndicatorTeamBlue;
 
 	UFUNCTION()
 	void CallGameOverMenuNavigated();
@@ -121,13 +127,12 @@ public:
 	
 protected:
 	ACyberbowlCharacter* character;
-	TArray<AActor*> savedPlayerStarts;
 	
 	TArray<UWidgetComponent*> otherPlayerNametags;
 
 	// Constants for the nametag widget height adjustment
-	const float MinZWidgetPos = 120.f;
-	const float MaxZWidgetPos = 400.f;
+	const float MinZWidgetPos = 150.f;
+	const float MaxZWidgetPos = 550.f;
 	const float MinPlayerDistance = 1000.f;
 	const float MaxPlayerDistance = 15000.f;
 };

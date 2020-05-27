@@ -23,13 +23,13 @@ inline const char* ToCharacterName(ECBCharacterType type)
 	switch (type)
 	{
 		case ECBCharacterType::CBCHRACTERTYPE_FIRE:
-			return "Hapala";
+			return "HAPALA";
 		case ECBCharacterType::CBCHRACTERTYPE_EARTH:
-			return "Jishin";
+			return "JISHIN";
 		case ECBCharacterType::CBCHRACTERTYPE_ICE:
-			return "Siku";
+			return "FREY";
 		case ECBCharacterType::CBCHRACTERTYPE_AIR:
-			return "Zefyra";
+			return "ZEFYRA";
 		default:
 			return "Unknown";
 	}

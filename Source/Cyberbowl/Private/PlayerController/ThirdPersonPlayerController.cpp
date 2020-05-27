@@ -13,6 +13,7 @@
 #include "Character/CyberbowlCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Widgets/WNameTag.h"
 
@@ -23,7 +24,7 @@ void AThirdPersonPlayerController::BeginPlay()
 	SetAsLocalPlayerController();
 	SpawnActors();
 	//Disable movement til the countdown when starting the game ends.
-	OnPauseGamePlay();
+	character->DisableInput(this);
 }
 
 void AThirdPersonPlayerController::Tick(float DeltaSeconds)
@@ -66,21 +67,9 @@ void AThirdPersonPlayerController::SpawnActors()
 	currPlayerType = currPlayerInfo->CharacterType;
 	
 	TArray<AActor*> playerStarts;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), playerStarts);
-	APlayerStart* playerSpawn = nullptr;
-	savedPlayerStarts = playerStarts;
-	
-	for (AActor* currPlayerStart : playerStarts)
-	{
-		playerSpawn = Cast<APlayerStart>(currPlayerStart);
-		int playerTeam = FCString::Atoi(*playerSpawn->PlayerStartTag.ToString());
-		if (playerTeam == currPlayerTeam)
-		{
-			int idx = playerStarts.Find(currPlayerStart);
-			playerStarts.RemoveAt(idx);
-			break;
-		}
-	}
+
+	AInGameGameMode* gameMode = Cast<AInGameGameMode>(GetWorld()->GetAuthGameMode());
+	APlayerStart* playerSpawn = gameMode->GetPlayerStart(currPlayerTeam);
 
 	character = nullptr;
 	FVector spawnTransform = playerSpawn->GetTransform().GetLocation();
@@ -113,10 +102,10 @@ void AThirdPersonPlayerController::SpawnActors()
 	UUserWidget* baseWidget = CreateWidget<UUserWidget>(this, baseHudClass);
 	baseWidget->AddToPlayerScreen();
 
-	AInGameGameMode* gameMode = Cast<AInGameGameMode>(GetWorld()->GetAuthGameMode());
+
 
 	gameMode->StartGamePlay.AddDynamic(this, &AThirdPersonPlayerController::OnStartGamePlay);
-	gameMode->PauseGamePlay.AddDynamic(this, &AThirdPersonPlayerController::OnPauseGamePlay);
+	gameMode->GoalScored.AddDynamic(this, &AThirdPersonPlayerController::OnGoalScored);
 	gameMode->Regroup.AddDynamic(this, &AThirdPersonPlayerController::OnRegroup);
 	gameMode->EndGame.AddDynamic(this, &AThirdPersonPlayerController::OnEndGame);
 }
@@ -145,15 +134,18 @@ void AThirdPersonPlayerController::SetupNameTagWidgets()
 		UWidgetComponent* widgetComponent = widgetComponents.Pop();
 		UWNameTag* nameTagWidget = Cast<UWNameTag>(widgetComponent->GetUserWidgetObject());
 		UButton* nameplate = Cast<UButton>(nameTagWidget->GetWidgetFromName("TeamColorButton"));
+		UImage* arrowIndicator = Cast<UImage>(nameTagWidget->GetWidgetFromName("ArrowIndicator"));
 		nameTagWidget->CharacterName = ToCharacterName(currPlayerType);	
 
 		if (currPlayerTeam == 1)
 		{
-			nameplate->SetBackgroundColor(FLinearColor(0.9, 0.3, 0, 0.5));
+			nameplate->SetBackgroundColor(FLinearColor(0.97, 0.06, 0.38, 0.5));
+			arrowIndicator->SetBrushFromTexture(arrowIndicatorTeamRed);
 		}
 		else
 		{
-			nameplate->SetBackgroundColor(FLinearColor(0, 0.15, 0.55, 0.5));
+			nameplate->SetBackgroundColor(FLinearColor(0.04, 0.76, 0.78, 0.5));
+			arrowIndicator->SetBrushFromTexture(arrowIndicatorTeamBlue);
 		}
 
 		widgetComponent->SetOwnerPlayer(playerController->GetLocalPlayer());
@@ -178,28 +170,15 @@ void AThirdPersonPlayerController::OnStartGamePlay()
 	character->EnableInput(this);
 }
 
-void AThirdPersonPlayerController::OnPauseGamePlay()
+void AThirdPersonPlayerController::OnGoalScored()
 {
 	character->DisableInput(this);
 }
 
 void AThirdPersonPlayerController::OnRegroup()
 {
-	Algo::Reverse(savedPlayerStarts);
-	TArray<AActor*> playerStarts = savedPlayerStarts;
-
-	APlayerStart* playerSpawn = nullptr;
-	for (AActor* currPlayerStart : playerStarts)
-	{
-		playerSpawn = Cast<APlayerStart>(currPlayerStart);
-		int playerTeam = FCString::Atoi(*playerSpawn->PlayerStartTag.ToString());
-		if (playerTeam == currPlayerTeam)
-		{
-			int idx = playerStarts.Find(currPlayerStart);
-			playerStarts.RemoveAt(idx);
-			break;
-		}
-	}
+	AInGameGameMode* gameMode = Cast<AInGameGameMode>(GetWorld()->GetAuthGameMode());
+	APlayerStart* playerSpawn = gameMode->GetPlayerStart(currPlayerTeam);
 
 	FVector spawnTransform = playerSpawn->GetTransform().GetLocation();
 	FRotator spawnRotation = playerSpawn->GetActorRotation();

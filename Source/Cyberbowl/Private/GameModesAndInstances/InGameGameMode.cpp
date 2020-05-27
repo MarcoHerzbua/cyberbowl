@@ -11,6 +11,7 @@
 #include "Components/TextBlock.h"
 #include "FMODStudioModule.h"
 #include "Stadium/Goal_Collider.h"
+#include "GameFramework/PlayerStart.h"
 
 void AInGameGameMode::BeginPlay()
 {
@@ -45,6 +46,11 @@ void AInGameGameMode::BeginPlay()
 
 	bGamePlayStarted = false;
 	bLastMinuteFired = false;
+	FModGoalShotIntensity = 0;
+	FModInGameStartingIntensity = 5;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), savedPlayerStarts);
+	currPlayerStarts = savedPlayerStarts;
 }
 
 void AInGameGameMode::GameEnd()
@@ -98,6 +104,7 @@ void AInGameGameMode::PauseGameForAll(int playerIndexInitiator)
 	Cast<UButton>(pauseWidget->GetWidgetFromName("Button_Resume"))->SetKeyboardFocus();
 
 	bGameIsPaused = true;
+	PauseGamePlay.Broadcast();
 }
 
 void AInGameGameMode::ResumeGameForAll()
@@ -107,6 +114,8 @@ void AInGameGameMode::ResumeGameForAll()
 	pauseWidget->RemoveFromParent();
 
 	bGameIsPaused = false;
+
+	StartGamePlay.Broadcast();
 }
 
 void AInGameGameMode::SetPauseWidget(UUserWidget* widget)
@@ -137,11 +146,25 @@ void AInGameGameMode::Add_Points(int teamIndex)
 
 	effectLocation = Ball->GetActorLocation();
 	GetWorldTimerManager().PauseTimer(GameEndTimerHandle);
-	PauseGamePlay.Broadcast();
+
 	GetWorldTimerManager().SetTimer(GameIntermediateTimerHandle, this, &AInGameGameMode::RegroupPlayers, GameIntermediateTime);
 	Ball->StopBall();
 	Ball->HideBall(true);
 
+	float goaldifference = abs(PointsTeam0 - PointsTeam1);
+	if(!bLastMinuteFired && FModGoalShotIntensity < FModIntensityBoundery)
+	{
+		FModGoalShotIntensity += 10.f;
+	}
+
+	
+	else if (bLastMinuteFired && (FModGoalShotIntensity > FModIntensityBoundery || goaldifference < FModIntensityBoundery / 10.f))
+	{
+		FModGoalShotIntensity = 100.f - goaldifference * 10.f;
+	}
+
+	GoalScored.Broadcast();
+	PauseGamePlay.Broadcast();
 }
 
 void AInGameGameMode::Tick(float DeltaSeconds)
@@ -150,6 +173,15 @@ void AInGameGameMode::Tick(float DeltaSeconds)
 	GameIntermediateTimeRemaining = GetWorldTimerManager().GetTimerRemaining(GameCountdownTimerHandle);
 	if(GameEndTimeRemaining<=60 && !bLastMinuteFired)
 	{
+		float goalshotdifference = PointsTeam0 - PointsTeam1;
+		if (goalshotdifference < FModIntensityBoundery / 10.f)
+		{
+			FModGoalShotIntensity = 100.f - abs(PointsTeam0 - PointsTeam1) * 10.f;
+		}
+		else
+		{
+			FModGoalShotIntensity = FModIntensityBoundery;
+		}
 		StartingLastMinute.Broadcast();
 		bLastMinuteFired = true;
 	}
@@ -170,6 +202,8 @@ void AInGameGameMode::SelectGameOverMenu(int LevelIndex)
 
 void AInGameGameMode::RegroupPlayers()
 {
+	Algo::Reverse(savedPlayerStarts);
+	currPlayerStarts = savedPlayerStarts;
 	Regroup.Broadcast();
 	GetWorldTimerManager().SetTimer(GameCountdownTimerHandle, this, &AInGameGameMode::Start, GameIntermediateTime);
 	Ball->ResetBallPosition();
@@ -197,4 +231,22 @@ bool AInGameGameMode::GetIsPaused() const
 void AInGameGameMode::SetInOptionsMenu(bool inMenu)
 {
 	bInOptionsMenu = inMenu;
+}
+
+APlayerStart* AInGameGameMode::GetPlayerStart(int playerTeam)
+{
+	APlayerStart* playerSpawn = nullptr;
+	for (AActor* currPlayerStart : currPlayerStarts)
+	{
+		playerSpawn = Cast<APlayerStart>(currPlayerStart);
+		int currPlayerTeam = FCString::Atoi(*playerSpawn->PlayerStartTag.ToString());
+		if (playerTeam == currPlayerTeam)
+		{
+			int idx = currPlayerStarts.Find(currPlayerStart);
+			currPlayerStarts.RemoveAt(idx);
+			return playerSpawn;
+		}
+	}
+	
+	return nullptr;
 }
