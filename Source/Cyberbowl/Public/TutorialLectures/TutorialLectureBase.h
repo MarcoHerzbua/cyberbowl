@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AdvanceLecture();
 
+	UFUNCTION(BlueprintCallable)
+	void SkipLecture();
+
 	UPROPERTY(BlueprintAssignable, category = "EventDispatchers")
 	FOnLectureFinished OnLectureFinished;
 
@@ -63,4 +66,5 @@ protected:
 private:
 	TQueue<FString> lectureTasks;
 	FString currentTask;
+	FString oldTask;
 };
