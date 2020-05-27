@@ -24,7 +24,8 @@ void ATutorialLectureBase::BeginPlay()
 
 	// Debug purposes
 	// ToDo: Remove
-	tutorialPlayerController->OnAdvanceTutorial.AddDynamic(this, &ATutorialLectureBase::AdvanceLecture);
+	tutorialPlayerController->OnAdvanceTutorial.AddDynamic(this, &ATutorialLectureBase::SkipLecture);
+	oldTask = FString("");
 }
 
 void ATutorialLectureBase::SetupTasks()
@@ -57,6 +58,7 @@ void ATutorialLectureBase::EnqueueTask(FString task, int attempts)
 void ATutorialLectureBase::Enter()
 {
 	AdvanceLecture();
+	oldTask = currentTask;
 }
 
 void ATutorialLectureBase::Exit()
@@ -70,6 +72,7 @@ void ATutorialLectureBase::AdvanceLecture()
 	if (lectureTasks.IsEmpty())
 	{
 		OnLectureFinished.Broadcast();
+		oldTask = "";
 		return;
 	}
 
@@ -90,4 +93,13 @@ void ATutorialLectureBase::AdvanceLecture()
 void ATutorialLectureBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ATutorialLectureBase::SkipLecture()
+{
+	while (currentTask == oldTask)
+	{
+		AdvanceLecture();
+	};
+	oldTask = currentTask;
 }
