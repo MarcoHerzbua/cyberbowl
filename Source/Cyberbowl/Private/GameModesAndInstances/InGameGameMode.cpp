@@ -47,7 +47,6 @@ void AInGameGameMode::BeginPlay()
 	bGamePlayStarted = false;
 	bLastMinuteFired = false;
 	FModGoalShotIntensity = 0;
-	FModInGameStartingIntensity = 5;
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), savedPlayerStarts);
 	currPlayerStarts = savedPlayerStarts;

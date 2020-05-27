@@ -58,7 +58,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float FModGoalShotIntensity;
 	UPROPERTY(BlueprintReadOnly)
-	float FModInGameStartingIntensity;
+	float FModInGameStartingIntensity = 5;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float GamePlayTime = 180.f;
