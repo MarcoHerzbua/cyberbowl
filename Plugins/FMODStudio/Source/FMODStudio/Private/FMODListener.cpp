@@ -2,6 +2,7 @@
 
 #include "FMODListener.h"
 #include "Misc/App.h"
+#include "AudioDefines.h"
 #include "Sound/AudioVolume.h"
 
 float FFMODListener::Interpolate(const double EndTime)

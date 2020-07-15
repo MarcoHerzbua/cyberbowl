@@ -7,6 +7,10 @@
 #include "Settings/ProjectPackagingSettings.h"
 #endif
 
+#ifdef FMOD_PLATFORM_HEADER
+#include "FMODPlatform.h"
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 // UPaperRuntimeSettings
 
@@ -52,7 +56,9 @@ FString UFMODSettings::GetFullBankPath() const
     }
     else
     {
-#if PLATFORM_IOS || PLATFORM_TVOS || PLATFORM_ANDROID
+#ifdef FMOD_PLATFORM_HEADER
+        FString PlatformName = FMODPlatform_PlatformName();
+#elif PLATFORM_IOS || PLATFORM_TVOS || PLATFORM_ANDROID
         FString PlatformName = "Mobile";
 #elif PLATFORM_PS4
         FString PlatformName = "PS4";
