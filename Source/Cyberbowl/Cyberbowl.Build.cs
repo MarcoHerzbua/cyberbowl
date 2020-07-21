@@ -9,7 +9,7 @@ public class Cyberbowl : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Niagara", "FMODStudio" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Niagara", "FMODStudio", "OnlineSubsystem", "OnlineSubsystemUtils", "Steamworks" });
 
         PublicIncludePaths.AddRange(new string[] {
             Path.Combine(EngineDirectory, "../Engine/Plugins/FX/Niagara/Source/")
