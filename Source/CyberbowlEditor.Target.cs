@@ -1,14 +1,14 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 using System.Collections.Generic;
 
 public class CyberbowlEditorTarget : TargetRules
 {
-	public CyberbowlEditorTarget(TargetInfo Target) : base(Target)
+	public CyberbowlEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.Add("Cyberbowl");
+		ExtraModuleNames.AddRange( new string[] { "Cyberbowl" } );
 	}
 }

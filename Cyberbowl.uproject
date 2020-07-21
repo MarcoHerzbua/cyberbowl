@@ -8,14 +8,33 @@
 			"Name": "Cyberbowl",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine",
-				"UMG",
-				"CoreUObject"
-			]
+      "AdditionalDependencies": [
+        "Engine",
+        "UMG",
+        "CoreUObject"
+      ]
 		}
 	],
 	"Plugins": [
+		{
+			"Name": "OnlineSubsystemGooglePlay",
+			"Enabled": false,
+			"SupportedTargetPlatforms": [
+				"Android"
+			]
+		},
+		{
+			"Name": "OnlineSubsystemIOS",
+			"Enabled": false,
+			"SupportedTargetPlatforms": [
+				"IOS",
+				"TVOS"
+			]
+		},
+		{
+			"Name": "OnlineSubsystemSteam",
+			"Enabled": true
+		},
 		{
 			"Name": "OculusVR",
 			"Enabled": false,
@@ -36,21 +55,13 @@
 			]
 		},
 		{
-			"Name": "OnlineSubsystemSteam",
-			"Enabled": true
-		},
-		{
-			"Name": "FMODStudio",
-			"Enabled": true
-		},
-		{
 			"Name": "Substance",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/2f6439c2f9584f49809d9b13b16c2ba4"
 		},
 		{
-			"Name": "Niagara",
+			"Name": "FMODStudio",
 			"Enabled": true
-		},
+		}
 	]
 }
