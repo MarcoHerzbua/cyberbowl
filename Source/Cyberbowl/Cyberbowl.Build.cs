@@ -9,10 +9,8 @@ public class Cyberbowl : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Niagara", "FMODStudio", "OnlineSubsystem", "OnlineSubsystemUtils", "Steamworks" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OnlineSubsystem", "OnlineSubsystemUtils", "Steamworks", "Niagara", "FMODStudio" });
 
-        PublicIncludePaths.AddRange(new string[] {
-            Path.Combine(EngineDirectory, "../Engine/Plugins/FX/Niagara/Source/")
-        });
-	}
+        PrivateDependencyModuleNames.Add("OnlineSubsystem");
+    }
 }
