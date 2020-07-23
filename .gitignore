@@ -91,6 +91,7 @@ Build/Android/res/*
 Build/Android/res/*/*
 !Build/Android/res/*/*.png
 
-
+Plugins/FMODStudio/Intermediate
+!Plugins/FMODStudio
 
 # End of https://www.gitignore.io/api/unrealengine
