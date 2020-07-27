@@ -1,4 +1,3 @@
-
 # Created by https://www.gitignore.io/api/unrealengine
 # Edit at https://www.gitignore.io/?templates=unrealengine
 
@@ -91,7 +90,5 @@ Build/Android/res/*
 Build/Android/res/*/*
 !Build/Android/res/*/*.png
 
-Plugins/FMODStudio/Intermediate
-!Plugins/FMODStudio
 
 # End of https://www.gitignore.io/api/unrealengine
